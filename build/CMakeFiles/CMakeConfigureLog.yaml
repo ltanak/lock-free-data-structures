@@ -505,3 +505,410 @@ events:
       
       
 ...
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineSystem.cmake:204 (message)"
+      - "CMakeLists.txt"
+    message: |
+      The system is: Linux - 5.14.0-570.49.1.el9_6.x86_64 - x86_64
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+      Compiler: /modules/cs325/llvm-21.1.0/bin/clang 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+      
+      The C compiler identification is Clang, found in:
+        /dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/3.26.5/CompilerIdC/a.out
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/usr/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler: /modules/cs325/llvm-21.1.0/bin/clang++ 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+      
+      The CXX compiler identification is Clang, found in:
+        /dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/3.26.5/CompilerIdCXX/a.out
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:57 (try_compile)"
+      - "/usr/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt"
+    checks:
+      - "Detecting C compiler ABI info"
+    directories:
+      source: "/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-TZbAM2"
+      binary: "/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-TZbAM2"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+    buildResult:
+      variable: "CMAKE_C_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: /dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-TZbAM2
+        
+        Run Build Command(s):/usr/bin/ninja-build -v cmTC_83cc5 && [1/2] /modules/cs325/llvm-21.1.0/bin/clang   -v -MD -MT CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake/Modules/CMakeCCompilerABI.c
+        clang version 21.1.0
+        Target: x86_64-unknown-linux-gnu
+        Thread model: posix
+        InstalledDir: /modules/cs325/llvm-21.1.0/bin
+        Found candidate GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11
+        Selected GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11
+        Candidate multilib: .;@m64
+        Candidate multilib: 32;@m32
+        Selected multilib: .;@m64
+         (in-process)
+         "/modules/cs325/llvm-21.1.0/bin/clang-21" -cc1 -triple x86_64-unknown-linux-gnu -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -fdebug-compilation-dir=/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-TZbAM2 -v -fcoverage-compilation-dir=/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-TZbAM2 -resource-dir /modules/cs325/llvm-21.1.0/lib/clang/21 -dependency-file CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o -sys-header-deps -internal-isystem /modules/cs325/llvm-21.1.0/lib/clang/21/include -internal-isystem /usr/local/include -internal-isystem /usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include -internal-externc-isystem /include -internal-externc-isystem /usr/include -ferror-limit 19 -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o -x c /usr/share/cmake/Modules/CMakeCCompilerABI.c
+        clang -cc1 version 21.1.0 based upon LLVM 21.1.0 default target x86_64-unknown-linux-gnu
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include"
+        ignoring nonexistent directory "/include"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /modules/cs325/llvm-21.1.0/lib/clang/21/include
+         /usr/local/include
+         /usr/include
+        End of search list.
+        [2/2] : && /modules/cs325/llvm-21.1.0/bin/clang  -v  -rdynamic CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o -o cmTC_83cc5   && :
+        clang version 21.1.0
+        Target: x86_64-unknown-linux-gnu
+        Thread model: posix
+        InstalledDir: /modules/cs325/llvm-21.1.0/bin
+        Found candidate GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11
+        Selected GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11
+        Candidate multilib: .;@m64
+        Candidate multilib: 32;@m32
+        Selected multilib: .;@m64
+         "/usr/bin/ld" --hash-style=gnu --eh-frame-hdr -m elf_x86_64 -export-dynamic -pie -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_83cc5 /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/Scrt1.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/11/crtbeginS.o -L/modules/cs325/llvm-21.1.0/bin/../lib/x86_64-unknown-linux-gnu -L/usr/lib/gcc/x86_64-redhat-linux/11 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64 -L/lib/../lib64 -L/usr/lib64 -L/lib -L/usr/lib CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-redhat-linux/11/crtendS.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:127 (message)"
+      - "/usr/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt"
+    message: |
+      Parsed C implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/modules/cs325/llvm-21.1.0/lib/clang/21/include]
+          add: [/usr/local/include]
+          add: [/usr/include]
+        end of search list found
+        collapse include dir [/modules/cs325/llvm-21.1.0/lib/clang/21/include] ==> [/modules/cs325/llvm-21.1.0/lib/clang/21/include]
+        collapse include dir [/usr/local/include] ==> [/usr/local/include]
+        collapse include dir [/usr/include] ==> [/usr/include]
+        implicit include dirs: [/modules/cs325/llvm-21.1.0/lib/clang/21/include;/usr/local/include;/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:152 (message)"
+      - "/usr/share/cmake/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt"
+    message: |
+      Parsed C implicit link information:
+        link line regex: [^( *|.*[/\\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        ignore line: [Change Dir: /dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-TZbAM2]
+        ignore line: []
+        ignore line: [Run Build Command(s):/usr/bin/ninja-build -v cmTC_83cc5 && [1/2] /modules/cs325/llvm-21.1.0/bin/clang   -v -MD -MT CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake/Modules/CMakeCCompilerABI.c]
+        ignore line: [clang version 21.1.0]
+        ignore line: [Target: x86_64-unknown-linux-gnu]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /modules/cs325/llvm-21.1.0/bin]
+        ignore line: [Found candidate GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11]
+        ignore line: [Selected GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11]
+        ignore line: [Candidate multilib: .]
+        ignore line: [@m64]
+        ignore line: [Candidate multilib: 32]
+        ignore line: [@m32]
+        ignore line: [Selected multilib: .]
+        ignore line: [@m64]
+        ignore line: [ (in-process)]
+        ignore line: [ "/modules/cs325/llvm-21.1.0/bin/clang-21" -cc1 -triple x86_64-unknown-linux-gnu -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -fdebug-compilation-dir=/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-TZbAM2 -v -fcoverage-compilation-dir=/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-TZbAM2 -resource-dir /modules/cs325/llvm-21.1.0/lib/clang/21 -dependency-file CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o -sys-header-deps -internal-isystem /modules/cs325/llvm-21.1.0/lib/clang/21/include -internal-isystem /usr/local/include -internal-isystem /usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include -internal-externc-isystem /include -internal-externc-isystem /usr/include -ferror-limit 19 -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o -x c /usr/share/cmake/Modules/CMakeCCompilerABI.c]
+        ignore line: [clang -cc1 version 21.1.0 based upon LLVM 21.1.0 default target x86_64-unknown-linux-gnu]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include"]
+        ignore line: [ignoring nonexistent directory "/include"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /modules/cs325/llvm-21.1.0/lib/clang/21/include]
+        ignore line: [ /usr/local/include]
+        ignore line: [ /usr/include]
+        ignore line: [End of search list.]
+        ignore line: [[2/2] : && /modules/cs325/llvm-21.1.0/bin/clang  -v  -rdynamic CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o -o cmTC_83cc5   && :]
+        ignore line: [clang version 21.1.0]
+        ignore line: [Target: x86_64-unknown-linux-gnu]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /modules/cs325/llvm-21.1.0/bin]
+        ignore line: [Found candidate GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11]
+        ignore line: [Selected GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11]
+        ignore line: [Candidate multilib: .]
+        ignore line: [@m64]
+        ignore line: [Candidate multilib: 32]
+        ignore line: [@m32]
+        ignore line: [Selected multilib: .]
+        ignore line: [@m64]
+        link line: [ "/usr/bin/ld" --hash-style=gnu --eh-frame-hdr -m elf_x86_64 -export-dynamic -pie -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_83cc5 /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/Scrt1.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/11/crtbeginS.o -L/modules/cs325/llvm-21.1.0/bin/../lib/x86_64-unknown-linux-gnu -L/usr/lib/gcc/x86_64-redhat-linux/11 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64 -L/lib/../lib64 -L/usr/lib64 -L/lib -L/usr/lib CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-redhat-linux/11/crtendS.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o]
+          arg [/usr/bin/ld] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [--eh-frame-hdr] ==> ignore
+          arg [-m] ==> ignore
+          arg [elf_x86_64] ==> ignore
+          arg [-export-dynamic] ==> ignore
+          arg [-pie] ==> ignore
+          arg [-dynamic-linker] ==> ignore
+          arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_83cc5] ==> ignore
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/Scrt1.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/Scrt1.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/crtbeginS.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/crtbeginS.o]
+          arg [-L/modules/cs325/llvm-21.1.0/bin/../lib/x86_64-unknown-linux-gnu] ==> dir [/modules/cs325/llvm-21.1.0/bin/../lib/x86_64-unknown-linux-gnu]
+          arg [-L/usr/lib/gcc/x86_64-redhat-linux/11] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/11]
+          arg [-L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64]
+          arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+          arg [-L/usr/lib64] ==> dir [/usr/lib64]
+          arg [-L/lib] ==> dir [/lib]
+          arg [-L/usr/lib] ==> dir [/usr/lib]
+          arg [CMakeFiles/cmTC_83cc5.dir/CMakeCCompilerABI.c.o] ==> ignore
+          arg [-lgcc] ==> lib [gcc]
+          arg [--as-needed] ==> ignore
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [--no-as-needed] ==> ignore
+          arg [-lc] ==> lib [c]
+          arg [-lgcc] ==> lib [gcc]
+          arg [--as-needed] ==> ignore
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [--no-as-needed] ==> ignore
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/crtendS.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/crtendS.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/Scrt1.o] ==> [/usr/lib64/Scrt1.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o] ==> [/usr/lib64/crti.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o] ==> [/usr/lib64/crtn.o]
+        collapse library dir [/modules/cs325/llvm-21.1.0/bin/../lib/x86_64-unknown-linux-gnu] ==> [/modules/cs325/llvm-21.1.0/lib/x86_64-unknown-linux-gnu]
+        collapse library dir [/usr/lib/gcc/x86_64-redhat-linux/11] ==> [/usr/lib/gcc/x86_64-redhat-linux/11]
+        collapse library dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64] ==> [/usr/lib64]
+        collapse library dir [/lib/../lib64] ==> [/lib64]
+        collapse library dir [/usr/lib64] ==> [/usr/lib64]
+        collapse library dir [/lib] ==> [/lib]
+        collapse library dir [/usr/lib] ==> [/usr/lib]
+        implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+        implicit objs: [/usr/lib64/Scrt1.o;/usr/lib64/crti.o;/usr/lib/gcc/x86_64-redhat-linux/11/crtbeginS.o;/usr/lib/gcc/x86_64-redhat-linux/11/crtendS.o;/usr/lib64/crtn.o]
+        implicit dirs: [/modules/cs325/llvm-21.1.0/lib/x86_64-unknown-linux-gnu;/usr/lib/gcc/x86_64-redhat-linux/11;/usr/lib64;/lib64;/lib;/usr/lib]
+        implicit fwks: []
+      
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:57 (try_compile)"
+      - "/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-LTBhWR"
+      binary: "/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-LTBhWR"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: /dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-LTBhWR
+        
+        Run Build Command(s):/usr/bin/ninja-build -v cmTC_ac201 && [1/2] /modules/cs325/llvm-21.1.0/bin/clang++   -v -MD -MT CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+        clang version 21.1.0
+        Target: x86_64-unknown-linux-gnu
+        Thread model: posix
+        InstalledDir: /modules/cs325/llvm-21.1.0/bin
+        Found candidate GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11
+        Selected GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11
+        Candidate multilib: .;@m64
+        Candidate multilib: 32;@m32
+        Selected multilib: .;@m64
+         (in-process)
+         "/modules/cs325/llvm-21.1.0/bin/clang-21" -cc1 -triple x86_64-unknown-linux-gnu -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -fdebug-compilation-dir=/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-LTBhWR -v -fcoverage-compilation-dir=/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-LTBhWR -resource-dir /modules/cs325/llvm-21.1.0/lib/clang/21 -dependency-file CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11 -internal-isystem /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/x86_64-redhat-linux -internal-isystem /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/backward -internal-isystem /modules/cs325/llvm-21.1.0/lib/clang/21/include -internal-isystem /usr/local/include -internal-isystem /usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -ferror-limit 19 -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -fcxx-exceptions -fexceptions -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+        clang -cc1 version 21.1.0 based upon LLVM 21.1.0 default target x86_64-unknown-linux-gnu
+        ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include"
+        ignoring nonexistent directory "/include"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11
+         /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/x86_64-redhat-linux
+         /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/backward
+         /modules/cs325/llvm-21.1.0/lib/clang/21/include
+         /usr/local/include
+         /usr/include
+        End of search list.
+        [2/2] : && /modules/cs325/llvm-21.1.0/bin/clang++  -v  -rdynamic CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_ac201   && :
+        clang version 21.1.0
+        Target: x86_64-unknown-linux-gnu
+        Thread model: posix
+        InstalledDir: /modules/cs325/llvm-21.1.0/bin
+        Found candidate GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11
+        Selected GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11
+        Candidate multilib: .;@m64
+        Candidate multilib: 32;@m32
+        Selected multilib: .;@m64
+         "/usr/bin/ld" --hash-style=gnu --eh-frame-hdr -m elf_x86_64 -export-dynamic -pie -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_ac201 /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/Scrt1.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/11/crtbeginS.o -L/modules/cs325/llvm-21.1.0/bin/../lib/x86_64-unknown-linux-gnu -L/usr/lib/gcc/x86_64-redhat-linux/11 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64 -L/lib/../lib64 -L/usr/lib64 -L/lib -L/usr/lib CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-redhat-linux/11/crtendS.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:127 (message)"
+      - "/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt"
+    message: |
+      Parsed CXX implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11]
+          add: [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/x86_64-redhat-linux]
+          add: [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/backward]
+          add: [/modules/cs325/llvm-21.1.0/lib/clang/21/include]
+          add: [/usr/local/include]
+          add: [/usr/include]
+        end of search list found
+        collapse include dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11] ==> [/usr/include/c++/11]
+        collapse include dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/x86_64-redhat-linux] ==> [/usr/include/c++/11/x86_64-redhat-linux]
+        collapse include dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/backward] ==> [/usr/include/c++/11/backward]
+        collapse include dir [/modules/cs325/llvm-21.1.0/lib/clang/21/include] ==> [/modules/cs325/llvm-21.1.0/lib/clang/21/include]
+        collapse include dir [/usr/local/include] ==> [/usr/local/include]
+        collapse include dir [/usr/include] ==> [/usr/include]
+        implicit include dirs: [/usr/include/c++/11;/usr/include/c++/11/x86_64-redhat-linux;/usr/include/c++/11/backward;/modules/cs325/llvm-21.1.0/lib/clang/21/include;/usr/local/include;/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:152 (message)"
+      - "/usr/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        ignore line: [Change Dir: /dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-LTBhWR]
+        ignore line: []
+        ignore line: [Run Build Command(s):/usr/bin/ninja-build -v cmTC_ac201 && [1/2] /modules/cs325/llvm-21.1.0/bin/clang++   -v -MD -MT CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [clang version 21.1.0]
+        ignore line: [Target: x86_64-unknown-linux-gnu]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /modules/cs325/llvm-21.1.0/bin]
+        ignore line: [Found candidate GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11]
+        ignore line: [Selected GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11]
+        ignore line: [Candidate multilib: .]
+        ignore line: [@m64]
+        ignore line: [Candidate multilib: 32]
+        ignore line: [@m32]
+        ignore line: [Selected multilib: .]
+        ignore line: [@m64]
+        ignore line: [ (in-process)]
+        ignore line: [ "/modules/cs325/llvm-21.1.0/bin/clang-21" -cc1 -triple x86_64-unknown-linux-gnu -emit-obj -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -fdebug-compilation-dir=/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-LTBhWR -v -fcoverage-compilation-dir=/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-LTBhWR -resource-dir /modules/cs325/llvm-21.1.0/lib/clang/21 -dependency-file CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11 -internal-isystem /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/x86_64-redhat-linux -internal-isystem /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/backward -internal-isystem /modules/cs325/llvm-21.1.0/lib/clang/21/include -internal-isystem /usr/local/include -internal-isystem /usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -ferror-limit 19 -fgnuc-version=4.2.1 -fskip-odr-check-in-gmf -fcxx-exceptions -fexceptions -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [clang -cc1 version 21.1.0 based upon LLVM 21.1.0 default target x86_64-unknown-linux-gnu]
+        ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-redhat-linux/11/../../../../x86_64-redhat-linux/include"]
+        ignore line: [ignoring nonexistent directory "/include"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11]
+        ignore line: [ /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/x86_64-redhat-linux]
+        ignore line: [ /usr/lib/gcc/x86_64-redhat-linux/11/../../../../include/c++/11/backward]
+        ignore line: [ /modules/cs325/llvm-21.1.0/lib/clang/21/include]
+        ignore line: [ /usr/local/include]
+        ignore line: [ /usr/include]
+        ignore line: [End of search list.]
+        ignore line: [[2/2] : && /modules/cs325/llvm-21.1.0/bin/clang++  -v  -rdynamic CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_ac201   && :]
+        ignore line: [clang version 21.1.0]
+        ignore line: [Target: x86_64-unknown-linux-gnu]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /modules/cs325/llvm-21.1.0/bin]
+        ignore line: [Found candidate GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11]
+        ignore line: [Selected GCC installation: /usr/lib/gcc/x86_64-redhat-linux/11]
+        ignore line: [Candidate multilib: .]
+        ignore line: [@m64]
+        ignore line: [Candidate multilib: 32]
+        ignore line: [@m32]
+        ignore line: [Selected multilib: .]
+        ignore line: [@m64]
+        link line: [ "/usr/bin/ld" --hash-style=gnu --eh-frame-hdr -m elf_x86_64 -export-dynamic -pie -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_ac201 /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/Scrt1.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o /usr/lib/gcc/x86_64-redhat-linux/11/crtbeginS.o -L/modules/cs325/llvm-21.1.0/bin/../lib/x86_64-unknown-linux-gnu -L/usr/lib/gcc/x86_64-redhat-linux/11 -L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64 -L/lib/../lib64 -L/usr/lib64 -L/lib -L/usr/lib CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /usr/lib/gcc/x86_64-redhat-linux/11/crtendS.o /usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o]
+          arg [/usr/bin/ld] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [--eh-frame-hdr] ==> ignore
+          arg [-m] ==> ignore
+          arg [elf_x86_64] ==> ignore
+          arg [-export-dynamic] ==> ignore
+          arg [-pie] ==> ignore
+          arg [-dynamic-linker] ==> ignore
+          arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_ac201] ==> ignore
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/Scrt1.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/Scrt1.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/crtbeginS.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/crtbeginS.o]
+          arg [-L/modules/cs325/llvm-21.1.0/bin/../lib/x86_64-unknown-linux-gnu] ==> dir [/modules/cs325/llvm-21.1.0/bin/../lib/x86_64-unknown-linux-gnu]
+          arg [-L/usr/lib/gcc/x86_64-redhat-linux/11] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/11]
+          arg [-L/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64] ==> dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64]
+          arg [-L/lib/../lib64] ==> dir [/lib/../lib64]
+          arg [-L/usr/lib64] ==> dir [/usr/lib64]
+          arg [-L/lib] ==> dir [/lib]
+          arg [-L/usr/lib] ==> dir [/usr/lib]
+          arg [CMakeFiles/cmTC_ac201.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [-lstdc++] ==> lib [stdc++]
+          arg [-lm] ==> lib [m]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [-lc] ==> lib [c]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/crtendS.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/crtendS.o]
+          arg [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o] ==> obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/Scrt1.o] ==> [/usr/lib64/Scrt1.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crti.o] ==> [/usr/lib64/crti.o]
+        collapse obj [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64/crtn.o] ==> [/usr/lib64/crtn.o]
+        collapse library dir [/modules/cs325/llvm-21.1.0/bin/../lib/x86_64-unknown-linux-gnu] ==> [/modules/cs325/llvm-21.1.0/lib/x86_64-unknown-linux-gnu]
+        collapse library dir [/usr/lib/gcc/x86_64-redhat-linux/11] ==> [/usr/lib/gcc/x86_64-redhat-linux/11]
+        collapse library dir [/usr/lib/gcc/x86_64-redhat-linux/11/../../../../lib64] ==> [/usr/lib64]
+        collapse library dir [/lib/../lib64] ==> [/lib64]
+        collapse library dir [/usr/lib64] ==> [/usr/lib64]
+        collapse library dir [/lib] ==> [/lib]
+        collapse library dir [/usr/lib] ==> [/usr/lib]
+        implicit libs: [stdc++;m;gcc_s;gcc;c;gcc_s;gcc]
+        implicit objs: [/usr/lib64/Scrt1.o;/usr/lib64/crti.o;/usr/lib/gcc/x86_64-redhat-linux/11/crtbeginS.o;/usr/lib/gcc/x86_64-redhat-linux/11/crtendS.o;/usr/lib64/crtn.o]
+        implicit dirs: [/modules/cs325/llvm-21.1.0/lib/x86_64-unknown-linux-gnu;/usr/lib/gcc/x86_64-redhat-linux/11;/usr/lib64;/lib64;/lib;/usr/lib]
+        implicit fwks: []
+      
+      
+...
