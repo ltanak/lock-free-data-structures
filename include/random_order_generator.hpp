@@ -5,5 +5,6 @@
 template <typename TOrder>
 class RandomOrderGenerator : public OrderGenInterface<TOrder, RandomOrderGenerator<TOrder>> {
     
-    // will add to this
+    // this class generates random orders
+    // will be using seeded random number generator for reproducibility
 };
