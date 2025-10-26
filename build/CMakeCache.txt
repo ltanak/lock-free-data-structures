@@ -20,7 +20,8 @@ CMAKE_ADDR2LINE:FILEPATH=/modules/cs325/llvm-21.1.0/bin/llvm-addr2line
 //Path to a program.
 CMAKE_AR:FILEPATH=/modules/cs325/llvm-21.1.0/bin/llvm-ar
 
-//No help, variable specified on the command line.
+//Choose the type of build, options are: None Debug Release RelWithDebInfo
+// MinSizeRel ...
 CMAKE_BUILD_TYPE:STRING=Debug
 
 //No help, variable specified on the command line.
@@ -146,7 +147,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=Project
+CMAKE_PROJECT_NAME:STATIC=lock_free_data_structures
 
 //Path to a program.
 CMAKE_RANLIB:FILEPATH=/modules/cs325/llvm-21.1.0/bin/llvm-ranlib
@@ -218,6 +219,15 @@ Project_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
 Project_SOURCE_DIR:STATIC=/dcs/23/u5508367/3yp/lock-free-data-structures
+
+//Value Computed by CMake
+lock_free_data_structures_BINARY_DIR:STATIC=/dcs/23/u5508367/3yp/lock-free-data-structures/build
+
+//Value Computed by CMake
+lock_free_data_structures_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+lock_free_data_structures_SOURCE_DIR:STATIC=/dcs/23/u5508367/3yp/lock-free-data-structures
 
 
 ########################
@@ -304,6 +314,8 @@ CMAKE_GENERATOR_INSTANCE:INTERNAL=
 CMAKE_GENERATOR_PLATFORM:INTERNAL=
 //Name of generator toolset.
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
+//Test CMAKE_HAVE_LIBC_PTHREAD
+CMAKE_HAVE_LIBC_PTHREAD:INTERNAL=1
 //Source directory with the top level CMakeLists.txt file for this
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=/dcs/23/u5508367/3yp/lock-free-data-structures
@@ -369,6 +381,8 @@ CMAKE_STRIP-ADVANCED:INTERNAL=1
 CMAKE_UNAME:INTERNAL=/usr/bin/uname
 //ADVANCED property for variable: CMAKE_VERBOSE_MAKEFILE
 CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
+//Details about finding Threads
+FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //linker supports push/pop state
 _CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
 

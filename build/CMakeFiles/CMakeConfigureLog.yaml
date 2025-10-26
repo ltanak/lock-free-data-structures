@@ -912,3 +912,34 @@ events:
       
       
 ...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/usr/share/cmake/Modules/CheckCXXSourceCompiles.cmake:76 (cmake_check_source_compiles)"
+      - "/usr/share/cmake/Modules/FindThreads.cmake:99 (CHECK_CXX_SOURCE_COMPILES)"
+      - "/usr/share/cmake/Modules/FindThreads.cmake:163 (_threads_check_libc)"
+      - "CMakeLists.txt:23 (find_package)"
+    checks:
+      - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
+    directories:
+      source: "/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-jhXgyu"
+      binary: "/dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-jhXgyu"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "CMAKE_HAVE_LIBC_PTHREAD"
+      cached: true
+      stdout: |
+        Change Dir: /dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-jhXgyu
+        
+        Run Build Command(s):/usr/bin/ninja-build -v cmTC_eec56 && [1/2] /modules/cs325/llvm-21.1.0/bin/clang++ -DCMAKE_HAVE_LIBC_PTHREAD  -std=c++20 -MD -MT CMakeFiles/cmTC_eec56.dir/src.cxx.o -MF CMakeFiles/cmTC_eec56.dir/src.cxx.o.d -o CMakeFiles/cmTC_eec56.dir/src.cxx.o -c /dcs/23/u5508367/3yp/lock-free-data-structures/build/CMakeFiles/CMakeScratch/TryCompile-jhXgyu/src.cxx
+        [2/2] : && /modules/cs325/llvm-21.1.0/bin/clang++   CMakeFiles/cmTC_eec56.dir/src.cxx.o -o cmTC_eec56   && :
+        
+      exitCode: 0
+...

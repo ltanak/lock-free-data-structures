@@ -12,7 +12,11 @@
 						"string" : "3.23"
 					},
 					"projectIndex" : 0,
-					"source" : "."
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
 				}
 			],
 			"name" : "Debug",
@@ -23,10 +27,23 @@
 					[
 						0
 					],
-					"name" : "Project"
+					"name" : "lock_free_data_structures",
+					"targetIndexes" : 
+					[
+						0
+					]
 				}
 			],
-			"targets" : []
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "lock_free_data_structures::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lock_free_data_structures-Debug-3b19d7e047832d63d41b.json",
+					"name" : "lock_free_data_structures",
+					"projectIndex" : 0
+				}
+			]
 		}
 	],
 	"kind" : "codemodel",
