@@ -56,6 +56,13 @@ build CMakeFiles/lock_free_data_structures.dir/src/main.cpp.o: CXX_COMPILER__loc
   OBJECT_DIR = CMakeFiles/lock_free_data_structures.dir
   OBJECT_FILE_DIR = CMakeFiles/lock_free_data_structures.dir/src
 
+build CMakeFiles/lock_free_data_structures.dir/src/order_simulation/order_simulation.cpp.o: CXX_COMPILER__lock_free_data_structures_unscanned_Debug /dcs/23/u5508367/3yp/lock-free-data-structures/src/order_simulation/order_simulation.cpp || cmake_object_order_depends_target_lock_free_data_structures
+  DEP_FILE = CMakeFiles/lock_free_data_structures.dir/src/order_simulation/order_simulation.cpp.o.d
+  FLAGS = -g -std=c++20
+  INCLUDES = -I/dcs/23/u5508367/3yp/lock-free-data-structures/include
+  OBJECT_DIR = CMakeFiles/lock_free_data_structures.dir
+  OBJECT_FILE_DIR = CMakeFiles/lock_free_data_structures.dir/src/order_simulation
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target lock_free_data_structures
@@ -64,7 +71,7 @@ build CMakeFiles/lock_free_data_structures.dir/src/main.cpp.o: CXX_COMPILER__loc
 #############################################
 # Link the executable lock_free_data_structures
 
-build lock_free_data_structures: CXX_EXECUTABLE_LINKER__lock_free_data_structures_Debug CMakeFiles/lock_free_data_structures.dir/src/main.cpp.o
+build lock_free_data_structures: CXX_EXECUTABLE_LINKER__lock_free_data_structures_Debug CMakeFiles/lock_free_data_structures.dir/src/main.cpp.o CMakeFiles/lock_free_data_structures.dir/src/order_simulation/order_simulation.cpp.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/lock_free_data_structures.dir
   POST_BUILD = :

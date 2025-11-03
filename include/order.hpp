@@ -11,6 +11,6 @@ struct Order {
     uint64_t order_id;
     OrderType type;
     double price;
-    uint32_t quantity;
+    double quantity;
     std::chrono::time_point<std::chrono::high_resolution_clock> timestamp;
 };

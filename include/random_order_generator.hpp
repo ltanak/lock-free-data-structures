@@ -46,6 +46,6 @@ public:
         double price = priceDist_(rng_);
         double quantity = quantityDist_(rng_);
         std::chrono::time_point<std::chrono::high_resolution_clock> timestamp = std::chrono::high_resolution_clock::now();
-        return TOrder{orderId_, orderType, price, static_cast<uint32_t>(quantity), timestamp};
+        return TOrder{orderId_, orderType, price, quantity, timestamp};
     }
 };
