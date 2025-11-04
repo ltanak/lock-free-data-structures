@@ -35,7 +35,6 @@ public:
     TOrder generateOrder() {
         orderId_++;
         int index = orderGenerators(rng_);
-        std::cout << "Generating order from generator index: " << index << std::endl;
         TOrder order = generatorsVector[index](); // parentheses to call function
         std::chrono::time_point<std::chrono::high_resolution_clock> timestamp = std::chrono::high_resolution_clock::now();
         order.order_id = orderId_;
