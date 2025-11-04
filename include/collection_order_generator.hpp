@@ -12,7 +12,7 @@ public:
     CollectionOrderGenerator(std::vector<std::function<TOrder()>> generators, std::optional<uint32_t> seed = std::nullopt);
     TOrder generateOrder();
 private:
-    uint64_t orderId_;
+    uint64_t orderId_ = 0;
     std::mt19937 rng_;
     std::uniform_int_distribution<int> orderGenerators;
     std::vector<std::function<TOrder()>> generatorsVector;

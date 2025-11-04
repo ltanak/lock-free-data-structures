@@ -30,5 +30,4 @@ TOrder RandomOrderGenerator<TOrder>::generateOrder(){
     return TOrder{orderId_, orderType, price, quantity, timestamp};
 }
 
-#include "order.hpp"
 template class RandomOrderGenerator<Order>;
