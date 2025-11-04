@@ -6,7 +6,8 @@ cmake_policy(SET CMP0009 NEW)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/dcs/23/u5508367/3yp/lock-free-data-structures/src/*.cpp")
 set(OLD_GLOB
   "/dcs/23/u5508367/3yp/lock-free-data-structures/src/main.cpp"
-  "/dcs/23/u5508367/3yp/lock-free-data-structures/src/order_simulation/order_simulation.cpp"
+  "/dcs/23/u5508367/3yp/lock-free-data-structures/src/order_simulation/collection_order_generator.cpp"
+  "/dcs/23/u5508367/3yp/lock-free-data-structures/src/order_simulation/random_order_generator.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")

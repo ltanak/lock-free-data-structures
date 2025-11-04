@@ -1,7 +1,4 @@
 #pragma once
-#include "order.hpp"
-#include <random>
-
 
 /**
  * @brief Interface for generating orders
@@ -11,7 +8,7 @@
  * Every derived class implements its own generateOrder method
  */
 template <typename TOrder, typename OrderGenImpl>
-class OrderGenInterface {
+class IOrderGenerator {
     public:
         TOrder generate() {
             return static_cast<OrderGenImpl*>(this)->generateOrder();

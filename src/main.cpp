@@ -3,9 +3,9 @@
 #include <algorithm>
 #include <string>
 #include <optional>
-#include <order_generator.hpp>
-#include <random_order_generator.hpp>
-#include <generator_collection.hpp>
+#include "order.hpp"
+#include "random_order_generator.hpp"
+#include "collection_order_generator.hpp"
 
 int main() {
     std::cout << "running code" << std::endl;
@@ -22,7 +22,7 @@ int main() {
      * if you use [] it means no outside variables are used (so e.g. we create the generators inside the lambda)
      */
 
-    GeneratorCollection<Order> collection(gens, 42);
+    CollectionOrderGenerator<Order> collection(gens, 42);
 
     Order o = orderGen.generate();
     std::cout << "ID: " << o.order_id << ", Type: " << (o.type == OrderType::BUY ? "BUY" : "SELL") 
