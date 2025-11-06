@@ -22,6 +22,15 @@ int main() {
      * if you use [] it means no outside variables are used (so e.g. we create the generators inside the lambda)
      */
 
+    /**
+     * TO IMPLEMENT NEXT
+     * Need to update order generation model so that they read from the market state
+     * Thread that controls the market state
+     * Need to implement the stress testing and order testing code / generators
+     * Once done need to then just print and output results and do a quick measure on the speed of transactions
+     * Create "framework" / section where we will put the endpoint of the lock-free data structure to start getting ready for that
+     */
+
     CollectionOrderGenerator<Order> collection(gens, 42);
 
     Order o = orderGen.generate();
