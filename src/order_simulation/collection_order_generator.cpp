@@ -1,8 +1,5 @@
 #include "collection_order_generator.hpp"
-#include <random>
-#include <chrono>
-#include <optional>
-#include <functional>
+#include "order.hpp"
 
 template<typename TOrder>
 CollectionOrderGenerator<TOrder>::CollectionOrderGenerator(std::vector<std::function<TOrder()>> generators, std::optional<uint32_t> seed){
@@ -18,14 +15,13 @@ CollectionOrderGenerator<TOrder>::CollectionOrderGenerator(std::vector<std::func
 
 template<typename TOrder>
 TOrder CollectionOrderGenerator<TOrder>::generateOrder() {
+    // uint64_t id = orderId_.fetch_add(1, std::memory_order_relaxed);
     orderId_++;
     int index = orderGenerators(rng_);
-    TOrder order = generatorsVector[index](); // parentheses to call function
-    std::chrono::time_point<std::chrono::high_resolution_clock> timestamp = std::chrono::high_resolution_clock::now();
+    TOrder order = generatorsVector[index]();
     order.order_id = orderId_;
-    order.timestamp = timestamp;
+    order.timestamp = std::chrono::high_resolution_clock::now();
     return order;
 }
 
-#include "order.hpp"
 template class CollectionOrderGenerator<Order>;
