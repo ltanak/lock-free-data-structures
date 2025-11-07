@@ -31,6 +31,7 @@ int main() {
      * Create "framework" / section where we will put the endpoint of the lock-free data structure to start getting ready for that
      */
 
+     
     CollectionOrderGenerator<Order> collection(gens, 42);
 
     Order o = orderGen.generate();
