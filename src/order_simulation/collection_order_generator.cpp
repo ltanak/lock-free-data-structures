@@ -1,5 +1,5 @@
-#include "collection_order_generator.hpp"
-#include "order.hpp"
+#include "order_simulation/collection_order_generator.hpp"
+#include "order_simulation/order.hpp"
 
 template<typename TOrder>
 CollectionOrderGenerator<TOrder>::CollectionOrderGenerator(std::vector<std::function<TOrder()>> generators, std::optional<uint32_t> seed){

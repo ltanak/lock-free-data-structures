@@ -10,4 +10,14 @@ if [[ ! -x "$BUILD_DIR/$EXEC" ]]; then
   cmake --build "$BUILD_DIR" -j
 fi
 
+# Argument Handling
+# understand how to write bash conditionals
+if [[ $# -eq 0 ]]; then
+  echo "No arguments provided, defaulting to 'stress -s'"
+  set -- stress -s
+else
+  echo "Arguments provided: $*"
+fi
+
+echo "Running: $EXEC $*"
 exec "$BUILD_DIR/$EXEC" "$@"

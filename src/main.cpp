@@ -3,58 +3,68 @@
 #include <algorithm>
 #include <string>
 #include <optional>
-#include "order.hpp"
-#include "random_order_generator.hpp"
-#include "collection_order_generator.hpp"
-#include "market_state.hpp"
+#include "order_simulation/order.hpp"
+#include "order_simulation/random_order_generator.hpp"
+#include "order_simulation/collection_order_generator.hpp"
+#include "order_simulation/market_state.hpp"
+#include "scenarios/testing_stress_single_producer.hpp"
 
-int main() {
-    std::cout << "running code" << std::endl;
+/**
+ * @brief Main function using arguments passed in will branch to the different tests
+ * Arguments:
+ * "stress" - stress testing
+ *  -m flag means multi producer stress testing
+ *  -s flag means single producer stress testing
+ * "order" - order testing
+ *  -m flag means multi consumer order testing
+ *  -s flag means single consumer order testing
+ * 
+ * @example
+ * ./run.sh stress -s
+ * ./run.sh order -m
+ * If no arguments are provided, defaults to stress -s
+ * 
+ * @note Future work will add additional parameters that will be used in testing e.g. order limits
+ */
 
-    MarketState marketState;
-    RandomOrderGenerator<Order> marketGen = RandomOrderGenerator<Order>(marketState, 100, 42);
-    Order o;
-    for (int i = 0; i <= 5; ++i){
-        o = marketGen.generate();
-        std::cout << "ID: " << o.order_id << ", Type: " << (o.type == OrderType::BUY ? "BUY" : "SELL") 
-                  << ", Price: " << o.price << ", Quantity: " << o.quantity << std::endl;
+int main(int argc, char* argv[]) {
+
+    std::string mode = argv[1];
+    int test_type = ((std::string)argv[2] == "-s") ? 0 : 1;
+    
+    if (mode == "stress") {
+        switch (test_type){
+            case 0:
+                std::cout << "Running single producer stress test..." << std::endl;
+                singleProducerStressTest();
+                break;
+            case 1:
+                std::cout << "Running multi producer stress test..." << std::endl;
+                // multiProducerStressTest(); // To be implemented
+                break;
+            default:
+                std::cerr << "Unknown test type for stress mode: " << test_type << std::endl;
+                return 1;
+        }
+    } else if (mode == "order") {
+        switch (test_type){
+            case 0:
+                std::cout << "Running single consumer order test..." << std::endl;
+                // singleConsumerOrderTest(); // To be implemented
+                break;
+            case 1:
+                std::cout << "Running multi consumer order test..." << std::endl;
+                // multiConsumerOrderTest(); // To be implemented
+                break;
+            default:
+                std::cerr << "Unknown test type for order mode: " << test_type << std::endl;
+                return 1;
+        }
+    } else {
+        std::cerr << "Unknown mode: " << mode << std::endl;
+        return 1;
     }
 
-    std::cout << "Collection Testing: \n";
-    RandomOrderGenerator<Order> g1 = RandomOrderGenerator<Order>(marketState, 10, 42);
-    RandomOrderGenerator<Order> g2 = RandomOrderGenerator<Order>(marketState, 100, 25);
-    Order o1 = g1.generate();
-    Order o2 = g2.generate();
-    std::cout << "ID: " << o1.order_id << ", Type: " << (o1.type == OrderType::BUY ? "BUY" : "SELL") 
-                  << ", Price: " << o1.price << ", Quantity: " << o1.quantity << std::endl;
-    std::cout << "ID: " << o2.order_id << ", Type: " << (o2.type == OrderType::BUY ? "BUY" : "SELL") 
-                  << ", Price: " << o2.price << ", Quantity: " << o2.quantity << std::endl;
-
-    std::vector<std::function<Order()>> gens {
-        [&]() { return g1.generate() ;},
-        [&]() { return g2.generate();}
-    };
-
-    CollectionOrderGenerator<Order> collection(gens, 42);
-    std::cout << "Generating from collection:" << std::endl;
-    for (int i = 0; i < 1000; i++) {
-        Order oc = collection.generate();
-        std::cout << "ID: " << oc.order_id << ", Type: " << (oc.type == OrderType::BUY ? "BUY" : "SELL") 
-                  << ", Price: " << oc.price << ", Quantity: " << oc.quantity << std::endl;
-    }
-
-    // RandomOrderGenerator<Order> orderGen = RandomOrderGenerator<Order>(10.0, 20.0, 50.0, 42);
-    // RandomOrderGenerator<Order> orderGen2 = RandomOrderGenerator<Order>(50.0, 100.0, 50.0, 42);
-    // std::vector<std::function<Order()>> gens {
-    //     [&]() { return orderGen.generate() ;},
-    //     [&]() { return orderGen2.generate();}
-    // };
-    /**
-     * type erased callable that returns order
-     * [&] means we capture by reference
-     * () means no parameters
-     * if you use [] it means no outside variables are used (so e.g. we create the generators inside the lambda)
-     */
 
     /**
      * TO IMPLEMENT NEXT
@@ -65,16 +75,5 @@ int main() {
      * Create "framework" / section where we will put the endpoint of the lock-free data structure to start getting ready for that
      */
 
-    // CollectionOrderGenerator<Order> collection(gens, 42);
-
-    // Order o = orderGen.generate();
-    // std::cout << "ID: " << o.order_id << ", Type: " << (o.type == OrderType::BUY ? "BUY" : "SELL") 
-    //           << ", Price: " << o.price << ", Quantity: " << o.quantity << std::endl;
-    // std::cout << "Generating from collection:" << std::endl;
-    // for (int i = 0; i < 5; i++) {
-    //     Order oc = collection.generate();
-    //     std::cout << "ID: " << oc.order_id << ", Type: " << (oc.type == OrderType::BUY ? "BUY" : "SELL") 
-    //               << ", Price: " << oc.price << ", Quantity: " << oc.quantity << std::endl;
-    // }
     return 0;
 }
