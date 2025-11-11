@@ -8,6 +8,7 @@
 #include "order_simulation/collection_order_generator.hpp"
 #include "order_simulation/market_state.hpp"
 #include "scenarios/testing_stress_single_producer.hpp"
+#include "scenarios/testing_stress_multi_producer.hpp"
 
 /**
  * @brief Main function using arguments passed in will branch to the different tests
@@ -40,7 +41,7 @@ int main(int argc, char* argv[]) {
                 break;
             case 1:
                 std::cout << "Running multi producer stress test..." << std::endl;
-                // multiProducerStressTest(); // To be implemented
+                multiProducerStressTest(); // To be implemented
                 break;
             default:
                 std::cerr << "Unknown test type for stress mode: " << test_type << std::endl;
