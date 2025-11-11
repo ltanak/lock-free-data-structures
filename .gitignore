@@ -41,4 +41,5 @@
 *.dwo
 
 # Build Directory
-build
+build/
+.scratch/
