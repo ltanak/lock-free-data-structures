@@ -45,9 +45,6 @@ int main(int argc, char* argv[]) {
                 std::cout << "Running multi producer stress test: " << std::endl;
                 multiProducerStressTest();
                 break;
-            default:
-                std::cerr << "Unknown test type for stress mode: " << test_type << std::endl;
-                return 1;
         }
     } else if (mode == "order") {
         switch (test_type){
@@ -59,9 +56,6 @@ int main(int argc, char* argv[]) {
                 std::cout << "Running multi consumer order test: " << std::endl;
                 multiConsumerOrderTest();
                 break;
-            default:
-                std::cerr << "Unknown test type for order mode: " << test_type << std::endl;
-                return 1;
         }
     } else {
         std::cerr << "Unknown mode: " << mode << std::endl;
@@ -71,7 +65,6 @@ int main(int argc, char* argv[]) {
 
     /**
      * TO IMPLEMENT NEXT
-     * DONE - Need to update order generation model so that they read from the market state
      * Thread that controls the market state
      * DONE - Need to implement the stress testing and order testing code / generators
      * Once done need to then just print and output results and do a quick measure on the speed of transactions

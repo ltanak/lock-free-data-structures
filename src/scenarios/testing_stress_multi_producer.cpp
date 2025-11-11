@@ -12,23 +12,27 @@
 #include "order_simulation/collection_order_generator.hpp"
 #include "order_simulation/market_state.hpp"
 
-void multiProducerStressTest() {
-    std::cout << "begin?" << std::endl;
-    /**
-        - Each thread has its own order generation model
-        - Each thread pushes directly to the data structure
-        - Consumer threads will deque at the same time
-        - Don't require the market state thread to be running for this test (for now)
-     */
-    constexpr int numProducers = 4;
-    constexpr int numConsumers = 4;
-    std::atomic<bool> running{true};
-    std::vector<uint64_t> counts(numProducers, 0);
+#define PRODUCERS 4
+#define CONSUMERS 4
 
+
+/**
+ * @brief Multi producer stress test
+ * Purpose of test is to benchmark the throughput of multiple producers adding to a data structure
+ * Multiple threads will be generating orders and pushing them to the data structure
+ * Each producer thread will have its own order generation model
+ * Multiple consumer threads will be dequeuing from the data structure at the same time
+ * 
+ * @note Parameterised tests to be added in the future
+ */
+
+void multiProducerStressTest() {
+    std::atomic<bool> running{true};
+    std::vector<uint64_t> counts(PRODUCERS, 0);
     MarketState marketState;
 
     std::vector<std::thread> producers;
-    for (int i = 0; i < numProducers; ++i) {
+    for (int i = 0; i < PRODUCERS; ++i) {
         producers.emplace_back(
             [&, i]() {
                 uint64_t count = 0;
@@ -48,7 +52,7 @@ void multiProducerStressTest() {
     }
 
     std::vector<std::thread> consumers;
-    for (int i = 0; i < numConsumers; ++i) {
+    for (int i = 0; i < CONSUMERS; ++i) {
         consumers.emplace_back(
             [&, i]() {
                 Order o;
@@ -79,5 +83,5 @@ void multiProducerStressTest() {
     }
     std::cout << std::endl;
 
-    std::cout << "Stress test completed with " << numProducers << " producers and " << numConsumers << " consumers.\n";
+    std::cout << "Stress test completed with " << PRODUCERS << " producers and " << CONSUMERS << " consumers.\n";
 }
