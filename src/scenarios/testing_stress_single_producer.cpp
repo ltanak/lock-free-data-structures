@@ -9,8 +9,11 @@
 #include "order_simulation/market_state.hpp"
 
 /**
- * Seeded generator class that stores each generator, then uses random seed to choose which generator it reads from
- * Will constantly enqueue & dequeue the lock-free data structure being tested for stress testing
+ * @brief Single producer stress test
+ * Purpose of test is to benchmark the throughput of a single producer adding to a data structure
+ * A single thread will be generating orders and pushing them to the data structure
+ * 
+ * @note Parameterised tests to be added in the future
  */
 
 void singleProducerStressTest() {

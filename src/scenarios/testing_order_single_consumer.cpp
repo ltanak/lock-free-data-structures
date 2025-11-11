@@ -10,18 +10,22 @@
 #include "order_simulation/market_state.hpp"
 #include "scenarios/testing_order_single_consumer.hpp"
 
+/**
+ * @brief Single consumer order test
+ * Purpose of test is to benchmark the ordering and correctness of orders being processed
+ * Adds sequenced orders to a data structure from a single producer
+ * Single thread will then deque orders from the data structure
+ * 
+ * @note Parameterised tests to be added in the future
+ */
+
+#define LIMIT 100000
+
 void singleConsumerOrderTest() {
-    // create a vector filled with a bunch of orders & market updates
-    // NEED TO PARAMETERISE THE FUNCTIONS SO WE CAN RUN DIFFERENT AMOUNT OF ORDERS
-    // apply an ordering value to each of these (using sequence_number)
-
-    // then we will enqueue all of these in order into the data structure
-
-    // then we will deuqueue all of these in order
-    // we will only benchmark from the dequeing point
-
     std::queue<Order> ordersQueue;
     MarketState marketState;
+
+    // Order generators
     RandomOrderGenerator<Order> g1 = RandomOrderGenerator<Order>(marketState, 10, 42);
     RandomOrderGenerator<Order> g2 = RandomOrderGenerator<Order>(marketState, 100, 25);
 
@@ -31,17 +35,19 @@ void singleConsumerOrderTest() {
     };
 
     CollectionOrderGenerator<Order> collection(gens, 42);
-    for (int i = 0; i < 20; ++i){
+
+    // Generating orders
+    for (int i = 0; i < LIMIT; ++i){
         Order o = collection.generate();
         o.sequence_number = i;
-        ordersQueue.emplace(o); // emplace copies the actual thing, rather than doing it by pointer
+        ordersQueue.emplace(o); // emplace copies the actual structure, rather than doing it by pointer
     }
     std::cout << "Orders now going to be popped -> enqueued" << std::endl;
 
 
     // enqueueing onto the data structure
     while (!ordersQueue.empty()){
-        Order o1 = ordersQueue.front(); // CHECK THIS - NEED TO MAKE SURE IT ACTUALLY 
+        Order o1 = ordersQueue.front();
         ordersQueue.pop();
         std::cout << "ID: " << o1.order_id << ", Type: " << (o1.type == OrderType::BUY ? "BUY" : "SELL") 
         << ", Price: " << o1.price << ", Quantity: " << o1.quantity << ", Sequence: " << o1.sequence_number << std::endl;

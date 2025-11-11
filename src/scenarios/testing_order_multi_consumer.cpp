@@ -14,19 +14,20 @@
 // POSSIBLE REFACTOR - MERGE BOTH ORDER TESTS AND JUST SET THE SINGLE ONE TO ONE THREAD - WILL HAVE THE EXACT SAME EFFECT AND WOULD
 // SAVE LINES OF CODE
 
+/**
+ * @brief Multi consumer order test
+ * Purpose of test is to benchmark the ordering and correctness of orders being processed
+ * Adds sequenced orders to a data structure from a single producer
+ * Multiple consumers will then deque orders from the data structure
+ * 
+ * @note Parameterised tests to be added in the future
+ */
+
 void multiConsumerOrderTest() {
 
-    constexpr int numConsumers = 4;
+    constexpr int CONSUMERS = 4;
     std::atomic<bool> running{true};
-    // create a vector filled with a bunch of orders & market updates
-    // NEED TO PARAMETERISE THE FUNCTIONS SO WE CAN RUN DIFFERENT AMOUNT OF ORDERS
-    // apply an ordering value to each of these (using sequence_number)
-
-    // then we will enqueue all of these in order into the data structure
-
-    // then we will deuqueue all of these in order
-    // we will only benchmark from the dequeing point
-    // FOR THIS ONE WE NEED MULTIPLE CONSUMER THREADS
+    // DataStructure<Order> queue; // TO BE DEFINED - DATA STRUCTURE TO BE TESTED
 
     std::queue<Order> ordersQueue;
     MarketState marketState;
@@ -60,7 +61,7 @@ void multiConsumerOrderTest() {
 
     // dequeing from the data structure
     std::vector<std::thread> consumers;
-    for (int i = 0; i < numConsumers; ++i) {
+    for (int i = 0; i < CONSUMERS; ++i) {
         consumers.emplace_back(
             [&, i]() {
                 Order o;
@@ -81,6 +82,5 @@ void multiConsumerOrderTest() {
     for (auto& cons: consumers){
         cons.join();
     }
-
 
 }
