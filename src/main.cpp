@@ -9,6 +9,8 @@
 #include "order_simulation/market_state.hpp"
 #include "scenarios/testing_stress_single_producer.hpp"
 #include "scenarios/testing_stress_multi_producer.hpp"
+#include "scenarios/testing_order_single_consumer.hpp"
+#include "scenarios/testing_order_multi_consumer.hpp"
 
 /**
  * @brief Main function using arguments passed in will branch to the different tests
@@ -36,12 +38,12 @@ int main(int argc, char* argv[]) {
     if (mode == "stress") {
         switch (test_type){
             case 0:
-                std::cout << "Running single producer stress test..." << std::endl;
+                std::cout << "Running single producer stress test: " << std::endl;
                 singleProducerStressTest();
                 break;
             case 1:
-                std::cout << "Running multi producer stress test..." << std::endl;
-                multiProducerStressTest(); // To be implemented
+                std::cout << "Running multi producer stress test: " << std::endl;
+                multiProducerStressTest();
                 break;
             default:
                 std::cerr << "Unknown test type for stress mode: " << test_type << std::endl;
@@ -50,12 +52,12 @@ int main(int argc, char* argv[]) {
     } else if (mode == "order") {
         switch (test_type){
             case 0:
-                std::cout << "Running single consumer order test..." << std::endl;
-                // singleConsumerOrderTest(); // To be implemented
+                std::cout << "Running single consumer order test: " << std::endl;
+                singleConsumerOrderTest();
                 break;
             case 1:
-                std::cout << "Running multi consumer order test..." << std::endl;
-                // multiConsumerOrderTest(); // To be implemented
+                std::cout << "Running multi consumer order test: " << std::endl;
+                multiConsumerOrderTest();
                 break;
             default:
                 std::cerr << "Unknown test type for order mode: " << test_type << std::endl;
@@ -71,7 +73,7 @@ int main(int argc, char* argv[]) {
      * TO IMPLEMENT NEXT
      * DONE - Need to update order generation model so that they read from the market state
      * Thread that controls the market state
-     * Need to implement the stress testing and order testing code / generators
+     * DONE - Need to implement the stress testing and order testing code / generators
      * Once done need to then just print and output results and do a quick measure on the speed of transactions
      * Create "framework" / section where we will put the endpoint of the lock-free data structure to start getting ready for that
      */

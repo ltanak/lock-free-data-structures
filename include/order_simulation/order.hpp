@@ -13,4 +13,5 @@ struct Order {
     double price;
     double quantity;
     std::chrono::time_point<std::chrono::high_resolution_clock> timestamp;
+    uint64_t sequence_number;
 };

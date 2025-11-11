@@ -18,4 +18,5 @@ private:
     std::mt19937 rng_;
     std::uniform_real_distribution<double> quantityDist_;
     std::uniform_int_distribution<int> sideDist_;
+    uint64_t sequence_number = 0;
 };
