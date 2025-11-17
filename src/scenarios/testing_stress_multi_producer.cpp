@@ -31,7 +31,6 @@ void multiProducerStressTest() {
     std::vector<uint64_t> counts(PRODUCERS, 0);
     MarketState marketState;
 
-    
     std::vector<std::thread> producers;
     for (int i = 0; i < PRODUCERS; ++i) {
         producers.emplace_back(
