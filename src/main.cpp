@@ -66,7 +66,6 @@ int main(int argc, char* argv[]) {
     /**
      * TO IMPLEMENT NEXT
      * Thread that controls the market state
-     * DONE - Need to implement the stress testing and order testing code / generators
      * Once done need to then just print and output results and do a quick measure on the speed of transactions
      * Create "framework" / section where we will put the endpoint of the lock-free data structure to start getting ready for that
      */

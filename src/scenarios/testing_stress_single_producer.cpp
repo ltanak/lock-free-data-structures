@@ -34,6 +34,9 @@ void singleProducerStressTest() {
     for (int i = 0; i < 10000; i++) {
         Order oc = collection.generate(); // generates an order from the collection
 
+        std::cout << "ID: " << oc.order_id << ", Type: " << (oc.type == OrderType::BUY ? "BUY" : "SELL") 
+        << ", Price: " << oc.price << ", Quantity: " << oc.quantity << ", Sequence: " << oc.sequence_number << std::endl;
+
         // THIS IS WHERE WE WILL BE PERFORMING ENQUEUE FOR THE DATA STRUCTURE BEING TESTED
 
         // datastructure.enqueue(oc);
