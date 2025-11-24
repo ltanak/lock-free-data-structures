@@ -5,17 +5,47 @@
 #include <optional>
 #include "data_structures/queues/i_queue.hpp"
 #include "data_structures/queues/regular_queue.hpp"
+#include "order_simulation/order.hpp"
 
 template<typename TOrder>
-RegularQueue<TOrder>::RegularQueue(): size(0) {}
+RegularQueue<TOrder>::RegularQueue(): size_(0) {}
 
 template<typename TOrder>
 bool RegularQueue<TOrder>::enqueueOrder(TOrder &order){
-    queue_.push(order)
+    std::lock_guard<std::mutex> lock(mutexLock_);
+    queue_.push(order);
+    size_++;
+    return true;
 }
 
 template<typename TOrder>
-TOrder RegularQueue<TOrder>::dequeueOrder(){
-    // pass
-    return -1;
-}   
+void RegularQueue<TOrder>::dequeueOrder(){
+    std::lock_guard<std::mutex> lock(mutexLock_);
+    if (!queue_.empty()){
+        queue_.pop();
+        size_--;
+    }
+}
+
+template<typename TOrder>
+uint64_t RegularQueue<TOrder>::getSize(){
+    std::lock_guard<std::mutex> lock(mutexLock_);
+    return size_;
+}
+
+template<typename TOrder>
+bool RegularQueue<TOrder>::isEmpty(){
+    std::lock_guard<std::mutex> lock(mutexLock_);
+    if (size_ == 0){
+        return true;
+    }
+    return false;
+}
+
+template<typename TOrder>
+TOrder RegularQueue<TOrder>::getFront(){
+    std::lock_guard<std::mutex> lock(mutexLock_);
+    return queue_.front();
+}
+
+template class RegularQueue<Order>;
