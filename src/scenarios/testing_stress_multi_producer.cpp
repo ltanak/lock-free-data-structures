@@ -42,9 +42,6 @@ void multiProducerStressTest() {
                     ++count;
                     // datastructure.enqueue(o);
                     // will print out result to test it works
-                    
-                    // std::cout << "ID: " << o.order_id << ", Type: " << (o.type == OrderType::BUY ? "BUY" : "SELL") 
-                    // << ", Price: " << o.price << ", Quantity: " << o.quantity << std::endl;
                 }
                 counts[i] = count; 
             }
@@ -65,7 +62,7 @@ void multiProducerStressTest() {
     }
 
     std::cout << "Running the threads" << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     std::cout << "Timer done" << std::endl;
 
     running.store(false);
