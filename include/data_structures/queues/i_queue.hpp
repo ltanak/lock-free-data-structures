@@ -10,9 +10,9 @@ template <typename TOrder, typename QueueImpl>
 class IQueue {
     public:
         bool enqueue(TOrder &order){
-            return static_cast<QueueImpl*>(this)->enqueueOrder();
+            return static_cast<QueueImpl*>(this)->enqueueOrder(order);
         }
-        TOrder dequeue(){
+        void dequeue(){
             return static_cast<QueueImpl*>(this)->dequeueOrder();
         }
         uint64_t size(){
@@ -20,5 +20,8 @@ class IQueue {
         }
         bool empty(){
             return static_cast<QueueImpl*>(this)->isEmpty();
+        }
+        TOrder front(){
+            return static_cast<QueueImpl*>(this)->getFront();
         }
 };

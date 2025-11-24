@@ -13,12 +13,13 @@ class RegularQueue : public IQueue<TOrder, RegularQueue<TOrder>> {
 public:
     RegularQueue();
     bool enqueueOrder(TOrder &order);
-    TOrder dequeueOrder();
+    void dequeueOrder();
     uint64_t getSize();
     bool isEmpty();
+    TOrder getFront();
 
 private:
     uint64_t size_;
-    mutable std::mutex mutex_;
+    mutable std::mutex mutexLock_;
     std::queue<TOrder> queue_;
 };
