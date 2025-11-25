@@ -12,39 +12,7 @@
  * @brief Single producer stress test
  * Purpose of test is to benchmark the throughput of a single producer adding to a data structure
  * A single thread will be generating orders and pushing them to the data structure
+ * 
+ * Logic for this code has been moved into include/scenarios in corresponding .hpp files
+ * This allows for it to be templated correctly, so the data structure only needs to be defined once in main.cpp when benchmarking
  */
-
- // TO CHANGE - SHOULDN'T DO SIMULTANEOUS ENQUEUE AND DEQUE, WILL NEED TO MERGE 
- // THIS WITH STRESS MULTI PRODUCER AND JUST SET TO 1 PRODUCER / CONSUMER
-
-void singleProducerStressTest() {
-
-    MarketState marketState;
-    // would need to start the thread for the market state here
-    RandomOrderGenerator<Order> g1 = RandomOrderGenerator<Order>(marketState, 10, 42);
-    RandomOrderGenerator<Order> g2 = RandomOrderGenerator<Order>(marketState, 100, 25);
-
-    std::vector<std::function<Order()>> gens {
-        [&]() { return g1.generate() ;},
-        [&]() { return g2.generate();}
-    };
-
-    CollectionOrderGenerator<Order> collection(gens, 42);
-    std::cout << "Generating from collection:" << std::endl;
-    for (int i = 0; i < 10000; i++) {
-        Order oc = collection.generate(); // generates an order from the collection
-
-        std::cout << "ID: " << oc.order_id << ", Type: " << (oc.type == OrderType::BUY ? "BUY" : "SELL") 
-        << ", Price: " << oc.price << ", Quantity: " << oc.quantity << ", Sequence: " << oc.sequence_number << std::endl;
-
-        // THIS IS WHERE WE WILL BE PERFORMING ENQUEUE FOR THE DATA STRUCTURE BEING TESTED
-
-        // datastructure.enqueue(oc);
-
-        // gap
-
-        // datastructure.deque();
-
-    }
-
-}
