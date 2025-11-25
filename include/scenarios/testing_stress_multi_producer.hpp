@@ -13,8 +13,8 @@
 #include "order_simulation/collection_order_generator.hpp"
 #include "order_simulation/market_state.hpp"
 
-#define PRODUCERS 4
-#define CONSUMERS 4
+#define PRODUCERS 1
+#define CONSUMERS 1
 
 
 /**
