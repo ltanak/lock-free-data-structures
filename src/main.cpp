@@ -12,6 +12,9 @@
 #include "scenarios/testing_order_single_consumer.hpp"
 #include "scenarios/testing_order_multi_consumer.hpp"
 
+// Data structure includes
+#include "data_structures/queues/regular_queue.hpp"
+
 /**
  * @brief Main function using arguments passed in will branch to the different tests
  * Arguments:
@@ -34,27 +37,26 @@ int main(int argc, char* argv[]) {
 
     std::string mode = argv[1];
     int test_type = ((std::string)argv[2] == "-s") ? 0 : 1;
+
+    // add code here where you can change the appropriate data structure to use
+    RegularQueue<Order> queue;
     
     if (mode == "stress") {
         switch (test_type){
             case 0:
-                std::cout << "Running single producer stress test: " << std::endl;
-                singleProducerStressTest();
+                singleProducerStressTest(queue);
                 break;
             case 1:
-                std::cout << "Running multi producer stress test: " << std::endl;
-                multiProducerStressTest();
+                multiProducerStressTest(queue);
                 break;
         }
     } else if (mode == "order") {
         switch (test_type){
             case 0:
-                std::cout << "Running single consumer order test: " << std::endl;
-                singleConsumerOrderTest();
+                singleConsumerOrderTest(queue);
                 break;
             case 1:
-                std::cout << "Running multi consumer order test: " << std::endl;
-                multiConsumerOrderTest();
+                multiConsumerOrderTest(queue);
                 break;
         }
     } else {
