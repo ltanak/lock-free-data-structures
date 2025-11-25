@@ -64,13 +64,5 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-
-    /**
-     * TO IMPLEMENT NEXT
-     * Thread that controls the market state
-     * Once done need to then just print and output results and do a quick measure on the speed of transactions
-     * Create "framework" / section where we will put the endpoint of the lock-free data structure to start getting ready for that
-     */
-
     return 0;
 }
