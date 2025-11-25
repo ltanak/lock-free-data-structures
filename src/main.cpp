@@ -14,6 +14,7 @@
 
 // Data structure includes
 #include "data_structures/queues/regular_queue.hpp"
+#include "data_structures/queues/mc_lockfree_queue.hpp"
 
 /**
  * @brief Main function using arguments passed in will branch to the different tests
@@ -39,7 +40,8 @@ int main(int argc, char* argv[]) {
     int test_type = ((std::string)argv[2] == "-s") ? 0 : 1;
 
     // add code here where you can change the appropriate data structure to use
-    RegularQueue<Order> queue;
+    // RegularQueue<Order> queue;
+    MCLockFreeQueue<Order> queue;
     
     if (mode == "stress") {
         switch (test_type){

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 /**
  * @brief Interface for queue data structures
  * @tparam TOrder The type of the order being pushed to the queue
