@@ -8,7 +8,6 @@ MCLockFreeQueue<TOrder>::MCLockFreeQueue(): size_(0) {}
 
 template<typename TOrder>
 bool MCLockFreeQueue<TOrder>::enqueueOrder(TOrder &order){
-    // implement adding to the queue
     return mcQueue_.enqueue(order);
 }
 
