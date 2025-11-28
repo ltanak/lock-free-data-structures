@@ -69,3 +69,17 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
+
+/**
+ * TO DO
+ * 
+ * fix the interfaces for front() / find out the best way around this: std::queue uses void dequeue()
+ * find way where i can collect results - can't just be doing std::cout -> see if i can use message passing / something low-lantency
+   to keep track of the pointers to all of the orders
+ * start looking into benchmarking library design -> wrapper around functions? use atomic instructions then at end let it compute all the stuff?
+   should I have a function of .calculate() which writes all results into a csv, so then i can also use python to graph out the results nicely?
+ * automated scripts - how is it done in industry? should i use yaml and then you make the code read the yaml you want? Set parameters like order limit,
+   thread count, etc
+ * get error logging sorted, so that I can use it throughout
+ * write unit tests that make sure the outputs are correct for each of the corresponding data structures and their functions
+ */
