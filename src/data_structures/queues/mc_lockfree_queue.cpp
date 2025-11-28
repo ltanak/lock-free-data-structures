@@ -16,25 +16,14 @@ bool MCLockFreeQueue<TOrder>::enqueueOrder(TOrder &order){
 }
 
 template<typename TOrder>
-void MCLockFreeQueue<TOrder>::dequeueOrder(){
-    TOrder order;
-    bool success = mcQueue_.try_dequeue(order);
-    if (!success){
+bool MCLockFreeQueue<TOrder>::dequeueOrder(TOrder &order){
+    if (!mcQueue_.try_dequeue(order)){
         // will do a terminal logging error saying not possible
+        return false;
+    } else {
+        size_--;
+        return true;
     }
-    size_--;
-}
-
-template<typename TOrder>
-TOrder MCLockFreeQueue<TOrder>::dequeueOrderV(){
-    TOrder order;
-    bool success = mcQueue_.try_dequeue(order);
-    if (!success){
-        // logger
-        return {};
-    }
-    size_--;
-    return order;
 }
 
 template<typename TOrder>
@@ -43,17 +32,12 @@ uint64_t MCLockFreeQueue<TOrder>::getSize(){
 }
 
 template<typename TOrder>
-TOrder MCLockFreeQueue<TOrder>::getFront(){
-    // TOrder *order = mcQueue_.peek();
-    // return *order;
-    TOrder order;
-    bool success = mcQueue_.try_dequeue(order);
-    if (!success){
-        // logger
-        return {};
+bool MCLockFreeQueue<TOrder>::getFront(TOrder &order){
+    if (auto *ptr = mcQueue_.peek()){
+        order = *ptr;
+        return true;
     }
-    size_--;
-    return order;
+    return false;
 }
 
 template<typename TOrder>

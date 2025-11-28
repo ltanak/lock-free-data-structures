@@ -19,13 +19,12 @@ bool MCConcurrentQueue<TOrder>::enqueueOrder(TOrder &order){
 }
 
 template<typename TOrder>
-void MCConcurrentQueue<TOrder>::dequeueOrder(){
-    TOrder order;
-    bool success = mcMPMCQueue_.try_dequeue(order);
-    if (!success){
-        // error message here
+bool MCConcurrentQueue<TOrder>::dequeueOrder(TOrder &order){
+    if (mcMPMCQueue_.try_dequeue(order)){
+        size_--;
+        return true;
     }
-    size_--;
+    return false;
 }
 
 template<typename TOrder>
@@ -34,28 +33,19 @@ uint64_t MCConcurrentQueue<TOrder>::getSize(){
 }
 
 template<typename TOrder>
-TOrder MCConcurrentQueue<TOrder>::getFront(){
+bool MCConcurrentQueue<TOrder>::getFront(TOrder &order){
     // TOrder *order = mcMPMCQueue_.
     // there isn't an implementation for peek, it does it through deque
-    // NOT_IMPLEMENTED
-    TOrder order;
-    bool success = mcMPMCQueue_.try_dequeue(order);
-    if (!success){
-        // error message here
-    }
-    size_--;
-    return order;
+    NOT_IMPLEMENTED
+    return false;
+    // TOrder order;
+    // bool success = mcMPMCQueue_.try_dequeue(order);
+    // if (!success){
+    //     // error message here
+    // }
+    // size_--;
+    // return order;
 }
-
-// template<typename TOrder>
-// TOrder MCConcurrentQueue<TOrder>::dequeueOrderV(){
-//     TOrder order;
-//     bool success = mcMPMCQueue_.try_dequeue(order);
-//     if (!success){
-//         // error message here
-//     }
-//     return order;
-// }
 
 template<typename TOrder>
 bool MCConcurrentQueue<TOrder>::isEmpty(){

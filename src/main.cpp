@@ -73,7 +73,6 @@ int main(int argc, char* argv[]) {
 /**
  * TO DO
  * 
- * fix the interfaces for front() / find out the best way around this: std::queue uses void dequeue()
  * find way where i can collect results - can't just be doing std::cout -> see if i can use message passing / something low-lantency
    to keep track of the pointers to all of the orders
  * start looking into benchmarking library design -> wrapper around functions? use atomic instructions then at end let it compute all the stuff?
