@@ -10,6 +10,7 @@ public:
     MCLockFreeQueue();
     bool enqueueOrder(TOrder &order);
     void dequeueOrder();
+    TOrder dequeueOrderV();
     uint64_t getSize();
     bool isEmpty();
     TOrder getFront();

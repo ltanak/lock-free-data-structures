@@ -1,0 +1,65 @@
+#include "data_structures/queues/i_queue.hpp"
+#include "data_structures/queues/mc_mpmc_queue.hpp"
+#include "order_simulation/order.hpp"
+#include <cstdint>
+#include <stdexcept>
+
+#define NOT_IMPLEMENTED throw std::logic_error("Function not implemented.");
+
+template<typename TOrder>
+MCConcurrentQueue<TOrder>::MCConcurrentQueue(): size_(0) {}
+
+template<typename TOrder>
+bool MCConcurrentQueue<TOrder>::enqueueOrder(TOrder &order){
+    if (mcMPMCQueue_.enqueue(order)){
+        size_++;
+        return true;
+    }
+    return false;
+}
+
+template<typename TOrder>
+void MCConcurrentQueue<TOrder>::dequeueOrder(){
+    TOrder order;
+    bool success = mcMPMCQueue_.try_dequeue(order);
+    if (!success){
+        // error message here
+    }
+    size_--;
+}
+
+template<typename TOrder>
+uint64_t MCConcurrentQueue<TOrder>::getSize(){
+    return size_;
+}
+
+template<typename TOrder>
+TOrder MCConcurrentQueue<TOrder>::getFront(){
+    // TOrder *order = mcMPMCQueue_.
+    // there isn't an implementation for peek, it does it through deque
+    // NOT_IMPLEMENTED
+    TOrder order;
+    bool success = mcMPMCQueue_.try_dequeue(order);
+    if (!success){
+        // error message here
+    }
+    size_--;
+    return order;
+}
+
+// template<typename TOrder>
+// TOrder MCConcurrentQueue<TOrder>::dequeueOrderV(){
+//     TOrder order;
+//     bool success = mcMPMCQueue_.try_dequeue(order);
+//     if (!success){
+//         // error message here
+//     }
+//     return order;
+// }
+
+template<typename TOrder>
+bool MCConcurrentQueue<TOrder>::isEmpty(){
+    return size_ == 0;
+}
+
+template class MCConcurrentQueue<Order>;

@@ -26,7 +26,7 @@
  * @note Parameterised tests to be added in the future
  */
 
-#define CONSUMERS 4
+#define CONSUMERS 1
 
 auto initialiseGeneratorsOrder(MarketState &market) -> CollectionOrderGenerator<Order> {
     auto g1 = std::make_shared<RandomOrderGenerator<Order>>(market, 10, 42);
