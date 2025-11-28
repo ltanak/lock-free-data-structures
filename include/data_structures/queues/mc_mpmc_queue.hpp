@@ -1,17 +1,13 @@
 #pragma once
 
-#include <queue>
-#include <mutex>
-#include <random>
-#include <chrono>
-#include <optional>
 #include "data_structures/queues/i_queue.hpp"
+#include "data_structures/queues/concurrentqueue.h"
 
 template <typename TOrder>
-class RegularQueue : public IQueue<TOrder, RegularQueue<TOrder>> {
+class MCConcurrentQueue : public IQueue<TOrder, MCConcurrentQueue<TOrder>> {
 
 public:
-    RegularQueue();
+    MCConcurrentQueue();
     bool enqueueOrder(TOrder &order);
     void dequeueOrder();
     TOrder dequeueOrderV();
@@ -21,6 +17,5 @@ public:
 
 private:
     uint64_t size_;
-    mutable std::mutex mutexLock_;
-    std::queue<TOrder> queue_;
+    moodycamel::ConcurrentQueue<TOrder> mcMPMCQueue_;
 };

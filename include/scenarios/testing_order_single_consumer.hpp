@@ -22,7 +22,7 @@
  * @note Parameterised tests to be added in the future
  */
 
-#define LIMIT 100000
+#define LIMIT 10
 
 auto initialiseGenerators(MarketState &market) -> CollectionOrderGenerator<Order> {
     auto g1 = std::make_shared<RandomOrderGenerator<Order>>(market, 10, 42);
@@ -50,7 +50,7 @@ void singleConsumerOrderTest(DataStructure &structure) {
     for (int i = 0; i < LIMIT; ++i){
         Order o = collection.generate();
         o.sequence_number = i;
-        ordersQueue.emplace(o); // emplace copies the actual structure, rather than doing it by pointer
+        ordersQueue.push(o); // emplace copies the actual structure, rather than doing it by pointer
     }
     std::cout << "Orders now going to be popped -> enqueued" << std::endl;
 
@@ -65,11 +65,14 @@ void singleConsumerOrderTest(DataStructure &structure) {
         structure.enqueue(o1);
     }
 
-
     // dequeing from the data structure
-
+    std::cout << "Now going to empty the data structure:" << std::endl;
+    std::cout << structure.size() << std::endl;
     while (!structure.empty()){
-        structure.dequeue();
+        Order o = structure.front();
+        // structure.dequeue();
+        std::cout << "ID: " << o.order_id << ", Type: " << (o.type == OrderType::BUY ? "BUY" : "SELL") 
+        << ", Price: " << o.price << ", Quantity: " << o.quantity << ", Sequence: " << o.sequence_number << std::endl;
         // output results or measure results here
     }
     std::cout << "Done!" << std::endl;

@@ -15,6 +15,7 @@
 // Data structure includes
 #include "data_structures/queues/regular_queue.hpp"
 #include "data_structures/queues/mc_lockfree_queue.hpp"
+#include "data_structures/queues/mc_mpmc_queue.hpp"
 
 /**
  * @brief Main function using arguments passed in will branch to the different tests
@@ -41,7 +42,7 @@ int main(int argc, char* argv[]) {
 
     // add code here where you can change the appropriate data structure to use
     // RegularQueue<Order> queue;
-    MCLockFreeQueue<Order> queue;
+    MCConcurrentQueue<Order> queue;
     
     if (mode == "stress") {
         switch (test_type){

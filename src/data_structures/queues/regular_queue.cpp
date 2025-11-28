@@ -28,6 +28,18 @@ void RegularQueue<TOrder>::dequeueOrder(){
 }
 
 template<typename TOrder>
+TOrder RegularQueue<TOrder>::dequeueOrderV(){
+    std::lock_guard<std::mutex> lock(mutexLock_);
+    TOrder order; // check this
+    if (!queue_.empty()){
+        order = queue_.front();
+        queue_.pop();
+        size_--;
+    }
+    return order;
+}
+
+template<typename TOrder>
 uint64_t RegularQueue<TOrder>::getSize(){
     std::lock_guard<std::mutex> lock(mutexLock_);
     return size_;
@@ -45,7 +57,13 @@ bool RegularQueue<TOrder>::isEmpty(){
 template<typename TOrder>
 TOrder RegularQueue<TOrder>::getFront(){
     std::lock_guard<std::mutex> lock(mutexLock_);
-    return queue_.front();
+    TOrder order; // check this
+    if (!queue_.empty()){
+        order = queue_.front();
+        queue_.pop();
+        size_--;
+    }
+    return order;
 }
 
 template class RegularQueue<Order>;
