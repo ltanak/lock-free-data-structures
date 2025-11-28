@@ -67,7 +67,7 @@ void multiProducerStressTest(DataStructure &structure) {
             [&, i]() {
                 Order o;
                 while (running.load(std::memory_order_relaxed)){
-                    structure.dequeue();
+                    structure.dequeue(o);
                     // can also print out results here
                 }
             }

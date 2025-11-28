@@ -12,6 +12,7 @@
 #include "order_simulation/collection_order_generator.hpp"
 #include "order_simulation/market_state.hpp"
 #include "scenarios/testing_order_single_consumer.hpp"
+#include "scenarios/utils.hpp"
 
 /**
  * @brief Single consumer order test
@@ -59,8 +60,7 @@ void singleConsumerOrderTest(DataStructure &structure) {
     while (!ordersQueue.empty()){
         Order o1 = ordersQueue.front();
         ordersQueue.pop();
-        std::cout << "ID: " << o1.order_id << ", Type: " << (o1.type == OrderType::BUY ? "BUY" : "SELL") 
-        << ", Price: " << o1.price << ", Quantity: " << o1.quantity << ", Sequence: " << o1.sequence_number << std::endl;
+        std::cout << o1 << std::endl;
 
         structure.enqueue(o1);
     }
@@ -69,11 +69,9 @@ void singleConsumerOrderTest(DataStructure &structure) {
     std::cout << "Now going to empty the data structure:" << std::endl;
     std::cout << structure.size() << std::endl;
     while (!structure.empty()){
-        Order o = structure.front();
-        // structure.dequeue();
-        std::cout << "ID: " << o.order_id << ", Type: " << (o.type == OrderType::BUY ? "BUY" : "SELL") 
-        << ", Price: " << o.price << ", Quantity: " << o.quantity << ", Sequence: " << o.sequence_number << std::endl;
-        // output results or measure results here
+        Order o;
+        structure.dequeue(o);
+        std::cout << o << std::endl;
     }
     std::cout << "Done!" << std::endl;
 

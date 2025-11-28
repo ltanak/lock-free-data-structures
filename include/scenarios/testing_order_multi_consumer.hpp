@@ -73,8 +73,7 @@ void multiConsumerOrderTest(DataStructure &structure) {
     while (!ordersQueue.empty()){
         Order o1 = ordersQueue.front(); // CHECK THIS - NEED TO MAKE SURE IT ACTUALLY 
         ordersQueue.pop();
-        std::cout << "ID: " << o1.order_id << ", Type: " << (o1.type == OrderType::BUY ? "BUY" : "SELL") 
-        << ", Price: " << o1.price << ", Quantity: " << o1.quantity << ", Sequence: " << o1.sequence_number << std::endl;
+        std::cout << o1 << std::endl;
 
         structure.enqueue(o1);
     }
@@ -87,7 +86,7 @@ void multiConsumerOrderTest(DataStructure &structure) {
             [&, i]() {
                 Order o;
                 while (running.load(std::memory_order_relaxed)){
-                    structure.dequeue();
+                    structure.dequeue(o);
                     // can also print out results here
                 }
             }
