@@ -42,6 +42,6 @@ void singleProducerStressTest(DataStructure &structure) {
 
     std::cout << "Output some elemnts" << std::endl;
     Order x;
-    structure.front(x);
+    structure.dequeue(x);
     std::cout << x << std::endl;
 }
