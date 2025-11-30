@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
 }
 
 /**
- * TO DO
+ * TO DO - TOMORROW -> Prioritise getting the benchmarking library sorted in time for supervisor demo
  * 
  * find way where i can collect results - can't just be doing std::cout -> see if i can use message passing / something low-lantency
    to keep track of the pointers to all of the orders
