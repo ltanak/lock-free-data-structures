@@ -1,5 +1,9 @@
 #pragma once
 
 #include <stdint.h>
+#include <thread>
+#include <chrono>
 
-auto rdtscp_inline() -> uint64_t;
+uint64_t rdtscp_inline();
+
+double measure_tsc_ghz();
