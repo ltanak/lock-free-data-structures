@@ -13,8 +13,8 @@ fi
 # Argument Handling
 # understand how to write bash conditionals
 if [[ $# -eq 0 ]]; then
-  echo "No arguments provided, defaulting to 'stress -s'"
-  set -- stress -s
+  echo "No arguments provided, defaulting to 'stress 1 10000'"
+  set -- stress 1 10000
 else
   echo "Arguments provided: $*"
 fi

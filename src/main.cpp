@@ -7,10 +7,13 @@
 #include "order_simulation/random_order_generator.hpp"
 #include "order_simulation/collection_order_generator.hpp"
 #include "order_simulation/market_state.hpp"
-#include "scenarios/testing_stress_single_producer.hpp"
-#include "scenarios/testing_stress_multi_producer.hpp"
-#include "scenarios/testing_order_single_consumer.hpp"
-#include "scenarios/testing_order_multi_consumer.hpp"
+
+// Scenario Includes
+#include "scenarios/testing_stress.hpp"
+#include "scenarios/testing_order.hpp"
+
+// Code inputs
+#include "scenarios/test_inputs.hpp"
 
 // Data structure includes
 #include "data_structures/queues/regular_queue.hpp"
@@ -36,35 +39,21 @@
  */
 
 int main(int argc, char* argv[]) {
-
-    std::string mode = argv[1];
-    int test_type = ((std::string)argv[2] == "-s") ? 0 : 1;
+    TestParams params;
+    parseArgs(argc, argv, params);
 
     // add code here where you can change the appropriate data structure to use
     // RegularQueue<Order> queue;
     MCConcurrentQueue<Order> queue;
-    
-    if (mode == "stress") {
-        switch (test_type){
-            case 0:
-                singleProducerStressTest(queue);
-                break;
-            case 1:
-                multiProducerStressTest(queue);
-                break;
+
+    switch (params.test){
+        case TestType::STRESS: stressTest(queue, params); break;
+        case TestType::ORDER:  orderTest(queue, params); break;
+        default: {
+            std::cerr << "Unknown mode" << std::endl;
+            return 1;
+            break;
         }
-    } else if (mode == "order") {
-        switch (test_type){
-            case 0:
-                singleConsumerOrderTest(queue);
-                break;
-            case 1:
-                multiConsumerOrderTest(queue);
-                break;
-        }
-    } else {
-        std::cerr << "Unknown mode: " << mode << std::endl;
-        return 1;
     }
 
     return 0;

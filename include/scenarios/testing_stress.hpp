@@ -1,4 +1,5 @@
 #pragma once
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -8,23 +9,24 @@
 #include <atomic>
 #include <functional>
 #include <chrono>
+
+// Order simulation includes
 #include "order_simulation/order.hpp"
 #include "order_simulation/random_order_generator.hpp"
 #include "order_simulation/collection_order_generator.hpp"
 #include "order_simulation/market_state.hpp"
 
-#define PRODUCERS 1
-#define CONSUMERS 1
-
+// Temporarily defining threads, will pass as parameter
+#include "scenarios/test_inputs.hpp"
 
 /**
- * @brief Multi producer stress test
+ * @brief Stress Test
  * Purpose of test is to benchmark the throughput of multiple producers adding to a data structure
  * Multiple threads will be generating orders and pushing them to the data structure
  * Each producer thread will have its own order generation model
  * Multiple consumer threads will be dequeuing from the data structure at the same time
  * 
- * @note Parameterised tests to be added in the future
+ * @note For SPSC data structures, inputs will be 1 producer, 1 consumer thread
  */
 
 void closeThreads(std::vector<std::thread> &producers, std::vector<std::thread> &consumers){
@@ -37,12 +39,27 @@ void closeThreads(std::vector<std::thread> &producers, std::vector<std::thread> 
 }
 
 template <typename DataStructure>
-void multiProducerStressTest(DataStructure &structure) {
+void stressTest(DataStructure &structure, TestParams &params) {
+    const uint64_t PRODUCERS = params.thread_count;
+    const uint64_t CONSUMERS = params.thread_count;
+    const uint64_t TOTAL_ORDERS = params.total_orders;
+    const uint64_t THREAD_LIMIT = params.thread_order_limit;
+
     std::cout << "Running multi producer stress test: " << std::endl;
 
     std::atomic<bool> running{true};
     std::vector<uint64_t> counts(PRODUCERS, 0);
     MarketState marketState;
+
+    // RandomOrderGenerator<Order> g1 = RandomOrderGenerator<Order>(marketState, 10, 42);
+    // RandomOrderGenerator<Order> g2 = RandomOrderGenerator<Order>(marketState, 100, 25);
+
+    // std::vector<std::function<Order()>> gens {
+    //     [&]() { return g1.generate() ;},
+    //     [&]() { return g2.generate();}
+    // };
+
+    // CollectionOrderGenerator<Order> collection(gens, 42);
 
     std::vector<std::thread> producers;
     for (int i = 0; i < PRODUCERS; ++i) {
