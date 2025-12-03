@@ -20,6 +20,9 @@
 #include "data_structures/queues/mc_lockfree_queue.hpp"
 #include "data_structures/queues/mc_mpmc_queue.hpp"
 
+// Benchmark
+#include "benchmarking/benchmark.hpp"
+
 /**
  * @brief Main function using arguments passed in will branch to the different tests
  * Arguments:
@@ -44,10 +47,11 @@ int main(int argc, char* argv[]) {
 
     // add code here where you can change the appropriate data structure to use
     // RegularQueue<Order> queue;
-    MCConcurrentQueue<Order> queue;
+    RegularQueue<Order> queue;
+    BenchmarkWrapper<RegularQueue<Order>, Order> wrapper(queue, params);
 
     switch (params.test){
-        case TestType::STRESS: stressTest(queue, params); break;
+        case TestType::STRESS: stressTest(wrapper, params); break;
         case TestType::ORDER:  orderTest(queue, params); break;
         default: {
             std::cerr << "Unknown mode" << std::endl;

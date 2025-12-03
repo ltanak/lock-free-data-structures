@@ -70,7 +70,7 @@ void stressTest(DataStructure &structure, TestParams &params) {
                 while (running.load(std::memory_order_relaxed)){
                     Order o = gen.generate();
                     ++count;
-                    structure.enqueue(o);
+                    structure.enqueue_order(o, i);
                     // will print out result to test it works
                 }
                 counts[i] = count; 
@@ -84,7 +84,7 @@ void stressTest(DataStructure &structure, TestParams &params) {
             [&, i]() {
                 Order o;
                 while (running.load(std::memory_order_relaxed)){
-                    structure.dequeue(o);
+                    // structure.dequeue(o, i);
                     // can also print out results here
                 }
             }
@@ -92,7 +92,7 @@ void stressTest(DataStructure &structure, TestParams &params) {
     }
 
     std::cout << "Running the threads" << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
     std::cout << "Timer done" << std::endl;
 
     running.store(false);
@@ -102,6 +102,8 @@ void stressTest(DataStructure &structure, TestParams &params) {
     for (auto& c: counts){
         std::cout << c << ", ";
     }
+
+    structure.processLatencies();
     std::cout << std::endl;
 
     std::cout << "Stress test completed with " << PRODUCERS << " producers and " << CONSUMERS << " consumers.\n";

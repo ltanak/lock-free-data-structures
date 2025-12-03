@@ -19,5 +19,11 @@ else
   echo "Arguments provided: $*"
 fi
 
+if [[ "${1:-}" == "--gdb" ]]; then
+    shift
+    echo "Running under gdb with args: $*"
+    exec gdb --args "$BUILD_DIR/$EXEC" "$@"
+fi
+
 echo "Running: $EXEC $*"
 exec "$BUILD_DIR/$EXEC" "$@"
