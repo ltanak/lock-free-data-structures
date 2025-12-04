@@ -63,7 +63,6 @@ void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
 
     std::cout << "Avg Latency (ns): " << sum << std::endl;
     latencies::write_csv(ns_latencies);
-    
 }
 
 

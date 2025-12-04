@@ -75,12 +75,13 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
                     ++count;
                     
                     wrapper.enqueue_order(o, tid);
-                    // will print out result to test it works
                 }
                 counts[i] = count; 
             }
         );
     }
+
+    // NEED TO ADD CODE FOR CONSUMERS
 
     // std::vector<std::thread> consumers;
     // for (int i = 0; i < CONSUMERS; ++i) {
