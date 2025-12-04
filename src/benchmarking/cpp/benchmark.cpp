@@ -9,6 +9,8 @@
 
 #include "benchmarking/benchmark.hpp"
 
+#include "utils/files.hpp"
+
 template<typename DataStructure, typename TOrder>
 BenchmarkWrapper<DataStructure, TOrder>::BenchmarkWrapper(DataStructure &structure, TestParams &params)
 : structure_(structure), localIndex_(params.thread_count, 0), TOTAL_ORDERS_(params.total_orders), NUM_THREADS_(params.thread_count), THREAD_LIMIT_(params.thread_order_limit)
@@ -49,14 +51,19 @@ bool BenchmarkWrapper<DataStructure, TOrder>::enqueue_order(TOrder &o, int threa
 template<typename DataStructure, typename TOrder>
 void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
     double cycles_per_ns = measure_tsc_ghz();
+    std::vector<double> ns_latencies;
     double sum = 0;
 
     for (size_t i = 0; i < TOTAL_ORDERS_; ++i) {
-        sum += latencies_[i] / cycles_per_ns;
+        double ns = latencies_[i] / cycles_per_ns;
+        sum += ns;
+        ns_latencies.push_back(ns);
     }
     sum /= TOTAL_ORDERS_;
 
     std::cout << "Avg Latency (ns): " << sum << std::endl;
+    latencies::write_csv(ns_latencies);
+    
 }
 
 
