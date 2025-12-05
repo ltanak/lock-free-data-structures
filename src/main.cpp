@@ -67,11 +67,6 @@ int main(int argc, char* argv[]) {
 
 /**
  * TO DO - TOMORROW -> Prioritise getting the benchmarking library sorted in time for supervisor demo
- * 
- * find way where i can collect results - can't just be doing std::cout -> see if i can use message passing / something low-lantency
-   to keep track of the pointers to all of the orders
- * start looking into benchmarking library design -> wrapper around functions? use atomic instructions then at end let it compute all the stuff?
-   should I have a function of .calculate() which writes all results into a csv, so then i can also use python to graph out the results nicely?
  * automated scripts - how is it done in industry? should i use yaml and then you make the code read the yaml you want? Set parameters like order limit,
    thread count, etc
  * get error logging sorted, so that I can use it throughout
