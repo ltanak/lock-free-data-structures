@@ -12,21 +12,21 @@
 #include "order_simulation/random_order_generator.hpp"
 #include "order_simulation/collection_order_generator.hpp"
 #include "order_simulation/market_state.hpp"
-
-// Input parameters
-#include "scenarios/test_inputs.hpp"
+#include "scenarios/testing_order_multi_consumer.hpp"
 
 // POSSIBLE REFACTOR - MERGE BOTH ORDER TESTS AND JUST SET THE SINGLE ONE TO ONE THREAD - WILL HAVE THE EXACT SAME EFFECT AND WOULD
 // SAVE LINES OF CODE
 
 /**
- * @brief Order test
+ * @brief Multi consumer order test
  * Purpose of test is to benchmark the ordering and correctness of orders being processed
  * Adds sequenced orders to a data structure from a single producer
  * Multiple consumers will then deque orders from the data structure
  * 
  * @note Parameterised tests to be added in the future
  */
+
+#define CONSUMERS 1
 
 auto initialiseGeneratorsOrder(MarketState &market) -> CollectionOrderGenerator<Order> {
     auto g1 = std::make_shared<RandomOrderGenerator<Order>>(market, 10, 42);
@@ -49,20 +49,19 @@ auto closeThreads(std::vector<std::thread> &consumers) -> void {
 }
 
 template <typename DataStructure>
-void orderTest(DataStructure &structure, TestParams &params) {
-    const uint64_t CONSUMERS = params.thread_count;
-    const uint64_t TOTAL_ORDERS = params.total_orders;
-    const uint64_t THREAD_LIMIT = params.thread_order_limit;
-    std::atomic<bool> running{true};
-
+void multiConsumerOrderTest(DataStructure &structure) {
     std::cout << "Running multi consumer order test: " << std::endl;
 
+
+    // has to be expr as later when scripting we will add parameters for setting threads
+    // constexpr CONSUMERS = 4;
+    std::atomic<bool> running{true};
 
     std::queue<Order> ordersQueue;
     MarketState marketState;
 
     CollectionOrderGenerator<Order> collection = initialiseGeneratorsOrder(marketState);
-    for (int i = 0; i < TOTAL_ORDERS; ++i){
+    for (int i = 0; i < 20; ++i){
         Order o = collection.generate();
         o.sequence_number = i;
         ordersQueue.emplace(o); // emplace copies the actual thing, rather than doing it by pointer
@@ -95,7 +94,7 @@ void orderTest(DataStructure &structure, TestParams &params) {
     }
 
     std::cout << "Running the threads" << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
     std::cout << "Timer done" << std::endl;
 
     running.store(false);

@@ -1,3 +1,3 @@
 # Ideas to Implement
-- Parameterised tests done by timer
-- checking optimisations such as inlining
+- Parameterised tests done by timer or order limit
+- Google Test

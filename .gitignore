@@ -43,4 +43,3 @@
 # Build Directory
 build/
 .scratch/
-src/benchmarking/csvs
