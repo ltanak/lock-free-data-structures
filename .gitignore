@@ -45,4 +45,8 @@ build/
 .scratch/
 src/benchmarking/csvs
 src/benchmarking/python/.pixi
-src/benchmarking/python/latency_plots/__pycache__
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
