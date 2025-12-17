@@ -49,8 +49,8 @@ int main(int argc, char* argv[]) {
     // RegularQueue<Order> queue;
 
     // NEED TO MAKE BENCHMARK CODE SUPPORT ANY SPECIFIC LFDS, AS CURRENTLY IT WILL ONLY WORK FOR REGULAR QUEUES
-    RegularQueue<Order> queue;
-    BenchmarkWrapper<RegularQueue<Order>, Order> wrapper(queue, params);
+    MCLockFreeQueue<Order> queue;
+    BenchmarkWrapper<MCLockFreeQueue<Order>, Order> wrapper(queue, params);
 
     switch (params.test){
         case TestType::STRESS: stressTest(wrapper, params); break;
@@ -65,11 +65,7 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-
 /**
- * TO DO - TOMORROW -> Prioritise getting the benchmarking library sorted in time for supervisor demo
- * automated scripts - how is it done in industry? should i use yaml and then you make the code read the yaml you want? Set parameters like order limit,
-   thread count, etc
  * get error logging sorted, so that I can use it throughout
  * write unit tests that make sure the outputs are correct for each of the corresponding data structures and their functions
  */
