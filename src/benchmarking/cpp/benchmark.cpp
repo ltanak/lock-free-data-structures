@@ -4,6 +4,8 @@
 
 #include "order_simulation/order.hpp"
 #include "data_structures/queues/regular_queue.hpp"
+#include "data_structures/queues/mc_lockfree_queue.hpp"
+#include "data_structures/queues/mc_mpmc_queue.hpp"
 #include "scenarios/test_inputs.hpp"
 #include "utils/timing.hpp"
 
@@ -67,3 +69,5 @@ void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
 
 
 template class BenchmarkWrapper<RegularQueue<Order>, Order>;
+template class BenchmarkWrapper<MCLockFreeQueue<Order>, Order>;
+template class BenchmarkWrapper<MCConcurrentQueue<Order>, Order>;

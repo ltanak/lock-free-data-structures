@@ -12,8 +12,16 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # .cpp files under src/
 file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
-${CMAKE_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_SOURCE_DIR}/src/*.cpp
 )
+
+# Remove python benchmarking sources explicitly
+list(FILTER PROJECT_SOURCES EXCLUDE REGEX
+    ".*/benchmarking/python/.*"
+)
+
+set(PROJECT_LIB_SOURCES ${PROJECT_SOURCES})
+list(FILTER PROJECT_LIB_SOURCES EXCLUDE REGEX ".*/main.cpp")
 
 add_executable(lock_free_data_structures ${PROJECT_SOURCES})
 
@@ -40,7 +48,7 @@ FetchContent_Declare(
     ${CMAKE_SOURCE_DIR}/gtests/*.cpp
     )
     
-    add_executable(unit_tests ${TEST_SOURCES})
+    add_executable(unit_tests ${TEST_SOURCES} ${PROJECT_LIB_SOURCES})
     
     target_include_directories(unit_tests
     PRIVATE ${CMAKE_SOURCE_DIR}/include
@@ -53,8 +61,13 @@ FetchContent_Declare(
     Threads::Threads
     )
     
+    target_compile_definitions(unit_tests
+        PRIVATE PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
+    )
+    
     target_compile_definitions(lock_free_data_structures
         PRIVATE PROJECT_SOURCE_DIR="${CMAKE_SOURCE_DIR}"
     )
     
-    add_test(NAME unit_tests COMMAND unit_tests)
+    enable_testing()
+    add_test(NAME unit_tests COMMAND unit_tests WORKING_DIRECTORY ${CMAKE_BINARY_DIR})
