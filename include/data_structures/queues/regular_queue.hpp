@@ -12,11 +12,11 @@ class RegularQueue : public IQueue<TOrder, RegularQueue<TOrder>> {
 
 public:
     RegularQueue();
-    bool enqueueOrder(TOrder &order);
-    bool dequeueOrder(TOrder &order);
-    uint64_t getSize();
-    bool isEmpty();
-    bool getFront(TOrder &order);
+    auto enqueueOrder(TOrder &order) -> bool;
+    auto dequeueOrder(TOrder &order) -> bool;
+    auto getSize() -> uint64_t;
+    auto isEmpty() -> bool;
+    auto getFront(TOrder &order) -> bool;
 
 private:
     uint64_t size_;

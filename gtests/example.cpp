@@ -20,7 +20,7 @@ namespace {
 
     Order makeOrder(uint64_t id = 1, OrderType type = OrderType::BUY, double price = 10.0,
                     double qty = 5.0, uint64_t seq = 0) {
-        return Order{id, type, price, qty, std::chrono::high_resolution_clock::now(), seq};
+        return Order{id, type, price, qty, lTime::rdtscp_inline(), seq};
     }
 
 }
@@ -103,7 +103,7 @@ TEST(MCConcurrentQueueTest, GetFrontThrowsNotImplemented) {
 }
 
 TEST(TimingTest, MeasureTscGhzReasonableRange) {
-	double ghz = measure_tsc_ghz();
+	double ghz = lTime::measure_tsc_ghz();
 	EXPECT_GT(ghz, 0.1);   // should be positive
 	EXPECT_LT(ghz, 10.0);  // typical CPU upper bound guard
 }

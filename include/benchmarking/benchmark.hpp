@@ -14,6 +14,7 @@ public:
 
     auto addThread() -> int;
     auto enqueue_order(TOrder &o, int threadId) -> bool;
+    auto dequeue_order(TOrder &o, int threadId) -> bool;
     auto processLatencies() -> void;
 
 
@@ -25,6 +26,7 @@ private:
 
     DataStructure& structure_;
     std::atomic<int> nextThreadId_{0};
-    uint64_t* latencies_; // contiguous allocation
+    uint64_t* latencies_enqueue; // contiguous allocation for enqueue
+    uint64_t* latencies_dequeue;
     std::vector<uint64_t> localIndex_; // per-thread counters, initialized to 0
 };

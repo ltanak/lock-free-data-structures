@@ -1,5 +1,6 @@
 #include "order_simulation/collection_order_generator.hpp"
 #include "order_simulation/order.hpp"
+#include "utils/timing.hpp"
 
 template<typename TOrder>
 CollectionOrderGenerator<TOrder>::CollectionOrderGenerator(std::vector<std::function<TOrder()>> generators, std::optional<uint32_t> seed){
@@ -20,7 +21,7 @@ TOrder CollectionOrderGenerator<TOrder>::generateOrder() {
     int index = orderGenerators(rng_);
     TOrder order = generatorsVector[index]();
     order.order_id = orderId_;
-    order.timestamp = std::chrono::high_resolution_clock::now();
+    order.timestamp = lTime::rdtscp_inline();
     return order;
 }
 

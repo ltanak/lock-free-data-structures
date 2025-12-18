@@ -1,6 +1,7 @@
 #include "order_simulation/order.hpp"
 #include "order_simulation/random_order_generator.hpp"
 #include "order_simulation/market_state.hpp"
+#include "utils/timing.hpp"
 #include <random>
 #include <chrono>
 #include <optional>
@@ -36,7 +37,7 @@ TOrder RandomOrderGenerator<TOrder>::generateOrder(){
     OrderType type = isBuy ? OrderType::BUY : OrderType::SELL;
 
     double quantity = quantityDist_(rng_);
-    auto timestamp = std::chrono::high_resolution_clock::now();
+    uint64_t timestamp = lTime::rdtscp_inline();
 
     return TOrder{orderId_, type, price, quantity, timestamp};
 }

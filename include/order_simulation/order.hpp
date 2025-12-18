@@ -14,7 +14,7 @@ struct Order {
     OrderType type;
     double price;
     double quantity;
-    std::chrono::time_point<std::chrono::high_resolution_clock> timestamp;
+    u_int64_t timestamp;
     uint64_t sequence_number;
 
     friend std::ostream& operator<<(std::ostream& os, const Order &o);
