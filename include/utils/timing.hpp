@@ -4,6 +4,7 @@
 #include <thread>
 #include <chrono>
 
-uint64_t rdtscp_inline();
-
-double measure_tsc_ghz();
+namespace lTime {
+    auto rdtscp_inline() -> uint64_t;
+    auto measure_tsc_ghz() -> double;
+}

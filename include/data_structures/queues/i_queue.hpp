@@ -12,19 +12,19 @@ template <typename TOrder, typename QueueImpl>
 class IQueue {
     public:
         // we pass by reference so that we can point to the value that has been dequeued
-        bool enqueue(TOrder &order){
+        auto enqueue(TOrder &order) -> bool {
             return static_cast<QueueImpl*>(this)->enqueueOrder(order);
         }
-        bool dequeue(TOrder &order){
+        auto dequeue(TOrder &order) -> bool {
             return static_cast<QueueImpl*>(this)->dequeueOrder(order);
         }
-        uint64_t size(){
+        auto size() -> uint64_t{
             return static_cast<QueueImpl*>(this)->getSize();
         }
-        bool empty(){
+        auto empty() -> bool{
             return static_cast<QueueImpl*>(this)->isEmpty();
         }
-        bool front(TOrder &order){
+        auto front(TOrder &order) -> bool {
             return static_cast<QueueImpl*>(this)->getFront(order);
         }
 };
