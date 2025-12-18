@@ -26,19 +26,15 @@
 /**
  * @brief Main function using arguments passed in will branch to the different tests
  * Arguments:
- * "stress" - stress testing
- *  -m flag means multi producer stress testing
- *  -s flag means single producer stress testing
- * "order" - order testing
- *  -m flag means multi consumer order testing
- *  -s flag means single consumer order testing
- * 
+ _ "stress" - stress testing
+ | "order" - order testing
+ _ XXXX - number of threads (1 for SPSC style data structures, anything else for MPMC style)
+ _ XXXX - number of orders / transactions to execute
  * @example
- * ./run.sh stress -s
- * ./run.sh order -m
- * If no arguments are provided, defaults to stress -s
+ * ./run.sh stress 1 100'000'000
+ * ./run.sh order 4 1000
  * 
- * @note Future work will add additional parameters that will be used in testing e.g. order limits
+ * @note Future work will add additional parameters that will be used in testing e.g. time based
  */
 
 int main(int argc, char* argv[]) {
@@ -60,8 +56,3 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }
-
-/**
- * get error logging sorted, so that I can use it throughout
- * write unit tests that make sure the outputs are correct for each of the corresponding data structures and their functions
- */
