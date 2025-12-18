@@ -23,21 +23,22 @@ namespace latencies {
         return str;
     }
 
-    bool write_csv(const std::vector<double>& vec) {
+    bool write_csv_latencies(const std::vector<double>& enqueue_vec, const std::vector<double>& dequeue_vec) {
         namespace fs = std::filesystem;
 
         fs::path dirPath = getPath();
         fs::path filePath = dirPath / createFileName();
     
         if (!fs::exists(filePath)) {
-            std::ofstream(filePath) << "latencies\n"; // header
+            std::ofstream(filePath) << "enqueue_latency_ns,dequeue_latency_ns\n"; // header
         }
     
         // Open for append
         std::ofstream out(filePath, std::ios::app);
-    
-        for (auto v : vec) {
-            out << v << "\n";
+
+        for (std::size_t i = 0; i < enqueue_vec.size(); ++i){
+            // out method here is ofstream out
+            out << enqueue_vec[i] << "," << dequeue_vec[i] << "\n";
         }
         return true;
     }

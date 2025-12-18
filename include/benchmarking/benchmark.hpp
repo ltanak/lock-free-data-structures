@@ -13,6 +13,7 @@ public:
     BenchmarkWrapper(DataStructure &structure, TestParams &params);
 
     auto addThread() -> int;
+    auto addDequeueThread() -> int;
     auto enqueue_order(TOrder &o, int threadId) -> bool;
     auto dequeue_order(TOrder &o, int threadId) -> bool;
     auto processLatencies() -> void;
@@ -25,8 +26,11 @@ private:
     const uint64_t THREAD_LIMIT_;
 
     DataStructure& structure_;
-    std::atomic<int> nextThreadId_{0};
+    std::atomic<int> enqueueThreadId_{0};
+    std::atomic<int> dequeueThreadId_{0};
     uint64_t* latencies_enqueue; // contiguous allocation for enqueue
     uint64_t* latencies_dequeue;
-    std::vector<uint64_t> localIndex_; // per-thread counters, initialized to 0
+    // TOrder** ordering_dequeue; // array of pointers to the dequeued orders
+    std::vector<uint64_t> localIndexEnq_; // per-producer counters
+    std::vector<uint64_t> localIndexDeq_; // per-consumer counters
 };

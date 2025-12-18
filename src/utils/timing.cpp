@@ -4,7 +4,9 @@
 #include <thread>
 
 namespace lTime {
-    
+
+    // if you inline this, need to add memory clobber to asm
+    // investigate the latencies of this before you do it
     uint64_t rdtscp_inline() {
         uint32_t lo, hi;
         asm volatile ("rdtscp" : "=a"(lo), "=d"(hi) :: "rcx");

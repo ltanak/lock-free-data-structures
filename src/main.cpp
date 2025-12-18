@@ -45,10 +45,6 @@ int main(int argc, char* argv[]) {
     TestParams params;
     parseArgs(argc, argv, params);
 
-    // add code here where you can change the appropriate data structure to use
-    // RegularQueue<Order> queue;
-
-    // NEED TO MAKE BENCHMARK CODE SUPPORT ANY SPECIFIC LFDS, AS CURRENTLY IT WILL ONLY WORK FOR REGULAR QUEUES
     MCLockFreeQueue<Order> queue;
     BenchmarkWrapper<MCLockFreeQueue<Order>, Order> wrapper(queue, params);
 
