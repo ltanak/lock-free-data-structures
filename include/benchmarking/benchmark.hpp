@@ -18,8 +18,6 @@ public:
     auto dequeue_order(TOrder &o, int threadId) -> bool;
     auto processLatencies() -> void;
 
-
-
 private:
     const uint64_t TOTAL_ORDERS_;
     const uint64_t NUM_THREADS_;

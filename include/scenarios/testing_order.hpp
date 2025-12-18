@@ -41,13 +41,6 @@ auto initialiseGeneratorsOrder(MarketState &market) -> CollectionOrderGenerator<
     return collection;
 }
 
-auto closeThreads(std::vector<std::thread> &consumers) -> void {
-    // may require additional logic in the future
-    for (auto& cons: consumers){
-        cons.join();
-    }
-}
-
 template <typename DataStructure>
 void orderTest(DataStructure &structure, TestParams &params) {
     const uint64_t CONSUMERS = params.thread_count;
@@ -100,5 +93,5 @@ void orderTest(DataStructure &structure, TestParams &params) {
 
     running.store(false);
 
-    closeThreads(consumers);
+    lThread::close(consumers);
 }
