@@ -16,11 +16,12 @@
 #include "order_simulation/order.hpp"
 #include "order_simulation/market_state.hpp"
 
+// anonymous namespace reduces symbol leaks, and makes makeOrder only defined within this file (can use static, but namespace is modern C++)
 namespace {
 
-    Order makeOrder(uint64_t id = 1, OrderType type = OrderType::BUY, double price = 10.0,
-                    double qty = 5.0, uint64_t seq = 0) {
-        return Order{id, type, price, qty, lTime::rdtscp_inline(), seq};
+    Order makeOrder(uint64_t id = 1, OrderType type = OrderType::BUY, double price = 10.0, double qty = 5.0, uint64_t seq = 0) {
+		uint64_t ts = lTime::rdtscp_inline();
+        return Order{id, type, price, qty, ts, seq};
     }
 
 }

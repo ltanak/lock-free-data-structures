@@ -15,7 +15,7 @@
 
 template<typename DataStructure, typename TOrder>
 BenchmarkWrapper<DataStructure, TOrder>::BenchmarkWrapper(DataStructure &structure, TestParams &params)
-: structure_(structure), localIndex_(params.thread_count, 0), TOTAL_ORDERS_(params.total_orders), NUM_THREADS_(params.thread_count), THREAD_LIMIT_(params.thread_order_limit)
+: structure_(structure), localIndexEnq_(params.thread_count, 0), localIndexDeq_(params.thread_count, 0), TOTAL_ORDERS_(params.total_orders), NUM_THREADS_(params.thread_count), THREAD_LIMIT_(params.thread_order_limit)
 {
     latencies_enqueue = new uint64_t[params.total_orders];
     latencies_dequeue = new uint64_t[params.total_orders];
@@ -33,7 +33,12 @@ BenchmarkWrapper<DataStructure, TOrder>::~BenchmarkWrapper(){
 
 template<typename DataStructure, typename TOrder>
 int BenchmarkWrapper<DataStructure, TOrder>::addThread(){
-    return nextThreadId_.fetch_add(1, std::memory_order_relaxed);
+    return enqueueThreadId_.fetch_add(1, std::memory_order_relaxed);
+}
+
+template<typename DataStructure, typename TOrder>
+int BenchmarkWrapper<DataStructure, TOrder>::addDequeueThread(){
+    return dequeueThreadId_.fetch_add(1, std::memory_order_relaxed);
 }
 
 template<typename DataStructure, typename TOrder>
@@ -48,7 +53,7 @@ bool BenchmarkWrapper<DataStructure, TOrder>::enqueue_order(TOrder &o, int threa
 
     // calculations and storing
     uint64_t delta = t1 - t0;
-    uint64_t idx = threadId * THREAD_LIMIT_ + localIndex_[threadId]++; // localIndex_ could be TLS or array
+    uint64_t idx = threadId * THREAD_LIMIT_ + localIndexEnq_[threadId]++; // per-producer index
     latencies_enqueue[idx] = delta;
     return enqueued;
 }
@@ -65,7 +70,7 @@ bool BenchmarkWrapper<DataStructure, TOrder>::dequeue_order(TOrder &o, int threa
 
     // calculations and storing
     uint64_t delta = t1 - t0;
-    uint64_t idx = threadId * THREAD_LIMIT_ + localIndex_[threadId]++; // localIndex_ could be TLS or array
+    uint64_t idx = threadId * THREAD_LIMIT_ + localIndexDeq_[threadId]++; // per-consumer index
     latencies_dequeue[idx] = delta;
     return dequeued;
 }
@@ -73,18 +78,26 @@ bool BenchmarkWrapper<DataStructure, TOrder>::dequeue_order(TOrder &o, int threa
 template<typename DataStructure, typename TOrder>
 void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
     double cycles_per_ns = lTime::measure_tsc_ghz();
-    std::vector<double> ns_latencies;
-    double sum = 0;
+    std::vector<double> e_ns_latencies;
+    std::vector<double> d_ns_latencies;
+    double sumEnq = 0;
+    double sumDeq = 0;
 
     for (size_t i = 0; i < TOTAL_ORDERS_; ++i) {
-        double ns = latencies_enqueue[i] / cycles_per_ns;
-        sum += ns;
-        ns_latencies.push_back(ns);
-    }
-    sum /= TOTAL_ORDERS_;
+        double e_ns = latencies_enqueue[i] / cycles_per_ns;
+        sumEnq += e_ns;
+        e_ns_latencies.push_back(e_ns);
 
-    std::cout << "Avg Latency (ns): " << sum << std::endl;
-    latencies::write_csv(ns_latencies);
+        double d_ns = latencies_dequeue[i] / cycles_per_ns;
+        sumDeq += d_ns;
+        d_ns_latencies.push_back(d_ns);
+    }
+    sumEnq /= TOTAL_ORDERS_;
+    sumDeq /= TOTAL_ORDERS_;
+
+    std::cout << "Avg Enqueue Latency (ns): " << sumEnq << std::endl;
+    std::cout << "Avg Dequeue Latency (ns): " << sumDeq << std::endl;
+    latencies::write_csv_latencies(e_ns_latencies, d_ns_latencies);
 }
 
 template class BenchmarkWrapper<RegularQueue<Order>, Order>;
