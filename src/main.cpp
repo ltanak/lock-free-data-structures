@@ -41,8 +41,8 @@ int main(int argc, char* argv[]) {
     TestParams params;
     parseArgs(argc, argv, params);
 
-    MCLockFreeQueue<Order> queue;
-    BenchmarkWrapper<MCLockFreeQueue<Order>, Order> wrapper(queue, params);
+    MCConcurrentQueue<Order> queue;
+    BenchmarkWrapper<MCConcurrentQueue<Order>, Order> wrapper(queue, params);
 
     switch (params.test){
         case TestType::STRESS: stressTest(wrapper, params); break;

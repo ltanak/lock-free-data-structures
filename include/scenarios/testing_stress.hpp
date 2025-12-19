@@ -39,17 +39,15 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     const uint64_t TOTAL_ORDERS = params.total_orders;
     const uint64_t THREAD_LIMIT = params.thread_order_limit;
 
-    std::cout << "Running multi producer stress test: " << std::endl;
-
     MarketState marketState;
 
     std::vector<std::thread> producers;
     for (int i = 0; i < PRODUCERS; ++i) {
         int tid = wrapper.addThread();
         producers.emplace_back(
-            [&, i]() {
+            [&, tid]() {
                 uint64_t count = 0;
-                RandomOrderGenerator<Order> gen(marketState, 100 * (i + 1), 100 + i);
+                RandomOrderGenerator<Order> gen(marketState, 100 * (tid + 1), 100 + tid);
                 while (true){
                     if (count >= THREAD_LIMIT) break;
 
@@ -66,7 +64,7 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     for (int i = 0; i < CONSUMERS; ++i) {
         int tid = wrapper.addDequeueThread();
         consumers.emplace_back(
-            [&, i]() {
+            [&, tid]() {
                 Order o;
                 uint64_t count = 0;
                 while (true) {
@@ -78,8 +76,6 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
             }
         );
     }
-
-    std::cout << "Running the threads" << std::endl;
 
     lThread::close(producers, consumers);
 

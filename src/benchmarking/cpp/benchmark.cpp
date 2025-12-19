@@ -121,11 +121,29 @@ template<typename DataStructure, typename TOrder>
 void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGenerator<Order> &generator){
     std::vector<uint64_t> actual_order; // moving to a vector to reduce segfaults and stuff
     std::vector<uint64_t> expected_order;
+
+
+    std::vector<std::pair<uint64_t, uint64_t>> t_s; // timestamp, then sequence
+    t_s.reserve(TOTAL_ORDERS_);
+
+    for (size_t i = 0; i < TOTAL_ORDERS_; ++i) {
+        t_s.emplace_back(timestamps_dequeue[i], sequence_dequeue[i]); // make pair of each element, then sort by timestamp
+    }
+
+    std::sort(t_s.begin(), t_s.end(),
+        [](const auto& a, const auto& b) {
+            return a.first < b.first;
+        }
+    );
+
+    for (size_t i = 0; i < TOTAL_ORDERS_; ++i){
+        actual_order.push_back(t_s[i].second);
+    }
+
     for (size_t i = 0; i < TOTAL_ORDERS_; ++i){
         // std::cout << "Order sequence: " << sequence_dequeue[i] << std::endl;
         TOrder order = generator.generate();
         expected_order.push_back(order.order_id);
-        actual_order.push_back(sequence_dequeue[i]);
     }
     ordering::write_csv_ordering(expected_order, actual_order);
 }
