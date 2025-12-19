@@ -33,7 +33,7 @@ auto initialiseGeneratorsOrder(MarketState &market) -> CollectionOrderGenerator<
     auto g2 = std::make_shared<RandomOrderGenerator<Order>>(market, 100, 25);
 
     std::vector<std::function<Order()>> gens {
-        [g1]() { return g1->generate() ;},
+        [g1]() { return g1->generate();},
         [g2]() { return g2->generate();}
     };
 
@@ -41,12 +41,11 @@ auto initialiseGeneratorsOrder(MarketState &market) -> CollectionOrderGenerator<
     return collection;
 }
 
-template <typename DataStructure>
-void orderTest(DataStructure &structure, TestParams &params) {
+template <typename Wrapper>
+void orderTest(Wrapper &wrapper, TestParams &params) {
     const uint64_t CONSUMERS = params.thread_count;
     const uint64_t TOTAL_ORDERS = params.total_orders;
     const uint64_t THREAD_LIMIT = params.thread_order_limit;
-    std::atomic<bool> running{true};
 
     std::cout << "Running multi consumer order test: " << std::endl;
 
@@ -69,29 +68,31 @@ void orderTest(DataStructure &structure, TestParams &params) {
         ordersQueue.pop();
         std::cout << o1 << std::endl;
 
-        structure.enqueue(o1);
+        wrapper.enqueue_order(o1, 0);
     }
 
 
     // dequeing from the data structure
     std::vector<std::thread> consumers;
     for (int i = 0; i < CONSUMERS; ++i) {
+        int tid = wrapper.addDequeueThread();
         consumers.emplace_back(
             [&, i]() {
                 Order o;
-                while (running.load(std::memory_order_relaxed)){
-                    structure.dequeue(o);
-                    // can also print out results here
+                uint64_t count = 0;
+                while (true){
+                    if (count >= THREAD_LIMIT) break;
+                    ++count;
+                    wrapper.dequeue_ordering(o, tid);
                 }
             }
         );
     }
 
     std::cout << "Running the threads" << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-    std::cout << "Timer done" << std::endl;
-
-    running.store(false);
 
     lThread::close(consumers);
+
+    wrapper.processOrders();
+    std::cout << "Ordering test completed with " << CONSUMERS << " consumers.\n";
 }

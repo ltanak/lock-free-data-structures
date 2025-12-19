@@ -15,8 +15,10 @@ public:
     auto addThread() -> int;
     auto addDequeueThread() -> int;
     auto enqueue_order(TOrder &o, int threadId) -> bool;
-    auto dequeue_order(TOrder &o, int threadId) -> bool;
+    auto dequeue_latency(TOrder &o, int threadId) -> bool;
+    auto dequeue_ordering(TOrder &o, int threadId) -> bool;
     auto processLatencies() -> void;
+    auto processOrders() -> void;
 
 private:
     const uint64_t TOTAL_ORDERS_;
@@ -28,7 +30,11 @@ private:
     std::atomic<int> dequeueThreadId_{0};
     uint64_t* latencies_enqueue; // contiguous allocation for enqueue
     uint64_t* latencies_dequeue;
+
     // TOrder** ordering_dequeue; // array of pointers to the dequeued orders
+    uint64_t* sequence_dequeue;
+    uint64_t* timestamps_dequeue;
+
     std::vector<uint64_t> localIndexEnq_; // per-producer counters
     std::vector<uint64_t> localIndexDeq_; // per-consumer counters
 };

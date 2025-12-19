@@ -32,15 +32,6 @@
  * @note For SPSC data structures, inputs will be 1 producer, 1 consumer thread
  */
 
-// static void closeThreads2(std::vector<std::thread> &producers, std::vector<std::thread> &consumers){
-//     for (auto& prod: producers){
-//         prod.join();
-//     }
-//     for (auto& cons: consumers){
-//         cons.join();
-//     }
-// }
-
 template <typename Wrapper>
 void stressTest(Wrapper &wrapper, TestParams &params) {
     const uint64_t PRODUCERS = params.thread_count;
@@ -82,7 +73,7 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
                     if (count >= THREAD_LIMIT) break;
                     ++count;
 
-                    wrapper.dequeue_order(o, tid);
+                    wrapper.dequeue_latency(o, tid);
                 }
             }
         );
@@ -93,7 +84,5 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     lThread::close(producers, consumers);
 
     wrapper.processLatencies();
-    std::cout << std::endl;
-
     std::cout << "Stress test completed with " << PRODUCERS << " producers and " << CONSUMERS << " consumers.\n";
 }

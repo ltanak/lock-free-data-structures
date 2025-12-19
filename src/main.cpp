@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 
     switch (params.test){
         case TestType::STRESS: stressTest(wrapper, params); break;
-        case TestType::ORDER:  orderTest(queue, params); break;
+        case TestType::ORDER:  orderTest(wrapper, params); break;
         default: {
             std::cerr << "Unknown mode" << std::endl;
             return 1;
