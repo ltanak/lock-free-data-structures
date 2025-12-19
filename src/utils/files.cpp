@@ -62,24 +62,22 @@ namespace ordering {
         return str;
     }
 
-    bool write_csv_ordering() {
+    bool write_csv_ordering(const vector<uint64_t>& expected_order, const vector<uint64_t>& actual_order) {
         namespace fs = std::filesystem;
 
         fs::path dirPath = getPath();
         fs::path filePath = dirPath / createFileName();
         if (!fs::exists(filePath)) {
-            // TO CHANGE, TO CHANGE, TO CHANGE, TO CHANGE, TO CHANGE, TO CHANGE, TO CHANGE
-            std::ofstream(filePath) << "order_id, ....\n"; // header
+            std::ofstream(filePath) << "expected_id,actual_id\n"; // header
         }
     
         // Open for append
         std::ofstream out(filePath, std::ios::app);
 
         // code to add here:
-        // for (std::size_t i = 0; i < enqueue_vec.size(); ++i){
-        //     // out method here is ofstream out
-        //     out << enqueue_vec[i] << "," << dequeue_vec[i] << "\n";
-        // }
+        for (std::size_t i = 0; i < expected_order.size(); ++i){
+            out << expected_order[i] << "," << actual_order[i] << "\n";
+        }
         return true;
     }
 

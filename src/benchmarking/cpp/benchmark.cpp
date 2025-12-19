@@ -11,6 +11,8 @@
 
 #include "benchmarking/benchmark.hpp"
 
+#include "order_simulation/collection_order_generator.hpp"
+
 #include "utils/files.hpp"
 
 template<typename DataStructure, typename TOrder>
@@ -116,12 +118,16 @@ void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
 }
 
 template<typename DataStructure, typename TOrder>
-void BenchmarkWrapper<DataStructure, TOrder>::processOrders(){
-
+void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGenerator<Order> &generator){
+    std::vector<uint64_t> actual_order; // moving to a vector to reduce segfaults and stuff
+    std::vector<uint64_t> expected_order;
     for (size_t i = 0; i < TOTAL_ORDERS_; ++i){
-        std:cout << "Order sequence: " << sequence_dequeue[i] << std::endl;
+        // std::cout << "Order sequence: " << sequence_dequeue[i] << std::endl;
+        TOrder order = generator.generate();
+        expected_order.push_back(order.order_id);
+        actual_order.push_back(sequence_dequeue[i]);
     }
-
+    ordering::write_csv_ordering(expected_order, actual_order);
 }
 
 template class BenchmarkWrapper<RegularQueue<Order>, Order>;
