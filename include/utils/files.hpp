@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+
 using namespace std;
 
 namespace latencies {
@@ -22,7 +23,7 @@ namespace ordering {
 
     // "orders_DD_MM_YYYY_HH_MM_SS.csv"
     auto createFileName() -> string;
-    auto write_csv_ordering() -> bool;
+    auto write_csv_ordering(const vector<uint64_t>& expected_order, const vector<uint64_t>& actual_order) -> bool;
     auto read_csv() -> bool;
 
 }

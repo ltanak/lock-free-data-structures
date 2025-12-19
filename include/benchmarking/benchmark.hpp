@@ -6,6 +6,9 @@
 #include "scenarios/test_inputs.hpp"
 #include "utils/timing.hpp"
 
+// This will have to either be templ
+#include "order_simulation/collection_order_generator.hpp"
+
 template<typename DataStructure, typename TOrder>
 class BenchmarkWrapper {
 public:
@@ -18,7 +21,7 @@ public:
     auto dequeue_latency(TOrder &o, int threadId) -> bool;
     auto dequeue_ordering(TOrder &o, int threadId) -> bool;
     auto processLatencies() -> void;
-    auto processOrders() -> void;
+    auto processOrders(CollectionOrderGenerator<Order> &generator) -> void;
 
 private:
     const uint64_t TOTAL_ORDERS_;

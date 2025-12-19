@@ -54,19 +54,20 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
     MarketState marketState;
 
     CollectionOrderGenerator<Order> collection = initialiseGeneratorsOrder(marketState);
+    CollectionOrderGenerator<Order> checkGen = initialiseGeneratorsOrder(marketState);
+
     for (int i = 0; i < TOTAL_ORDERS; ++i){
         Order o = collection.generate();
-        o.sequence_number = i;
+        o.sequence_number = i + 1;
         ordersQueue.emplace(o); // emplace copies the actual thing, rather than doing it by pointer
     }
     std::cout << "Orders now going to be popped -> enqueued" << std::endl;
 
-
     // enqueueing onto the data structure
     while (!ordersQueue.empty()){
-        Order o1 = ordersQueue.front(); // CHECK THIS - NEED TO MAKE SURE IT ACTUALLY 
+        Order o1 = ordersQueue.front();
         ordersQueue.pop();
-        std::cout << o1 << std::endl;
+        // std::cout << o1 << std::endl;
 
         wrapper.enqueue_order(o1, 0);
     }
@@ -88,11 +89,18 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
             }
         );
     }
-
+    // uint64_t start_timestamp = lTime::rdtscp_inline();
     std::cout << "Running the threads" << std::endl;
 
     lThread::close(consumers);
 
-    wrapper.processOrders();
+    // as order generators are seeded, this will provide the exact same sequence of transactions to compare to
+    MarketState resetMarketstate;
+    CollectionOrderGenerator<Order> resetGen = initialiseGeneratorsOrder(resetMarketstate);
+    // for (int i = 0; i < TOTAL_ORDERS; ++i){
+    //     Order anotherCheck = afterCheck.generate();
+    //     std::cout << "Final check order: " << anotherCheck << std::endl;
+    // }
+    wrapper.processOrders(resetGen);
     std::cout << "Ordering test completed with " << CONSUMERS << " consumers.\n";
 }
