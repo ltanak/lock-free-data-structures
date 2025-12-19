@@ -47,9 +47,6 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
     const uint64_t TOTAL_ORDERS = params.total_orders;
     const uint64_t THREAD_LIMIT = params.thread_order_limit;
 
-    std::cout << "Running multi consumer order test: " << std::endl;
-
-
     std::queue<Order> ordersQueue;
     MarketState marketState;
 
@@ -61,7 +58,6 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
         o.sequence_number = i + 1;
         ordersQueue.emplace(o); // emplace copies the actual thing, rather than doing it by pointer
     }
-    std::cout << "Orders now going to be popped -> enqueued" << std::endl;
 
     // enqueueing onto the data structure
     while (!ordersQueue.empty()){
@@ -72,13 +68,12 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
         wrapper.enqueue_order(o1, 0);
     }
 
-
     // dequeing from the data structure
     std::vector<std::thread> consumers;
     for (int i = 0; i < CONSUMERS; ++i) {
         int tid = wrapper.addDequeueThread();
         consumers.emplace_back(
-            [&, i]() {
+            [&, i, tid]() {
                 Order o;
                 uint64_t count = 0;
                 while (true){
@@ -89,8 +84,6 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
             }
         );
     }
-    // uint64_t start_timestamp = lTime::rdtscp_inline();
-    std::cout << "Running the threads" << std::endl;
 
     lThread::close(consumers);
 
