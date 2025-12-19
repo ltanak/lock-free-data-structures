@@ -19,7 +19,7 @@ TOrder CollectionOrderGenerator<TOrder>::generateOrder() {
     // uint64_t id = orderId_.fetch_add(1, std::memory_order_relaxed);
     orderId_++;
     int index = orderGenerators(rng_);
-    TOrder order = generatorsVector[index]();
+    TOrder order = generatorsVector[index](); // calls the order generator function
     order.order_id = orderId_;
     order.timestamp = lTime::rdtscp_inline();
     return order;
