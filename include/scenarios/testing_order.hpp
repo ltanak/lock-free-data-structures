@@ -16,16 +16,13 @@
 // Input parameters
 #include "scenarios/test_inputs.hpp"
 
-// POSSIBLE REFACTOR - MERGE BOTH ORDER TESTS AND JUST SET THE SINGLE ONE TO ONE THREAD - WILL HAVE THE EXACT SAME EFFECT AND WOULD
-// SAVE LINES OF CODE
-
 /**
  * @brief Order test
  * Purpose of test is to benchmark the ordering and correctness of orders being processed
  * Adds sequenced orders to a data structure from a single producer
  * Multiple consumers will then deque orders from the data structure
  * 
- * @note Parameterised tests to be added in the future
+ * @note Parameterised tests to be added in the future, and will eventually pass through a price-time priority exchange
  */
 
 auto initialiseGeneratorsOrder(MarketState &market) -> CollectionOrderGenerator<Order> {
@@ -73,7 +70,7 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
     for (int i = 0; i < CONSUMERS; ++i) {
         int tid = wrapper.addDequeueThread();
         consumers.emplace_back(
-            [&, i, tid]() {
+            [&, tid]() {
                 Order o;
                 uint64_t count = 0;
                 while (true){
@@ -90,10 +87,7 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
     // as order generators are seeded, this will provide the exact same sequence of transactions to compare to
     MarketState resetMarketstate;
     CollectionOrderGenerator<Order> resetGen = initialiseGeneratorsOrder(resetMarketstate);
-    // for (int i = 0; i < TOTAL_ORDERS; ++i){
-    //     Order anotherCheck = afterCheck.generate();
-    //     std::cout << "Final check order: " << anotherCheck << std::endl;
-    // }
+
     wrapper.processOrders(resetGen);
     std::cout << "Ordering test completed with " << CONSUMERS << " consumers.\n";
 }

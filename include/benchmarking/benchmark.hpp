@@ -34,7 +34,6 @@ private:
     uint64_t* latencies_enqueue; // contiguous allocation for enqueue
     uint64_t* latencies_dequeue;
 
-    // TOrder** ordering_dequeue; // array of pointers to the dequeued orders
     uint64_t* sequence_dequeue;
     uint64_t* timestamps_dequeue;
 
