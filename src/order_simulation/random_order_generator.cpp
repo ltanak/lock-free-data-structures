@@ -1,4 +1,4 @@
-#include "order_simulation/order.hpp"
+#include "order_simulation/benchmark_order.hpp"
 #include "order_simulation/random_order_generator.hpp"
 #include "order_simulation/market_state.hpp"
 #include "utils/timing.hpp"
@@ -42,4 +42,4 @@ TOrder RandomOrderGenerator<TOrder>::generateOrder(){
     return TOrder{orderId_, type, price, quantity, timestamp};
 }
 
-template class RandomOrderGenerator<Order>;
+template class RandomOrderGenerator<BenchmarkOrder>;

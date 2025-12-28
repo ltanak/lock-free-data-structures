@@ -5,7 +5,7 @@
 #include <optional>
 #include "data_structures/queues/i_queue.hpp"
 #include "data_structures/queues/regular_queue.hpp"
-#include "order_simulation/order.hpp"
+#include "order_simulation/benchmark_order.hpp"
 
 template<typename TOrder>
 RegularQueue<TOrder>::RegularQueue(): size_(0) {}
@@ -55,4 +55,4 @@ bool RegularQueue<TOrder>::getFront(TOrder &order){
     return false;
 }
 
-template class RegularQueue<Order>;
+template class RegularQueue<BenchmarkOrder>;

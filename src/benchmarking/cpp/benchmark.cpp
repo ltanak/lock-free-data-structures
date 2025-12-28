@@ -2,7 +2,7 @@
 #include <optional>
 #include <atomic>
 
-#include "order_simulation/order.hpp"
+#include "order_simulation/benchmark_order.hpp"
 #include "data_structures/queues/regular_queue.hpp"
 #include "data_structures/queues/mc_lockfree_queue.hpp"
 #include "data_structures/queues/mc_mpmc_queue.hpp"
@@ -118,7 +118,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
 }
 
 template<typename DataStructure, typename TOrder>
-void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGenerator<Order> &generator){
+void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGenerator<BenchmarkOrder> &generator){
     std::vector<uint64_t> actual_order; // moving to a vector to reduce segfaults and stuff
     std::vector<uint64_t> expected_order;
 
@@ -148,6 +148,6 @@ void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGener
     ordering::write_csv_ordering(expected_order, actual_order);
 }
 
-template class BenchmarkWrapper<RegularQueue<Order>, Order>;
-template class BenchmarkWrapper<MCLockFreeQueue<Order>, Order>;
-template class BenchmarkWrapper<MCConcurrentQueue<Order>, Order>;
+template class BenchmarkWrapper<RegularQueue<BenchmarkOrder>, BenchmarkOrder>;
+template class BenchmarkWrapper<MCLockFreeQueue<BenchmarkOrder>, BenchmarkOrder>;
+template class BenchmarkWrapper<MCConcurrentQueue<BenchmarkOrder>, BenchmarkOrder>;

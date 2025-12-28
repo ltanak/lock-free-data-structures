@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <string>
 #include <optional>
-#include "order_simulation/order.hpp"
+#include "order_simulation/benchmark_order.hpp"
 #include "order_simulation/random_order_generator.hpp"
 #include "order_simulation/collection_order_generator.hpp"
 #include "order_simulation/market_state.hpp"
@@ -41,8 +41,8 @@ int main(int argc, char* argv[]) {
     TestParams params;
     parseArgs(argc, argv, params);
 
-    MCConcurrentQueue<Order> queue;
-    BenchmarkWrapper<MCConcurrentQueue<Order>, Order> wrapper(queue, params);
+    MCConcurrentQueue<BenchmarkOrder> queue;
+    BenchmarkWrapper<MCConcurrentQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
 
     switch (params.test){
         case TestType::STRESS: stressTest(wrapper, params); break;

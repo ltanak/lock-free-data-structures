@@ -1,5 +1,5 @@
 #include "order_simulation/collection_order_generator.hpp"
-#include "order_simulation/order.hpp"
+#include "order_simulation/benchmark_order.hpp"
 #include "utils/timing.hpp"
 
 template<typename TOrder>
@@ -25,4 +25,4 @@ TOrder CollectionOrderGenerator<TOrder>::generateOrder() {
     return order;
 }
 
-template class CollectionOrderGenerator<Order>;
+template class CollectionOrderGenerator<BenchmarkOrder>;

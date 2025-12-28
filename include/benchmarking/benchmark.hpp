@@ -21,7 +21,7 @@ public:
     auto dequeue_latency(TOrder &o, int threadId) -> bool;
     auto dequeue_ordering(TOrder &o, int threadId) -> bool;
     auto processLatencies() -> void;
-    auto processOrders(CollectionOrderGenerator<Order> &generator) -> void;
+    auto processOrders(CollectionOrderGenerator<BenchmarkOrder> &generator) -> void;
 
 private:
     const uint64_t TOTAL_ORDERS_;
