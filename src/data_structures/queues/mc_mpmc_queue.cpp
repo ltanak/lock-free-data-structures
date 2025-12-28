@@ -1,6 +1,6 @@
 #include "data_structures/queues/i_queue.hpp"
 #include "data_structures/queues/mc_mpmc_queue.hpp"
-#include "order_simulation/order.hpp"
+#include "order_simulation/benchmark_order.hpp"
 #include <cstdint>
 #include <stdexcept>
 
@@ -52,4 +52,4 @@ bool MCConcurrentQueue<TOrder>::isEmpty(){
     return size_ == 0;
 }
 
-template class MCConcurrentQueue<Order>;
+template class MCConcurrentQueue<BenchmarkOrder>;

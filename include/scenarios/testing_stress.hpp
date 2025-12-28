@@ -11,7 +11,7 @@
 #include <chrono>
 
 // Order simulation includes
-#include "order_simulation/order.hpp"
+#include "order_simulation/benchmark_order.hpp"
 #include "order_simulation/random_order_generator.hpp"
 #include "order_simulation/collection_order_generator.hpp"
 #include "order_simulation/market_state.hpp"
@@ -38,6 +38,7 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     const uint64_t CONSUMERS = params.thread_count;
     const uint64_t TOTAL_ORDERS = params.total_orders;
     const uint64_t THREAD_LIMIT = params.thread_order_limit;
+    const uint32_t SEED = params.seed;
 
     MarketState marketState;
 
@@ -47,11 +48,11 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
         producers.emplace_back(
             [&, tid]() {
                 uint64_t count = 0;
-                RandomOrderGenerator<Order> gen(marketState, 100 * (tid + 1), 100 + tid);
+                RandomOrderGenerator<BenchmarkOrder> gen(marketState, 100 * (tid + 1), SEED + tid);
                 while (true){
                     if (count >= THREAD_LIMIT) break;
 
-                    Order o = gen.generate();
+                    BenchmarkOrder o = gen.generate();
                     ++count;
                     
                     wrapper.enqueue_order(o, tid);
@@ -65,7 +66,7 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
         int tid = wrapper.addDequeueThread();
         consumers.emplace_back(
             [&, tid]() {
-                Order o;
+                BenchmarkOrder o;
                 uint64_t count = 0;
                 while (true) {
                     if (count >= THREAD_LIMIT) break;

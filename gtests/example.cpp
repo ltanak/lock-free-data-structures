@@ -13,24 +13,24 @@
 #include "utils/files.hpp"
 #include "utils/timing.hpp"
 #include "scenarios/test_inputs.hpp"
-#include "order_simulation/order.hpp"
+#include "order_simulation/benchmark_order.hpp"
 #include "order_simulation/market_state.hpp"
 
 // anonymous namespace reduces symbol leaks, and makes makeOrder only defined within this file (can use static, but namespace is modern C++)
 namespace {
 
-    Order makeOrder(uint64_t id = 1, OrderType type = OrderType::BUY, double price = 10.0, double qty = 5.0, uint64_t seq = 0) {
+    BenchmarkOrder makeOrder(uint64_t id = 1, OrderType type = OrderType::BUY, double price = 10.0, double qty = 5.0, uint64_t seq = 0) {
 		uint64_t ts = lTime::rdtscp_inline();
-        return Order{id, type, price, qty, ts, seq};
+        return BenchmarkOrder{id, type, price, qty, ts, seq};
     }
 
 }
 
 TEST(RegularQueueTest, EnqueueDequeueAndFront) {
-	RegularQueue<Order> q;
-	Order in = makeOrder(42, OrderType::SELL, 25.5, 3.0, 7);
-	Order out{};
-	Order front{};
+	RegularQueue<BenchmarkOrder> q;
+	BenchmarkOrder in = makeOrder(42, OrderType::SELL, 25.5, 3.0, 7);
+	BenchmarkOrder out{};
+	BenchmarkOrder front{};
 
 	EXPECT_TRUE(q.empty());
 	EXPECT_EQ(q.size(), 0u);
@@ -53,17 +53,17 @@ TEST(RegularQueueTest, EnqueueDequeueAndFront) {
 }
 
 TEST(RegularQueueTest, DequeueEmptyReturnsFalse) {
-	RegularQueue<Order> q;
-	Order out{};
+	RegularQueue<BenchmarkOrder> q;
+	BenchmarkOrder out{};
 	EXPECT_FALSE(q.dequeueOrder(out));
 	EXPECT_TRUE(q.isEmpty());
 }
 
 TEST(MCLockFreeQueueTest, BasicOperations) {
-	MCLockFreeQueue<Order> q;
-	Order in = makeOrder(11, OrderType::BUY, 15.0, 1.0, 1);
-	Order out{};
-	Order front{};
+	MCLockFreeQueue<BenchmarkOrder> q;
+	BenchmarkOrder in = makeOrder(11, OrderType::BUY, 15.0, 1.0, 1);
+	BenchmarkOrder out{};
+	BenchmarkOrder front{};
 
 	EXPECT_TRUE(q.isEmpty());
 	EXPECT_EQ(q.getSize(), 0u);
@@ -81,9 +81,9 @@ TEST(MCLockFreeQueueTest, BasicOperations) {
 }
 
 TEST(MCConcurrentQueueTest, BasicOperations) {
-	MCConcurrentQueue<Order> q;
-	Order in = makeOrder(21, OrderType::SELL, 30.0, 2.5, 9);
-	Order out{};
+	MCConcurrentQueue<BenchmarkOrder> q;
+	BenchmarkOrder in = makeOrder(21, OrderType::SELL, 30.0, 2.5, 9);
+	BenchmarkOrder out{};
 
 	EXPECT_TRUE(q.isEmpty());
 	EXPECT_TRUE(q.enqueueOrder(in));
@@ -96,10 +96,10 @@ TEST(MCConcurrentQueueTest, BasicOperations) {
 }
 
 TEST(MCConcurrentQueueTest, GetFrontThrowsNotImplemented) {
-	MCConcurrentQueue<Order> q;
-	Order in = makeOrder();
+	MCConcurrentQueue<BenchmarkOrder> q;
+	BenchmarkOrder in = makeOrder();
 	q.enqueueOrder(in);
-	Order front{};
+	BenchmarkOrder front{};
 	EXPECT_THROW(q.getFront(front), std::logic_error);
 }
 

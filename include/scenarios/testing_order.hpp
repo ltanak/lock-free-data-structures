@@ -8,7 +8,7 @@
 #include <queue>
 #include <thread>
 #include <memory>
-#include "order_simulation/order.hpp"
+#include "order_simulation/benchmark_order.hpp"
 #include "order_simulation/random_order_generator.hpp"
 #include "order_simulation/collection_order_generator.hpp"
 #include "order_simulation/market_state.hpp"
@@ -25,16 +25,16 @@
  * @note Parameterised tests to be added in the future, and will eventually pass through a price-time priority exchange
  */
 
-auto initialiseGeneratorsOrder(MarketState &market) -> CollectionOrderGenerator<Order> {
-    auto g1 = std::make_shared<RandomOrderGenerator<Order>>(market, 10, 42);
-    auto g2 = std::make_shared<RandomOrderGenerator<Order>>(market, 100, 25);
+auto initialiseGeneratorsOrder(MarketState &market, const uint32_t SEED) -> CollectionOrderGenerator<BenchmarkOrder> {
+    auto g1 = std::make_shared<RandomOrderGenerator<BenchmarkOrder>>(market, 10, SEED);
+    auto g2 = std::make_shared<RandomOrderGenerator<BenchmarkOrder>>(market, 100, SEED + 1);
 
-    std::vector<std::function<Order()>> gens {
+    std::vector<std::function<BenchmarkOrder()>> gens {
         [g1]() { return g1->generate();},
         [g2]() { return g2->generate();}
     };
 
-    CollectionOrderGenerator<Order> collection(gens, 42);
+    CollectionOrderGenerator<BenchmarkOrder> collection(gens, 42);
     return collection;
 }
 
@@ -43,22 +43,23 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
     const uint64_t CONSUMERS = params.thread_count;
     const uint64_t TOTAL_ORDERS = params.total_orders;
     const uint64_t THREAD_LIMIT = params.thread_order_limit;
+    const uint32_t SEED = params.seed;
 
-    std::queue<Order> ordersQueue;
+    std::queue<BenchmarkOrder> ordersQueue;
     MarketState marketState;
 
-    CollectionOrderGenerator<Order> collection = initialiseGeneratorsOrder(marketState);
-    CollectionOrderGenerator<Order> checkGen = initialiseGeneratorsOrder(marketState);
+    CollectionOrderGenerator<BenchmarkOrder> collection = initialiseGeneratorsOrder(marketState, SEED);
+    CollectionOrderGenerator<BenchmarkOrder> checkGen = initialiseGeneratorsOrder(marketState, SEED);
 
     for (int i = 0; i < TOTAL_ORDERS; ++i){
-        Order o = collection.generate();
+        BenchmarkOrder o = collection.generate();
         o.sequence_number = i + 1;
         ordersQueue.emplace(o); // emplace copies the actual thing, rather than doing it by pointer
     }
 
     // enqueueing onto the data structure
     while (!ordersQueue.empty()){
-        Order o1 = ordersQueue.front();
+        BenchmarkOrder o1 = ordersQueue.front();
         ordersQueue.pop();
         // std::cout << o1 << std::endl;
 
@@ -71,7 +72,7 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
         int tid = wrapper.addDequeueThread();
         consumers.emplace_back(
             [&, tid]() {
-                Order o;
+                BenchmarkOrder o;
                 uint64_t count = 0;
                 while (true){
                     if (count >= THREAD_LIMIT) break;
@@ -86,7 +87,7 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
 
     // as order generators are seeded, this will provide the exact same sequence of transactions to compare to
     MarketState resetMarketstate;
-    CollectionOrderGenerator<Order> resetGen = initialiseGeneratorsOrder(resetMarketstate);
+    CollectionOrderGenerator<BenchmarkOrder> resetGen = initialiseGeneratorsOrder(resetMarketstate, SEED);
 
     wrapper.processOrders(resetGen);
     std::cout << "Ordering test completed with " << CONSUMERS << " consumers.\n";
