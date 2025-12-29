@@ -17,6 +17,6 @@ struct PriceBook {
     int32_t center_price_ticks;  // use market state information
 
     PriceLevel levels[NUM_LEVELS]; // the number of pricelevels
-    uint64_t bitmap[BITMAP_WORDS]; // each bit corresponds to a PriceLevel
+    uint64_t bitmap[BITMAP_WORDS]; // each bit corresponds to a PriceLevel to see if it is active or not
     uint8_t side; // buy or sell
 };
