@@ -13,18 +13,9 @@ def main():
 
     lp = LatencyPlot(csv_path)
     print(lp.summary())
-    lp.histogram(
-        out=histOut,
-        max_perc=99
-    )
-    lp.cdf(
-        out=cdfOut,
-        max_perc=50
-    )
-    lp.percentiles(
-        out=percOut,
-        max_perc=50
-    )
+    lp.histogram(metric="enqueue", out=histOut)
+    lp.cdf(metric="enqueue", out=cdfOut)
+
 
 
 if __name__ == "__main__":

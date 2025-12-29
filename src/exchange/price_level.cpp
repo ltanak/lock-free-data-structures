@@ -1,6 +1,6 @@
 #include <sstream>
-#include "exchange/book_order.hpp";
-#include "exchange/price_level.hpp";
+#include "exchange/book_order.hpp"
+#include "exchange/price_level.hpp"
 
 auto PriceLevel::enqueue(BookOrder* incoming) -> void {
     if (this->isEmpty()){
@@ -28,6 +28,6 @@ auto PriceLevel::dequeue(BookOrder* to_remove) -> void {
     total_quantity -= to_remove->quantity;
 }
 
-bool PriceLevel::isEmpty() {
+auto PriceLevel::isEmpty() -> bool {
     return head == nullptr;
 }
