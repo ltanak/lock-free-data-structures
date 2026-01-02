@@ -9,7 +9,7 @@ MCLockFreeQueue<TOrder>::MCLockFreeQueue(): size_(0) {}
 template<typename TOrder>
 bool MCLockFreeQueue<TOrder>::enqueueOrder(TOrder &order){
     if (mcQueue_.enqueue(order)){
-        size_++;
+        // size_++;
         return true;
     }
     return false;
@@ -21,7 +21,7 @@ bool MCLockFreeQueue<TOrder>::dequeueOrder(TOrder &order){
         // will do a terminal logging error saying not possible
         return false;
     } else {
-        size_--;
+        // size_--;
         return true;
     }
 }

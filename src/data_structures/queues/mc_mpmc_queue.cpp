@@ -12,7 +12,6 @@ MCConcurrentQueue<TOrder>::MCConcurrentQueue(): size_(0) {}
 template<typename TOrder>
 bool MCConcurrentQueue<TOrder>::enqueueOrder(TOrder &order){
     if (mcMPMCQueue_.enqueue(order)){
-        size_++;
         return true;
     }
     return false;
@@ -21,7 +20,6 @@ bool MCConcurrentQueue<TOrder>::enqueueOrder(TOrder &order){
 template<typename TOrder>
 bool MCConcurrentQueue<TOrder>::dequeueOrder(TOrder &order){
     if (mcMPMCQueue_.try_dequeue(order)){
-        size_--;
         return true;
     }
     return false;

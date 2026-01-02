@@ -1,5 +1,6 @@
 #pragma once
 
+#include <sstream>
 #include "exchange/book_order.hpp"
 #include "exchange/price_book.hpp"
 #include "exchange/price_level.hpp"
@@ -13,10 +14,15 @@ struct PriceBook {
     static constexpr int NUM_LEVELS = 8192;
     static constexpr int BITMAP_WORDS = (NUM_LEVELS + 63) / 64;
 
-    int32_t base_price_ticks;    // lowest supported price
-    int32_t center_price_ticks;  // use market state information
+    uint32_t base_price_ticks;    // lowest supported price
+    uint32_t centre_price_ticks;  // use market state information
 
     PriceLevel levels[NUM_LEVELS]; // the number of pricelevels
     uint64_t bitmap[BITMAP_WORDS]; // each bit corresponds to a PriceLevel to see if it is active or not
     uint8_t side; // buy or sell
+
+    auto initialise(uint32_t centre) -> void;
+    auto recentre(uint32_t centre) -> void;
+    auto shift(uint32_t new_ticks) -> void;
+    inline auto priceToIndex(uint32_t price) -> int;
 };
