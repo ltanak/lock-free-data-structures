@@ -10,13 +10,13 @@ struct MatchingEngine {
     PriceBook buy_book;
     PriceBook sell_book;
 
-    uint32_t tick_size = 0.01; // for prices such as 123.45
-    uint32_t price_scale;
+    double tick_size = 0.01; // for prices such as 123.45
+    uint32_t price_scale = 100;
 
-    auto processOrder(BenchmarkOrder*) -> void;
+    auto processOrder(BookOrder*) -> void;
     auto convertOrder(const BenchmarkOrder&) -> BookOrder;
     auto priceToTicks(double) -> uint32_t;
-    auto matchBuy() -> void;
-    auto matchSell() -> void;
+    auto matchBuy(BookOrder*) -> void;
+    auto matchSell(BookOrder*) -> void;
 
 };

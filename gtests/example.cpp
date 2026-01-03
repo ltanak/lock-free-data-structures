@@ -19,7 +19,7 @@
 // anonymous namespace reduces symbol leaks, and makes makeOrder only defined within this file (can use static, but namespace is modern C++)
 namespace {
 
-    BenchmarkOrder makeOrder(uint64_t id = 1, OrderType type = OrderType::BUY, double price = 10.0, double qty = 5.0, uint64_t seq = 0) {
+    BenchmarkOrder makeOrder(uint64_t id = 1, OrderType type = OrderType::BUY, double price = 10.0, uint32_t qty = 5.0, uint64_t seq = 0) {
 		uint64_t ts = lTime::rdtscp_inline();
         return BenchmarkOrder{id, type, price, qty, ts, seq};
     }

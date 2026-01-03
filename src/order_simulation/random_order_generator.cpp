@@ -7,7 +7,7 @@
 #include <optional>
 
 template<typename TOrder>
-RandomOrderGenerator<TOrder>::RandomOrderGenerator(MarketState &market, double maxQuantity, std::optional<uint32_t> seed){
+RandomOrderGenerator<TOrder>::RandomOrderGenerator(MarketState &market, uint32_t maxQuantity, std::optional<uint32_t> seed){
     maxQuantity_ = maxQuantity;
     marketState_ = &market;
     if (seed.has_value()) {
@@ -16,7 +16,7 @@ RandomOrderGenerator<TOrder>::RandomOrderGenerator(MarketState &market, double m
         std::random_device rd;
         rng_ = std::mt19937(rd());
     }
-    quantityDist_ = std::uniform_real_distribution<double>(1.0, maxQuantity_);
+    quantityDist_ = std::uniform_int_distribution<uint32_t>(1, maxQuantity_);
     sideDist_ = std::uniform_int_distribution<int>(0, 1);
 }
 
@@ -36,7 +36,7 @@ TOrder RandomOrderGenerator<TOrder>::generateOrder(){
     bool isBuy = (sideDist_(rng_) < (0.5 + bias * 0.5));
     OrderType type = isBuy ? OrderType::BUY : OrderType::SELL;
 
-    double quantity = quantityDist_(rng_);
+    uint32_t quantity = quantityDist_(rng_);
     uint64_t timestamp = lTime::rdtscp_inline();
 
     return TOrder{orderId_, type, price, quantity, timestamp};
