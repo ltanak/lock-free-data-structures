@@ -13,7 +13,7 @@ struct BenchmarkOrder {
     uint64_t order_id;
     OrderType type;
     double price;
-    double quantity;
+    uint32_t quantity;
     uint64_t timestamp;
     uint64_t sequence_number;
 

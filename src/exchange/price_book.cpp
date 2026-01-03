@@ -55,6 +55,7 @@ auto PriceBook::priceToIndex(uint32_t price) -> int {
 
 auto PriceBook::addOrder(BookOrder* order) -> void {
     int index = priceToIndex(order->price_ticks);
+    if (index < 0 || index >= NUM_LEVELS) return;
     levels[index].enqueue(order);
     setBit(index);
 }
@@ -70,7 +71,7 @@ auto PriceBook::setBit(int index) -> void {
 }
 
 auto PriceBook::clearBit(int index) -> void {
-    bitmap[index / 64] |= ~(1ULL << (index % 64));
+    bitmap[index / 64] &= ~(1ULL << (index % 64));
 }
 
 auto PriceBook::bestPriceLevel() const -> int {

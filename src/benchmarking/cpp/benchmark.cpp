@@ -144,6 +144,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGener
         // std::cout << "Order sequence: " << sequence_dequeue[i] << std::endl;
         TOrder order = generator.generate();
         expected_order.push_back(order.order_id);
+        std::cout << order << "\n";
     }
     ordering::write_csv_ordering(expected_order, actual_order);
 }
