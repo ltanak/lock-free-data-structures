@@ -31,3 +31,16 @@ auto PriceLevel::dequeue(BookOrder* to_remove) -> void {
 auto PriceLevel::isEmpty() -> bool {
     return head == nullptr;
 }
+
+auto PriceLevel::clear() -> void {
+    head = nullptr;
+    tail = nullptr;
+    total_quantity = 0;
+}
+
+auto PriceLevel::move(PriceLevel& move_from) -> void {
+    head = move_from.head;
+    tail = move_from.tail;
+    total_quantity = move_from.total_quantity;
+    move_from.clear();
+}

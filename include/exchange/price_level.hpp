@@ -8,9 +8,11 @@
 struct alignas(64) PriceLevel {
     BookOrder* head;
     BookOrder* tail;
-    int total_quantity;
+    int total_quantity = 0;
 
     auto enqueue(BookOrder*) -> void;
     auto dequeue(BookOrder*) -> void;
     auto isEmpty() -> bool;
+    auto clear() -> void;
+    auto move(PriceLevel& move_from) -> void;
 };
