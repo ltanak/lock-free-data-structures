@@ -24,5 +24,11 @@ struct PriceBook {
     auto initialise(uint32_t centre) -> void;
     auto recentre(uint32_t centre) -> void;
     auto shift(uint32_t new_ticks) -> void;
-    inline auto priceToIndex(uint32_t price) -> int;
+    auto priceToIndex(uint32_t price) -> int;
+    auto addOrder(BookOrder*) -> void;
+    auto removeOrder(BookOrder*) -> void;
+    auto setBit(int index) -> void;
+    auto clearBit(int index) -> void;
+
+    auto bestPriceLevel() const -> int;
 };
