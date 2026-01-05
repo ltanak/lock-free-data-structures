@@ -3,8 +3,11 @@
 #include <random>
 #include <optional>
 #include <atomic>
+#include <vector>
+#include <string>
 #include "scenarios/test_inputs.hpp"
 #include "utils/timing.hpp"
+#include "exchange/matching_engine.hpp"
 
 // This will have to either be templ
 #include "order_simulation/collection_order_generator.hpp"
@@ -23,7 +26,11 @@ public:
     auto processLatencies() -> void;
     auto processOrders(CollectionOrderGenerator<BenchmarkOrder> &generator) -> void;
 
+    auto performMatching(std::vector<TOrder>& orders, std::vector<uint64_t>& actual_order) -> void;
+
 private:
+    uint64_t current_cycle_ = 0;
+
     const uint64_t TOTAL_ORDERS_;
     const uint64_t NUM_THREADS_;
     const uint64_t THREAD_LIMIT_;
@@ -39,4 +46,6 @@ private:
 
     std::vector<uint64_t> localIndexEnq_; // per-producer counters
     std::vector<uint64_t> localIndexDeq_; // per-consumer counters
+
+    MatchingEngine<TOrder> exchange_;
 };
