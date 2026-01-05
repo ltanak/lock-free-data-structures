@@ -31,6 +31,7 @@ TOrder RandomOrderGenerator<TOrder>::generateOrder(){
     // gaussian distr around base price, scaled by volatility
     std::normal_distribution<double> priceDist(base, base * vol);
     double price = priceDist(rng_);
+    price = std::ceil(price * 100.00) / 100.00;
 
     // Adjust side probability based on trend bias
     bool isBuy = (sideDist_(rng_) < (0.5 + bias * 0.5));

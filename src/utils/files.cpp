@@ -22,7 +22,7 @@ namespace latencies {
         return str;
     }
 
-    bool write_csv_latencies(const std::vector<double>& enqueue_vec, const std::vector<double>& dequeue_vec) {
+    bool writeCsvLatencies(const std::vector<double>& enqueue_vec, const std::vector<double>& dequeue_vec) {
         namespace fs = std::filesystem;
 
         fs::path dirPath = getPath();
@@ -42,7 +42,7 @@ namespace latencies {
         return true;
     }
 
-    bool read_csv(){
+    bool readCsv(){
         return false;
     }
 }
@@ -62,7 +62,7 @@ namespace ordering {
         return str;
     }
 
-    bool write_csv_ordering(const vector<uint64_t>& expected_order, const vector<uint64_t>& actual_order) {
+    bool writeCsvOrdering(const vector<uint64_t>& expected_order, const vector<uint64_t>& actual_order) {
         namespace fs = std::filesystem;
 
         fs::path dirPath = getPath();
@@ -81,8 +81,90 @@ namespace ordering {
         return true;
     }
 
-
-    bool read_csv(){
+    bool readCsv(){
         return false;
+    }
+}
+
+namespace exchange {
+
+    auto getPath() -> filesystem::path {
+        return std::filesystem::path(PROJECT_SOURCE_DIR) / "src/benchmarking/csvs/exchange/";
+    }
+
+    auto createFileName() -> string {
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%d_%m_%Y_%H_%M_%S");
+        auto str = "matching_" + oss.str() + ".csv";
+        return str;
+    }
+
+    auto initialise(std::string file_name) -> bool {
+        namespace fs = std::filesystem;
+
+        fs::path dirPath = getPath();
+        fs::path filePath = dirPath / file_name;
+    
+        if (!fs::exists(filePath)) {
+            std::ofstream(filePath) << "cycle,exp_prices,exp_qties,acc_prices,acc_qties\n"; // header
+        }
+        return true;
+    }
+
+    auto write(const vector<TradesCycle> expected, const vector<TradesCycle> actual) -> bool {
+        namespace fs = std::filesystem;
+        
+        fs::path dirPath = getPath();
+        fs::path filePath = dirPath / createFileName();
+
+        if (!fs::exists(filePath)) {
+            std::ofstream(filePath) << "cycle,exp_prices,exp_qtities,cycle2,acc_prices,acc_qtities\n"; // header
+        }
+        
+        // Open for append
+        std::ofstream out(filePath, std::ios::app);
+
+        // code to add here
+        for (std::size_t i = 0; i < expected.size(); ++i){
+            out << expected[i].cycle << ",";
+            for (std::size_t j = 0; j < expected[i].prices.size(); ++j){
+                out << expected[i].prices[j];
+                if (j < expected[i].prices.size() - 1) {
+                    out << "|";
+                }
+            }
+            out << ",";
+            for (std::size_t j = 0; j < expected[i].quantities.size(); ++j){
+                out << expected[i].quantities[j];
+                if (j < expected[i].quantities.size() - 1) {
+                    out << "|";
+                }
+            }
+            out << ",";
+
+
+            // actual ones
+            out << actual[i].cycle << ",";
+            for (std::size_t j = 0; j < actual[i].prices.size(); ++j){
+                out << actual[i].prices[j];
+                if (j < actual[i].prices.size() - 1) {
+                    out << "|";
+                }
+            }
+            out << ",";
+            for (std::size_t j = 0; j < actual[i].quantities.size(); ++j){
+                out << actual[i].quantities[j];
+                if (j < actual[i].quantities.size() - 1) {
+                    out << "|";
+                }
+            }
+            out << "\n";
+        }
+        
+        out.flush();
+        out.close();
+        return true;
     }
 }
