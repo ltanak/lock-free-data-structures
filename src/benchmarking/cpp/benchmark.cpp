@@ -104,6 +104,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
     double sumDeq = 0;
 
     for (size_t i = 0; i < TOTAL_ORDERS_; ++i) {
+        // convert rdtscp into nano seconds
         double e_ns = latencies_enqueue[i] / cycles_per_ns;
         sumEnq += e_ns;
         e_ns_latencies.push_back(e_ns);
@@ -115,6 +116,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
     sumEnq /= TOTAL_ORDERS_;
     sumDeq /= TOTAL_ORDERS_;
 
+    // std out for average latencies (will be later included in report generation)
     std::cout << "Avg Enqueue Latency (ns): " << sumEnq << std::endl;
     std::cout << "Avg Dequeue Latency (ns): " << sumDeq << std::endl;
     latencies::writeCsvLatencies(e_ns_latencies, d_ns_latencies);
@@ -122,7 +124,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
 
 template<typename DataStructure, typename TOrder>
 void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGenerator<BenchmarkOrder> &generator){
-    std::vector<uint64_t> actual_order; // moving to a vector to reduce segfaults and stuff
+    std::vector<uint64_t> actual_order;
     std::vector<uint64_t> expected_order;
     std::vector<TOrder> orders;
 
@@ -130,68 +132,80 @@ void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGener
     std::vector<std::pair<uint64_t, uint64_t>> t_s; // timestamp, then sequence
     t_s.reserve(TOTAL_ORDERS_);
 
+    // store timestamp and sequence number from dequeue
     for (size_t i = 0; i < TOTAL_ORDERS_; ++i) {
         t_s.emplace_back(timestamps_dequeue[i], sequence_dequeue[i]); // make pair of each element, then sort by timestamp
     }
 
+    // sort based on timestamp
     std::sort(t_s.begin(), t_s.end(),
         [](const auto& a, const auto& b) {
             return a.first < b.first;
         }
     );
 
+    // create vector of final sequence
     for (size_t i = 0; i < TOTAL_ORDERS_; ++i){
         actual_order.push_back(t_s[i].second);
     }
 
+    // use seeded generator to get expected sequence of IDs
     for (size_t i = 0; i < TOTAL_ORDERS_; ++i){
-        // std::cout << "Order sequence: " << sequence_dequeue[i] << std::endl;
         TOrder order = generator.generate();
         orders.push_back(order);
         expected_order.push_back(order.order_id);
-        // std::cout << order << "\n";
     }
+
+    // write to csv
     ordering::writeCsvOrdering(expected_order, actual_order);
 
+    // perform next part - checking matching within an orderbook / exchange
     performMatching(orders, actual_order);
 }
 
 template<typename DataStructure, typename TOrder>
 void BenchmarkWrapper<DataStructure, TOrder>::performMatching(std::vector<TOrder>& orders, std::vector<uint64_t>& actual_order) {
-    // Convert all orders to BookOrder and store them persistently
+    // convert to BookOrders
     std::vector<BookOrder> book_orders;
-    std::vector<uint32_t> original_quantities;  // Store original quantities
+    std::vector<uint32_t> original_quantities;
     book_orders.reserve(orders.size());
     original_quantities.reserve(orders.size());
     
+    // convert the TOrder / BenchmarkOrder struct into a BookOrder struct
     for (const TOrder& order: orders){
         BookOrder converted_order = exchange_.convertOrder(order);
+
+        // store original quantities (to reset values for second pass)
         original_quantities.push_back(converted_order.quantity);
         book_orders.push_back(converted_order);
     }
 
-    // First pass: process orders in their original (expected) order
+    // Process orders in their original (expected) order
     std::vector<TradesCycle> expected_cycles;
     expected_cycles.reserve(book_orders.size());
+
+    // takes original order sequence and puts them through exchange
     for (BookOrder& b_order: book_orders){
         TradesCycle trade = exchange_.processOrder(&b_order);
+
+        // add each tradecycle (which stoes the cycle count, and all the matched prices and quantities)
         expected_cycles.push_back(trade);
     }
 
     // Restore original quantities before second pass
     for (size_t i = 0; i < book_orders.size(); ++i) {
         book_orders[i].quantity = original_quantities[i];
-        book_orders[i].next = nullptr;  // Reset pointers
-        book_orders[i].prev = nullptr;  // Reset pointers
+        book_orders[i].next = nullptr;  // reset pointers
+        book_orders[i].prev = nullptr;
     }
 
-    // Create mapping of order_id to its position in actual_order
+    // mapping of order_id to its position in actual_order
     std::unordered_map<uint64_t, size_t> order_pos;
     for (size_t i = 0; i < actual_order.size(); ++i){
         order_pos[actual_order[i]] = i;
     }
 
-    // Sort book_orders based on their position in actual_order
+    // sort based on their position in actual_order (their sequence on the output from processOrders)
     std::sort(book_orders.begin(), book_orders.end(),
         [&order_pos](const BookOrder& a, const BookOrder& b){
             auto pos_a = order_pos.find(a.order_id);
@@ -204,18 +218,21 @@ void BenchmarkWrapper<DataStructure, TOrder>::performMatching(std::vector<TOrder
         }
     );
 
-    // Second pass: process sorted orders through fresh exchange
+    // process sorted orders through cleared exchange
     std::vector<TradesCycle> actual_cycles;
     actual_cycles.reserve(book_orders.size());
 
+    // chekc this - unsafe / memory overhead
     MatchingEngine<TOrder> new_exchange(100.00);
     exchange_ = new_exchange;
 
     for (BookOrder& b_order: book_orders){
+        // go through exchange with new ordering
         TradesCycle trade = exchange_.processOrder(&b_order);
         actual_cycles.push_back(trade);
     }
 
+    // write results to csv
     exchange::write(expected_cycles, actual_cycles);
 }
 
