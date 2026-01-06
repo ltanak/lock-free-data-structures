@@ -74,7 +74,6 @@ namespace ordering {
         // Open for append
         std::ofstream out(filePath, std::ios::app);
 
-        // code to add here:
         for (std::size_t i = 0; i < expected_order.size(); ++i){
             out << expected_order[i] << "," << actual_order[i] << "\n";
         }
@@ -123,7 +122,7 @@ namespace exchange {
             std::ofstream(filePath) << "cycle,exp_prices,exp_qtities,cycle2,acc_prices,acc_qtities\n"; // header
         }
         
-        // Open for append
+        // open for append
         std::ofstream out(filePath, std::ios::app);
 
         // code to add here
