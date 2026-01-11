@@ -3,7 +3,7 @@
 #include <chrono>
 #include <thread>
 
-namespace lTime {
+namespace ltime {
 
     // if you inline this, need to add memory clobber to asm
     // investigate the latencies of this before you do it

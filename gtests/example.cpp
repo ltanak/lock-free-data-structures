@@ -22,7 +22,7 @@
 namespace {
 
     BenchmarkOrder makeOrder(uint64_t id = 1, OrderType type = OrderType::BUY, double price = 10.0, uint32_t qty = 5, uint64_t seq = 0) {
-		uint64_t ts = lTime::rdtscp_inline();
+		uint64_t ts = ltime::rdtscp_inline();
         return BenchmarkOrder{id, type, price, qty, ts, seq};
     }
 
@@ -213,7 +213,7 @@ TEST(MatchingEngineTest, RecenteringAndShifting) {
 }
 
 TEST(TimingTest, MeasureTscGhzReasonableRange) {
-	double ghz = lTime::measure_tsc_ghz();
+	double ghz = ltime::measure_tsc_ghz();
 	EXPECT_GT(ghz, 0.1);   // should be positive
 	EXPECT_LT(ghz, 10.0);  // typical CPU upper bound guard
 }

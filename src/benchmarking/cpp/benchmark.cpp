@@ -50,11 +50,11 @@ int BenchmarkWrapper<DataStructure, TOrder>::addDeqThread(){
 template<typename DataStructure, typename TOrder>
 bool BenchmarkWrapper<DataStructure, TOrder>::enqueueOrder(TOrder &o, int threadId) {
     // start timer
-    uint64_t t0 = lTime::rdtscp_inline();
+    uint64_t t0 = ltime::rdtscp_inline();
     // enqueue datastructure
     bool enqueued = structure_.enqueue(o);
     // end timer
-    uint64_t t1 = lTime::rdtscp_inline();
+    uint64_t t1 = ltime::rdtscp_inline();
     // maybe add logic for if transaction wasn't successful?
 
     // calculations and storing
@@ -66,11 +66,11 @@ bool BenchmarkWrapper<DataStructure, TOrder>::enqueueOrder(TOrder &o, int thread
 
 template<typename DataStructure, typename TOrder>
 bool BenchmarkWrapper<DataStructure, TOrder>::dequeueLatency(TOrder &o, int threadId) {
-    uint64_t t0 = lTime::rdtscp_inline();
+    uint64_t t0 = ltime::rdtscp_inline();
     // dequeue datastructure
     bool dequeued = structure_.dequeue(o);
     // end timer
-    uint64_t t1 = lTime::rdtscp_inline();
+    uint64_t t1 = ltime::rdtscp_inline();
     // maybe add logic for if transaction wasn't successful?
 
     // calculations and storing
@@ -86,7 +86,7 @@ bool BenchmarkWrapper<DataStructure, TOrder>::dequeueOrdering(TOrder &o, int thr
     uint64_t idx = threadId * THREAD_LIMIT_ + local_index_deq_[threadId]++;
 
     sequence_dequeue_[idx] = o.sequence_number;
-    timestamps_dequeue_[idx] = lTime::rdtscp_inline();
+    timestamps_dequeue_[idx] = ltime::rdtscp_inline();
 
     // maybe add logic for if transaction wasn't successful
     return dequeued;
@@ -94,7 +94,7 @@ bool BenchmarkWrapper<DataStructure, TOrder>::dequeueOrdering(TOrder &o, int thr
 
 template<typename DataStructure, typename TOrder>
 void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
-    double cycles_per_ns = lTime::measure_tsc_ghz();
+    double cycles_per_ns = ltime::measure_tsc_ghz();
     std::vector<double> e_ns_latencies;
     std::vector<double> d_ns_latencies;
     double sumEnq = 0;
