@@ -3,6 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include "exchange/book_order.hpp"
+#include <stdint.h>
 
 // double ended queue
 struct alignas(64) PriceLevel {

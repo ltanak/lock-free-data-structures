@@ -4,6 +4,7 @@
 #include "exchange/book_order.hpp"
 #include "exchange/price_book.hpp"
 #include "exchange/price_level.hpp"
+#include <iostream>
 
 /**
  * Going for a recentering OrderBook, so that it dynamically adapts
