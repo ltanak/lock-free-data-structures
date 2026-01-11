@@ -18,34 +18,47 @@ public:
     ~BenchmarkWrapper();
     BenchmarkWrapper(DataStructure &structure, TestParams &params);
 
-    auto addThread() -> int;
-    auto addDequeueThread() -> int;
-    auto enqueue_order(TOrder &o, int threadId) -> bool;
-    auto dequeue_latency(TOrder &o, int threadId) -> bool;
-    auto dequeue_ordering(TOrder &o, int threadId) -> bool;
+    // adds thread IDs for enqueing or dequeing threads
+    auto addEnqThread() -> int;
+    auto addDeqThread() -> int;
+
+    // operations for enqueing, and the different types of dequeueing
+    auto enqueueOrder(TOrder &o, int threadId) -> bool;
+    auto dequeueLatency(TOrder &o, int threadId) -> bool;
+    auto dequeueOrdering(TOrder &o, int threadId) -> bool;
+
+    // csv writing entry functions
     auto processLatencies() -> void;
     auto processOrders(CollectionOrderGenerator<BenchmarkOrder> &generator) -> void;
-
-    auto performMatching(std::vector<TOrder>& orders, std::vector<uint64_t>& actual_order) -> void;
+    auto processMatching(std::vector<TOrder>& orders, std::vector<uint64_t>& actual_order) -> void;
 
 private:
+    // cycle count for exchange
     uint64_t current_cycle_ = 0;
 
+    // consts for input parameters
     const uint64_t TOTAL_ORDERS_;
     const uint64_t NUM_THREADS_;
     const uint64_t THREAD_LIMIT_;
 
+    // data structure templated argument
     DataStructure& structure_;
-    std::atomic<int> enqueueThreadId_{0};
-    std::atomic<int> dequeueThreadId_{0};
-    uint64_t* latencies_enqueue; // contiguous allocation for enqueue
-    uint64_t* latencies_dequeue;
 
-    uint64_t* sequence_dequeue;
-    uint64_t* timestamps_dequeue;
+    // atomics for thread IDs
+    std::atomic<int> enqueue_thread_id_{0};
+    std::atomic<int> dequeue_thread_id{0};
 
-    std::vector<uint64_t> localIndexEnq_; // per-producer counters
-    std::vector<uint64_t> localIndexDeq_; // per-consumer counters
+    // contiguous allocation for latency writing - only used for enqueueOrder & dequeueLatency
+    uint64_t* latencies_enqueue_;
+    uint64_t* latencies_dequeue_;
 
+    // contiguous allocation for order writing - only used for dequeueOrdering
+    uint64_t* sequence_dequeue_;
+    uint64_t* timestamps_dequeue_;
+
+    std::vector<uint64_t> local_index_enq_; // per-producer counters
+    std::vector<uint64_t> local_index_deq_; // per-consumer counters
+
+    // the matching engine
     MatchingEngine<TOrder> exchange_;
 };

@@ -23,7 +23,6 @@ MatchingEngine<TOrder>::MatchingEngine(double centre_price): tick_size(0.01), pr
 
 template<typename TOrder>
 auto MatchingEngine<TOrder>::processOrder(BookOrder* incoming) -> TradesCycle {
-    std::cout << "ProcessOrder: side=" << (int)incoming->side << ", qty=" << incoming->quantity << ", price_ticks=" << incoming->price_ticks << "\n";
     TradesCycle tc;
     if (incoming->side == 0){
         tc = matchBuy(incoming);
@@ -42,8 +41,6 @@ auto MatchingEngine<TOrder>::convertOrder(const TOrder& incoming) -> BookOrder {
     book_order.order_id = incoming.order_id;
     book_order.quantity = incoming.quantity;
     book_order.price_ticks = priceToTicks(incoming.price);
-
-    // CHECK THIS -> THIS MIGHT CAUSE SOME ISSUES
     book_order.side = (incoming.type == OrderType::BUY) ? 0 : 1;
     book_order.next = nullptr;
     book_order.prev = nullptr;
@@ -75,14 +72,14 @@ auto MatchingEngine<TOrder>::matchBuy(BookOrder* order) -> TradesCycle {
         BookOrder* listStart = level.head;
 
         if (listStart == nullptr) {
-            std::cerr << "ERROR: listStart is nullptr but level exists!\n";
+            std::cerr << "ERR: listStart is nullptr but level exists\n";
             break;
         }
 
         uint32_t traded_volume = std::min(order->quantity, listStart->quantity);
         
         if (traded_volume == 0) {
-            std::cerr << "ERROR: traded_volume is 0. order->quantity=" << order->quantity 
+            std::cerr << "ERR: traded_volume is 0, quantity=" << order->quantity 
                       << " listStart->quantity=" << listStart->quantity << "\n";
             break;
         }

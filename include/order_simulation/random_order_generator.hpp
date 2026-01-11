@@ -1,9 +1,16 @@
 #pragma once
-#include "i_order_generator.hpp"
-#include "market_state.hpp"
+
 #include <random>
 #include <optional>
 #include <sstream>
+
+#include "i_order_generator.hpp"
+#include "market_state.hpp"
+
+/**
+ * RandomOrderGenerator class
+ * Uses seed to pseudorandomly generate orders
+ */
 
 template <typename TOrder>
 class RandomOrderGenerator : public IOrderGenerator<TOrder, RandomOrderGenerator<TOrder>> {

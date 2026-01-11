@@ -15,6 +15,5 @@ public:
     auto getFront(TOrder &order) -> bool;
 
 private:
-    uint64_t size_;
     moodycamel::ConcurrentQueue<TOrder> mcMPMCQueue_;
 };

@@ -9,6 +9,11 @@ enum class TestType {
     ORDER
 };
 
+/**
+ * TestParams
+ * the input parameters from the ./run.sh script
+ */
+
 struct TestParams {
     TestType test;
     uint64_t thread_count;

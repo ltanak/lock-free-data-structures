@@ -4,28 +4,25 @@
 #include <fstream>
 #include <sstream>
 
-#include "order_simulation/benchmark_order.hpp"
+#include "benchmarking/benchmark.hpp"
 #include "data_structures/queues/regular_queue.hpp"
 #include "data_structures/queues/mc_lockfree_queue.hpp"
 #include "data_structures/queues/mc_mpmc_queue.hpp"
+#include "exchange/trades_cycle.hpp"
+#include "order_simulation/benchmark_order.hpp"
+#include "order_simulation/collection_order_generator.hpp"
 #include "scenarios/test_inputs.hpp"
 #include "utils/timing.hpp"
-
-#include "benchmarking/benchmark.hpp"
-
-#include "order_simulation/collection_order_generator.hpp"
-
-#include "exchange/trades_cycle.hpp"
 #include "utils/files.hpp"
 
 template<typename DataStructure, typename TOrder>
 BenchmarkWrapper<DataStructure, TOrder>::BenchmarkWrapper(DataStructure &structure, TestParams &params)
-: structure_(structure), localIndexEnq_(params.thread_count, 0), localIndexDeq_(params.thread_count, 0), TOTAL_ORDERS_(params.total_orders), NUM_THREADS_(params.thread_count), THREAD_LIMIT_(params.thread_order_limit), exchange_(100)
+: structure_(structure), local_index_enq_(params.thread_count, 0), local_index_deq_(params.thread_count, 0), TOTAL_ORDERS_(params.total_orders), NUM_THREADS_(params.thread_count), THREAD_LIMIT_(params.thread_order_limit), exchange_(100)
 {
-    latencies_enqueue = new uint64_t[params.total_orders];
-    latencies_dequeue = new uint64_t[params.total_orders];
-    sequence_dequeue = new uint64_t[params.total_orders];
-    timestamps_dequeue = new uint64_t[params.total_orders];
+    latencies_enqueue_ = new uint64_t[params.total_orders];
+    latencies_dequeue_ = new uint64_t[params.total_orders];
+    sequence_dequeue_ = new uint64_t[params.total_orders];
+    timestamps_dequeue_ = new uint64_t[params.total_orders];
     if (NUM_THREADS_ == 0 || THREAD_LIMIT_ == 0 || TOTAL_ORDERS_ == 0) {
         std::cerr << "Invalid params (zero)" << std::endl;
         std::abort();
@@ -34,24 +31,24 @@ BenchmarkWrapper<DataStructure, TOrder>::BenchmarkWrapper(DataStructure &structu
 
 template<typename DataStructure, typename TOrder>
 BenchmarkWrapper<DataStructure, TOrder>::~BenchmarkWrapper(){
-    delete[] latencies_enqueue;
-    delete[] latencies_dequeue;
-    delete[] sequence_dequeue;
-    delete[] timestamps_dequeue;
+    delete[] latencies_enqueue_;
+    delete[] latencies_dequeue_;
+    delete[] sequence_dequeue_;
+    delete[] timestamps_dequeue_;
 }
 
 template<typename DataStructure, typename TOrder>
-int BenchmarkWrapper<DataStructure, TOrder>::addThread(){
-    return enqueueThreadId_.fetch_add(1, std::memory_order_relaxed);
+int BenchmarkWrapper<DataStructure, TOrder>::addEnqThread(){
+    return enqueue_thread_id_.fetch_add(1, std::memory_order_relaxed);
 }
 
 template<typename DataStructure, typename TOrder>
-int BenchmarkWrapper<DataStructure, TOrder>::addDequeueThread(){
-    return dequeueThreadId_.fetch_add(1, std::memory_order_relaxed);
+int BenchmarkWrapper<DataStructure, TOrder>::addDeqThread(){
+    return dequeue_thread_id.fetch_add(1, std::memory_order_relaxed);
 }
 
 template<typename DataStructure, typename TOrder>
-bool BenchmarkWrapper<DataStructure, TOrder>::enqueue_order(TOrder &o, int threadId) {
+bool BenchmarkWrapper<DataStructure, TOrder>::enqueueOrder(TOrder &o, int threadId) {
     // start timer
     uint64_t t0 = lTime::rdtscp_inline();
     // enqueue datastructure
@@ -62,13 +59,13 @@ bool BenchmarkWrapper<DataStructure, TOrder>::enqueue_order(TOrder &o, int threa
 
     // calculations and storing
     uint64_t delta = t1 - t0;
-    uint64_t idx = threadId * THREAD_LIMIT_ + localIndexEnq_[threadId]++; // per-producer index
-    latencies_enqueue[idx] = delta;
+    uint64_t idx = threadId * THREAD_LIMIT_ + local_index_enq_[threadId]++; // per-producer index
+    latencies_enqueue_[idx] = delta;
     return enqueued;
 }
 
 template<typename DataStructure, typename TOrder>
-bool BenchmarkWrapper<DataStructure, TOrder>::dequeue_latency(TOrder &o, int threadId) {
+bool BenchmarkWrapper<DataStructure, TOrder>::dequeueLatency(TOrder &o, int threadId) {
     uint64_t t0 = lTime::rdtscp_inline();
     // dequeue datastructure
     bool dequeued = structure_.dequeue(o);
@@ -78,18 +75,18 @@ bool BenchmarkWrapper<DataStructure, TOrder>::dequeue_latency(TOrder &o, int thr
 
     // calculations and storing
     uint64_t delta = t1 - t0;
-    uint64_t idx = threadId * THREAD_LIMIT_ + localIndexDeq_[threadId]++; // per-consumer index
-    latencies_dequeue[idx] = delta;
+    uint64_t idx = threadId * THREAD_LIMIT_ + local_index_deq_[threadId]++; // per-consumer index
+    latencies_dequeue_[idx] = delta;
     return dequeued;
 }
 
 template<typename DataStructure, typename TOrder>
-bool BenchmarkWrapper<DataStructure, TOrder>::dequeue_ordering(TOrder &o, int threadId) {
+bool BenchmarkWrapper<DataStructure, TOrder>::dequeueOrdering(TOrder &o, int threadId) {
     bool dequeued = structure_.dequeue(o);
-    uint64_t idx = threadId * THREAD_LIMIT_ + localIndexDeq_[threadId]++;
+    uint64_t idx = threadId * THREAD_LIMIT_ + local_index_deq_[threadId]++;
 
-    sequence_dequeue[idx] = o.sequence_number;
-    timestamps_dequeue[idx] = lTime::rdtscp_inline();
+    sequence_dequeue_[idx] = o.sequence_number;
+    timestamps_dequeue_[idx] = lTime::rdtscp_inline();
 
     // maybe add logic for if transaction wasn't successful
     return dequeued;
@@ -109,7 +106,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
         sumEnq += e_ns;
         e_ns_latencies.push_back(e_ns);
 
-        double d_ns = latencies_dequeue[i] / cycles_per_ns;
+        double d_ns = latencies_dequeue_[i] / cycles_per_ns;
         sumDeq += d_ns;
         d_ns_latencies.push_back(d_ns);
     }
@@ -119,7 +116,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
     // std out for average latencies (will be later included in report generation)
     std::cout << "Avg Enqueue Latency (ns): " << sumEnq << std::endl;
     std::cout << "Avg Dequeue Latency (ns): " << sumDeq << std::endl;
-    latencies::writeCsvLatencies(e_ns_latencies, d_ns_latencies);
+    latencies::write(e_ns_latencies, d_ns_latencies);
 }
 
 template<typename DataStructure, typename TOrder>
@@ -134,7 +131,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGener
 
     // store timestamp and sequence number from dequeue
     for (size_t i = 0; i < TOTAL_ORDERS_; ++i) {
-        t_s.emplace_back(timestamps_dequeue[i], sequence_dequeue[i]); // make pair of each element, then sort by timestamp
+        t_s.emplace_back(timestamps_dequeue_[i], sequence_dequeue_[i]); // make pair of each element, then sort by timestamp
     }
 
     // sort based on timestamp
@@ -151,21 +148,19 @@ void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGener
 
     // use seeded generator to get expected sequence of IDs
     for (size_t i = 0; i < TOTAL_ORDERS_; ++i){
+        // std::cout << "Order sequence: " << sequene_dequeue_[i] << std::endl;
         TOrder order = generator.generate();
         orders.push_back(order);
         expected_order.push_back(order.order_id);
     }
+    ordering::write(expected_order, actual_order);
 
-    // write to csv
-    ordering::writeCsvOrdering(expected_order, actual_order);
-
-    // perform next part - checking matching within an orderbook / exchange
-    performMatching(orders, actual_order);
+    processMatching(orders, actual_order);
 }
 
 template<typename DataStructure, typename TOrder>
-void BenchmarkWrapper<DataStructure, TOrder>::performMatching(std::vector<TOrder>& orders, std::vector<uint64_t>& actual_order) {
-    // convert to BookOrders
+void BenchmarkWrapper<DataStructure, TOrder>::processMatching(std::vector<TOrder>& orders, std::vector<uint64_t>& actual_order) {
+    // Convert all orders to BookOrder and store them persistently
     std::vector<BookOrder> book_orders;
     std::vector<uint32_t> original_quantities;
     book_orders.reserve(orders.size());

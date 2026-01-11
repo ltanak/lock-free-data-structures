@@ -7,7 +7,7 @@
 #define NOT_IMPLEMENTED throw std::logic_error("Function not implemented.");
 
 template<typename TOrder>
-MCConcurrentQueue<TOrder>::MCConcurrentQueue(): size_(0) {}
+MCConcurrentQueue<TOrder>::MCConcurrentQueue() {}
 
 template<typename TOrder>
 bool MCConcurrentQueue<TOrder>::enqueueOrder(TOrder &order){
@@ -27,7 +27,7 @@ bool MCConcurrentQueue<TOrder>::dequeueOrder(TOrder &order){
 
 template<typename TOrder>
 uint64_t MCConcurrentQueue<TOrder>::getSize(){
-    return size_;
+    return mcMPMCQueue_.size_approx();
 }
 
 template<typename TOrder>
@@ -47,7 +47,7 @@ bool MCConcurrentQueue<TOrder>::getFront(TOrder &order){
 
 template<typename TOrder>
 bool MCConcurrentQueue<TOrder>::isEmpty(){
-    return size_ == 0;
+    return mcMPMCQueue_.size_approx() == 0;
 }
 
 template class MCConcurrentQueue<BenchmarkOrder>;
