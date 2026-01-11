@@ -1,5 +1,8 @@
 #pragma once
 #include <sstream>
+#include <iostream>
+#include <stdint.h>
+
 
 struct BookOrder {
     uint32_t order_id;
