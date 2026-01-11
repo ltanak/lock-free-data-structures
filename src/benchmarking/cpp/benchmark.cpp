@@ -102,7 +102,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
 
     for (size_t i = 0; i < TOTAL_ORDERS_; ++i) {
         // convert rdtscp into nano seconds
-        double e_ns = latencies_enqueue[i] / cycles_per_ns;
+        double e_ns = latencies_enqueue_[i] / cycles_per_ns;
         sumEnq += e_ns;
         e_ns_latencies.push_back(e_ns);
 
