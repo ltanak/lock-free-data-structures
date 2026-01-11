@@ -40,22 +40,22 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     const uint64_t THREAD_LIMIT = params.thread_order_limit;
     const uint32_t SEED = params.seed;
 
-    MarketState marketState;
+    MarketState market_state;
 
     std::vector<std::thread> producers;
     for (int i = 0; i < PRODUCERS; ++i) {
-        int tid = wrapper.addThread();
+        int tid = wrapper.addEnqThread();
         producers.emplace_back(
             [&, tid]() {
                 uint64_t count = 0;
-                RandomOrderGenerator<BenchmarkOrder> gen(marketState, 100 * (tid + 1), SEED + tid);
+                RandomOrderGenerator<BenchmarkOrder> gen(market_state, 100 * (tid + 1), SEED + tid);
                 while (true){
                     if (count >= THREAD_LIMIT) break;
 
                     BenchmarkOrder o = gen.generate();
                     ++count;
                     
-                    wrapper.enqueue_order(o, tid);
+                    wrapper.enqueueOrder(o, tid);
                 }
             }
         );
@@ -63,7 +63,7 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
 
     std::vector<std::thread> consumers;
     for (int i = 0; i < CONSUMERS; ++i) {
-        int tid = wrapper.addDequeueThread();
+        int tid = wrapper.addDeqThread();
         consumers.emplace_back(
             [&, tid]() {
                 BenchmarkOrder o;
@@ -72,7 +72,7 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
                     if (count >= THREAD_LIMIT) break;
                     ++count;
 
-                    wrapper.dequeue_latency(o, tid);
+                    wrapper.dequeueLatency(o, tid);
                 }
             }
         );
@@ -81,5 +81,4 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     lThread::close(producers, consumers);
 
     wrapper.processLatencies();
-    std::cout << "Stress test completed with " << PRODUCERS << " producers and " << CONSUMERS << " consumers.\n";
 }

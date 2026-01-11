@@ -1,14 +1,19 @@
 #pragma once
 
 #include <sstream>
+#include <iostream>
+
 #include "exchange/book_order.hpp"
 #include "exchange/price_book.hpp"
 #include "exchange/price_level.hpp"
-#include <iostream>
 
 /**
  * Going for a recentering OrderBook, so that it dynamically adapts
  * to price changes like in a real exchange
+ * 
+ * Uses a PriceBook that stores various PriceLevels
+ * each pricelevel represents a different tick index
+ * bitmap indicates which price levels are active
  */
 
 struct PriceBook {
@@ -25,11 +30,15 @@ struct PriceBook {
     auto initialise(uint32_t centre) -> void;
     auto recentre(uint32_t centre) -> void;
     auto shift(uint32_t new_ticks) -> void;
+
     auto priceToIndex(uint32_t price) -> int;
+
+    // functions are O(1)
     auto addOrder(BookOrder*) -> void;
     auto removeOrder(BookOrder*) -> void;
     auto setBit(int index) -> void;
     auto clearBit(int index) -> void;
 
+    // amortised O(1) checking
     auto bestPriceLevel() const -> int;
 };

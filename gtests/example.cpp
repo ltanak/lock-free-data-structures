@@ -68,18 +68,18 @@ TEST(MCLockFreeQueueTest, BasicOperations) {
 	BenchmarkOrder front{};
 
 	EXPECT_TRUE(q.isEmpty());
-	// EXPECT_EQ(q.getSize(), 0u);
+	EXPECT_EQ(q.getSize(), 0u);
 
 	EXPECT_TRUE(q.enqueueOrder(in));
-	// EXPECT_FALSE(q.isEmpty());
-	// EXPECT_EQ(q.getSize(), 1u);
+	EXPECT_FALSE(q.isEmpty());
+	EXPECT_EQ(q.getSize(), 1u);
 
-	// EXPECT_TRUE(q.getFront(front));
-	// EXPECT_EQ(front.order_id, in.order_id);
+	EXPECT_TRUE(q.getFront(front));
+	EXPECT_EQ(front.order_id, in.order_id);
 
 	EXPECT_TRUE(q.dequeueOrder(out));
 	EXPECT_EQ(out.order_id, in.order_id);
-	// EXPECT_TRUE(q.isEmpty());
+	EXPECT_TRUE(q.isEmpty());
 }
 
 TEST(MCConcurrentQueueTest, BasicOperations) {
@@ -89,12 +89,12 @@ TEST(MCConcurrentQueueTest, BasicOperations) {
 
 	EXPECT_TRUE(q.isEmpty());
 	EXPECT_TRUE(q.enqueueOrder(in));
-	// EXPECT_EQ(q.getSize(), 1u);
+	EXPECT_EQ(q.getSize(), 1u);
 
 	EXPECT_TRUE(q.dequeueOrder(out));
 	EXPECT_EQ(out.order_id, in.order_id);
 	EXPECT_TRUE(q.isEmpty());
-	// EXPECT_EQ(q.getSize(), 0u);
+	EXPECT_EQ(q.getSize(), 0u);
 }
 
 TEST(MCConcurrentQueueTest, GetFrontThrowsNotImplemented) {
@@ -132,7 +132,7 @@ TEST(MatchingEngineTest, EnforcesPriceTimePriority) {
 TEST(MatchingEngineTest, MultipleOrdersTest){
 	MatchingEngine<BenchmarkOrder> engine(100.0);
 
-	// Add multiple sell orders at different price levels
+	// adding multiple sell orders
 	auto sell1 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(1, OrderType::SELL, 101.00, 5, 1)));
 	auto sell2 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(2, OrderType::SELL, 101.00, 7, 2)));
 	auto sell3 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(3, OrderType::SELL, 102.00, 10, 3)));
@@ -141,23 +141,25 @@ TEST(MatchingEngineTest, MultipleOrdersTest){
 	engine.processOrder(sell2.get());
 	engine.processOrder(sell3.get());
 
-	// Add a buy order that crosses at best sell level (sell1 and sell2 at 101.00)
+	// buy order that crosses sell1 and sell2 at 101.00
 	auto buy1 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(4, OrderType::BUY, 101.50, 8, 4)));
 	engine.processOrder(buy1.get());
+
 	// buy1 should match against sell1 (5 qty) and partially against sell2 (3 qty)
 	EXPECT_EQ(buy1->quantity, 0u);
 	EXPECT_EQ(sell1->quantity, 0u);
 	EXPECT_EQ(sell2->quantity, 4u);
 
-	// Add another buy order that crosses remaining sells
+	// next buy order that crosses remaining sells
 	auto buy2 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(5, OrderType::BUY, 102.50, 20, 5)));
 	engine.processOrder(buy2.get());
+
 	// buy2 should match against remaining sell2 (4 qty) and sell3 (10 qty), leaving 6 qty
 	EXPECT_EQ(buy2->quantity, 6u);
 	EXPECT_EQ(sell2->quantity, 0u);
 	EXPECT_EQ(sell3->quantity, 0u);
 
-	// Verify buy2 is now in the buy book
+	// check buy2 is now in the buy book
 	int buy_level = engine.buy_book.bestPriceLevel();
 	EXPECT_GE(buy_level, 0);
 	EXPECT_EQ(engine.buy_book.levels[buy_level].total_quantity, 6u);
@@ -167,41 +169,40 @@ TEST(MatchingEngineTest, MultipleOrdersTest){
 TEST(MatchingEngineTest, RecenteringAndShifting) {
 	MatchingEngine<BenchmarkOrder> engine(100.0);
 
-	// Add orders around the initial centre price of 100.0
 	auto sell1 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(1, OrderType::SELL, 101.00, 10, 1)));
 	auto sell2 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(2, OrderType::SELL, 102.00, 5, 2)));
 	
 	engine.processOrder(sell1.get());
 	engine.processOrder(sell2.get());
 
-	// Verify initial state
+	// check internal state / priceLevels and indexes
 	EXPECT_EQ(engine.sell_book.centre_price_ticks, engine.priceToTicks(100.0));
 	int sell_level_1_before = engine.sell_book.priceToIndex(sell1->price_ticks);
 	int sell_level_2_before = engine.sell_book.priceToIndex(sell2->price_ticks);
 	EXPECT_GE(sell_level_1_before, 0);
 	EXPECT_GE(sell_level_2_before, 0);
 
-	// Verify both orders are in the book with correct total quantity
+	// check both orders are in the book with correct total quantity
 	EXPECT_EQ(engine.sell_book.levels[sell_level_1_before].total_quantity, 10u);
 	EXPECT_EQ(engine.sell_book.levels[sell_level_2_before].total_quantity, 5u);
 
-	// Recenter the books to a new price (110.0) - still close to original
+	// recentre the books to a new price (110.0) - still close to original
 	engine.sell_book.recentre(engine.priceToTicks(110.0));
 
-	// Verify centre has moved
+	// centre has moved
 	EXPECT_EQ(engine.sell_book.centre_price_ticks, engine.priceToTicks(110.0));
 
-	// Verify orders are still at the correct price levels after recentering
+	// orders are still at the correct price levels after recentering
 	int sell_level_1_after = engine.sell_book.priceToIndex(sell1->price_ticks);
 	int sell_level_2_after = engine.sell_book.priceToIndex(sell2->price_ticks);
 	EXPECT_GE(sell_level_1_after, 0);
 	EXPECT_GE(sell_level_2_after, 0);
 
-	// Verify the orders still have their quantities after recentering
+	// orders still have their quantities after recentering
 	EXPECT_EQ(engine.sell_book.levels[sell_level_1_after].total_quantity, 10u);
 	EXPECT_EQ(engine.sell_book.levels[sell_level_2_after].total_quantity, 5u);
 
-	// Verify bitmap is set correctly for both orders
+	// check bitmap is set correctly for both orders
 	uint64_t sell_word_1 = sell_level_1_after / 64;
 	uint64_t sell_bit_1 = sell_level_1_after % 64;
 	EXPECT_TRUE((engine.sell_book.bitmap[sell_word_1] & (1ULL << sell_bit_1)));

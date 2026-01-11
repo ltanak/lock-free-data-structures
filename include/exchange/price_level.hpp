@@ -2,10 +2,14 @@
 
 #include <sstream>
 #include <iostream>
-#include "exchange/book_order.hpp"
 #include <stdint.h>
 
-// double ended queue
+#include "exchange/book_order.hpp"
+
+/**
+ * PriceLevel struct
+ * Stores all the orders as a FIFO linkedlist that match its pricelevel
+ */
 struct alignas(64) PriceLevel {
     BookOrder* head;
     BookOrder* tail;
@@ -15,5 +19,7 @@ struct alignas(64) PriceLevel {
     auto dequeue(BookOrder*) -> void;
     auto isEmpty() -> bool;
     auto clear() -> void;
+
+    // used on book recentering
     auto move(PriceLevel& move_from) -> void;
 };

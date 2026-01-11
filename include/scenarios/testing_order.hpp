@@ -21,8 +21,6 @@
  * Purpose of test is to benchmark the ordering and correctness of orders being processed
  * Adds sequenced orders to a data structure from a single producer
  * Multiple consumers will then deque orders from the data structure
- * 
- * @note Parameterised tests to be added in the future, and will eventually pass through a price-time priority exchange
  */
 
 auto initialiseGeneratorsOrder(MarketState &market, const uint32_t SEED) -> CollectionOrderGenerator<BenchmarkOrder> {
@@ -61,15 +59,13 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
     while (!ordersQueue.empty()){
         BenchmarkOrder o1 = ordersQueue.front();
         ordersQueue.pop();
-        // std::cout << o1 << std::endl;
-
-        wrapper.enqueue_order(o1, 0);
+        wrapper.enqueueOrder(o1, 0);
     }
 
     // dequeing from the data structure
     std::vector<std::thread> consumers;
     for (int i = 0; i < CONSUMERS; ++i) {
-        int tid = wrapper.addDequeueThread();
+        int tid = wrapper.addDeqThread();
         consumers.emplace_back(
             [&, tid]() {
                 BenchmarkOrder o;
@@ -77,7 +73,7 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
                 while (true){
                     if (count >= THREAD_LIMIT) break;
                     ++count;
-                    wrapper.dequeue_ordering(o, tid);
+                    wrapper.dequeueOrdering(o, tid);
                 }
             }
         );

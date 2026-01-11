@@ -4,12 +4,11 @@
 #include <cstdint>
 
 template<typename TOrder>
-MCLockFreeQueue<TOrder>::MCLockFreeQueue(): size_(0) {}
+MCLockFreeQueue<TOrder>::MCLockFreeQueue() {}
 
 template<typename TOrder>
 bool MCLockFreeQueue<TOrder>::enqueueOrder(TOrder &order){
     if (mcQueue_.enqueue(order)){
-        // size_++;
         return true;
     }
     return false;
@@ -21,14 +20,13 @@ bool MCLockFreeQueue<TOrder>::dequeueOrder(TOrder &order){
         // will do a terminal logging error saying not possible
         return false;
     } else {
-        // size_--;
         return true;
     }
 }
 
 template<typename TOrder>
 uint64_t MCLockFreeQueue<TOrder>::getSize(){
-    return size_;
+    return mcQueue_.size_approx();
 }
 
 template<typename TOrder>
@@ -42,7 +40,7 @@ bool MCLockFreeQueue<TOrder>::getFront(TOrder &order){
 
 template<typename TOrder>
 bool MCLockFreeQueue<TOrder>::isEmpty(){
-    return size_ == 0;
+    return mcQueue_.size_approx() == 0;
 }
 
 template class MCLockFreeQueue<BenchmarkOrder>;

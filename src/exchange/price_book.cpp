@@ -41,6 +41,7 @@ auto PriceBook::shift(uint32_t new_ticks) -> void {
         // shows that this price_level is active, then activates the specific bit
         new_bitmap[new_index / 64] |= (1ULL << (new_index % 64));
     }
+    
     // then commits the results into the main bitmap and levels
     for (int i = 0; i < NUM_LEVELS; ++i){
         levels[i].move(new_levels[i]);

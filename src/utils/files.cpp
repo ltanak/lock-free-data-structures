@@ -22,7 +22,7 @@ namespace latencies {
         return str;
     }
 
-    bool writeCsvLatencies(const std::vector<double>& enqueue_vec, const std::vector<double>& dequeue_vec) {
+    bool write(const std::vector<double>& enqueue_vec, const std::vector<double>& dequeue_vec) {
         namespace fs = std::filesystem;
 
         fs::path dirPath = getPath();
@@ -62,7 +62,7 @@ namespace ordering {
         return str;
     }
 
-    bool writeCsvOrdering(const vector<uint64_t>& expected_order, const vector<uint64_t>& actual_order) {
+    bool write(const vector<uint64_t>& expected_order, const vector<uint64_t>& actual_order) {
         namespace fs = std::filesystem;
 
         fs::path dirPath = getPath();
@@ -98,18 +98,6 @@ namespace exchange {
         oss << std::put_time(&tm, "%d_%m_%Y_%H_%M_%S");
         auto str = "matching_" + oss.str() + ".csv";
         return str;
-    }
-
-    auto initialise(std::string file_name) -> bool {
-        namespace fs = std::filesystem;
-
-        fs::path dirPath = getPath();
-        fs::path filePath = dirPath / file_name;
-    
-        if (!fs::exists(filePath)) {
-            std::ofstream(filePath) << "cycle,exp_prices,exp_qties,acc_prices,acc_qties\n"; // header
-        }
-        return true;
     }
 
     auto write(const vector<TradesCycle> expected, const vector<TradesCycle> actual) -> bool {
