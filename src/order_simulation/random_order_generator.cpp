@@ -38,7 +38,7 @@ TOrder RandomOrderGenerator<TOrder>::generateOrder(){
     OrderType type = isBuy ? OrderType::BUY : OrderType::SELL;
 
     uint32_t quantity = quantityDist_(rng_);
-    uint64_t timestamp = ltime::rdtscp_inline();
+    uint64_t timestamp = ltime::rdtsc_lfence();
 
     return TOrder{orderId_, type, price, quantity, timestamp};
 }

@@ -22,7 +22,7 @@
 namespace {
 
     BenchmarkOrder makeOrder(uint64_t id = 1, OrderType type = OrderType::BUY, double price = 10.0, uint32_t qty = 5, uint64_t seq = 0) {
-		uint64_t ts = ltime::rdtscp_inline();
+		uint64_t ts = ltime::rdtsc_lfence();
         return BenchmarkOrder{id, type, price, qty, ts, seq};
     }
 

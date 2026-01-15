@@ -9,7 +9,11 @@
  */
 
 struct TradesCycle {
-    int cycle;
+    // one cycle is equivalent to one insertion
+    int cycle; 
+
+    // vectors of prices and their quantaties when matched
+    // per-cycle can have multiple trades matched
     std::vector<double> prices;
     std::vector<uint32_t> quantities;
 };
