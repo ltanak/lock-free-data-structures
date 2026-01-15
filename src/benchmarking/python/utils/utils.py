@@ -26,3 +26,8 @@ def latencyPlotsDir():
     path = getBenchmarkingRoot() / "python" / "latency_plots" / "graphs"
     path.mkdir(parents=True, exist_ok=True)
     return path
+
+def orderPlotsDir():
+    path = getBenchmarkingRoot() / "python" / "ordering_plots" / "graphs"
+    path.mkdir(parents=True, exist_ok=True)
+    return path

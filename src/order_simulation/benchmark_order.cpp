@@ -5,7 +5,7 @@
 #include <sstream>
 
 std::ostream& operator<<(std::ostream& os, const BenchmarkOrder &order){
-    uint64_t clocks = ltime::rdtscp_inline();
+    uint64_t clocks = ltime::rdtsc_lfence();
     os << "Order {"
        << "id= " << order.order_id
        << ", type= " << (order.type == OrderType::BUY ? "BUY" : "SELL") 
