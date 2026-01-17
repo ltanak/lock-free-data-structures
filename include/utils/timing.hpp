@@ -20,4 +20,3 @@ namespace ltime {
 #endif
     auto measure_tsc_ghz() -> double;
 }
-
