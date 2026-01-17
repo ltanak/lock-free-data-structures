@@ -41,10 +41,10 @@ def main():
     op = OrderingPlot(ord_csv_path)
     print("\n=== ORDERING SUMMARY ===")
     print(op.mismatch_summary())
-    op.plot_out_of_order_pairs(out=ordPairsOut)
-    op.plot_offset(out=ordOffsetOut, id_range=(0, 1000))
-    op.plot_displacement_heatmap(out=ordHeatmapOut,)
-    op.plot_expected_vs_actual_colored(out=ordColoredOut)
+    op.plot_out_of_order_pairs(out=ordPairsOut, id_range=(0, 1000))
+    op.plot_offset(out=ordOffsetOut)
+    op.plot_displacement_heatmap(out=ordHeatmapOut, id_range=(0, 1000))
+    op.plot_expected_vs_actual_colored(out=ordColoredOut, id_range=(0, 1000))
 
 
 
