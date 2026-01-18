@@ -1,0 +1,54 @@
+compilation_database_dir: build
+output_directory: diagrams
+query_driver: clang++
+
+diagrams:
+  benchmarking_overview:
+    type: class
+    glob:
+      - src/benchmarking/**/*.cpp
+    exclude:
+      elements:
+        - "std::.*"
+        - "MatchingEngine"
+        - "PriceBook"
+        - "PriceLevel"
+        - "BookOrder"
+        - ".*Queue"
+        - ".*Buffer"
+        - "OrderGenerator.*"
+        - "MarketState"
+    title: "Benchmarking Overview"
+
+  data_structures:
+    type: class
+    glob:
+      - src/data_structures/**/*.cpp
+    exclude:
+      elements:
+        - "std::.*"
+    title: "Data Structures"
+
+  matching_engine:
+    type: class
+    glob:
+      - src/exchange/**/*.cpp
+    exclude:
+      elements:
+        - "std::.*"
+    title: "Matching Engine"
+
+  order_simulation:
+    type: class
+    glob:
+      - src/order_simulation/**/*.cpp
+    exclude:
+      elements:
+        - "std::.*"
+    title: "Order Simulation"
+
+  include_diagram:
+    type: include
+    glob:
+      - src/**/*.cpp
+    title: "Include Dependencies"

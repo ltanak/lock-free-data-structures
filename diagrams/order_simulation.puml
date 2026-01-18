@@ -1,0 +1,193 @@
+@startuml
+title Order Simulation
+class "std::atomic<double>" as C_0005179919139826839286
+class C_0005179919139826839286 {
+__
+}
+class "std::atomic<uint64_t>" as C_0011332686516704091328
+class C_0011332686516704091328 {
+__
+}
+class "std::optional<uint32_t>" as C_0016951693323196263165
+class C_0016951693323196263165 {
+__
+}
+class "std::mersenne_twister_engine<uint_fast32_t,32,624,397,31,0x9908b0df,11,0xffffffff,7,0x9d2c5680,15,0xefc60000,18,1812433253>" as C_0011895198819008469883
+class C_0011895198819008469883 {
+__
+}
+class "std::uniform_int_distribution<uint32_t>" as C_0016615085971629376192
+class C_0016615085971629376192 {
+__
+}
+class "std::uniform_int_distribution<int>" as C_0001157372402074594407
+class C_0001157372402074594407 {
+__
+}
+class "std::function<TOrder()>" as C_0018274157797402886569
+class C_0018274157797402886569 {
+__
+}
+class "std::vector<std::function<TOrder()>>" as C_0015071573456055921610
+class C_0015071573456055921610 {
+__
+}
+class "std::function<BenchmarkOrder()>" as C_0007536631042685068852
+class C_0007536631042685068852 {
+__
+}
+class "std::vector<std::function<BenchmarkOrder()>>" as C_0000139421699563582552
+class C_0000139421699563582552 {
+__
+}
+enum "OrderType" as C_0001318154217281991402
+enum C_0001318154217281991402 {
+BUY
+SELL
+CANCEL
+}
+class "BenchmarkOrder" as C_0007154198836549622057
+class C_0007154198836549622057 {
+__
++order_id : uint64_t
++price : double
++quantity : uint32_t
++sequence_number : uint64_t
++timestamp : uint64_t
++type : OrderType
+}
+class "IOrderGenerator<TOrder,OrderGenImpl>" as C_0005927283058235908490
+class C_0005927283058235908490 {
++generate() : TOrder
+__
+}
+class "MarketState" as C_0006121784099919024875
+class C_0006121784099919024875 {
++applyEvent(double priceMult, double newVol, double bias) noexcept : void
++getBias() const noexcept : double
++getPrice() const noexcept : double
++getVolatility() const noexcept : double
+__
++basePrice : std::atomic<double>
++lastOrderId : std::atomic<uint64_t>
++trendBias : std::atomic<double>
++volatility : std::atomic<double>
+}
+class "RandomOrderGenerator<TOrder>" as C_0000970596797968374422
+class C_0000970596797968374422 {
++RandomOrderGenerator(MarketState & market, uint32_t maxQuantity, std::optional<uint32_t> seed = std::nullopt) : void
+..
++generateOrder() : TOrder
+__
+-marketState_ : MarketState *
+-maxQuantity_ : uint32_t
+-orderId_ : uint64_t
+-quantityDist_ : std::uniform_int_distribution<uint32_t>
+-rng_ : std::mt19937
+-sequence_number : uint64_t
+-sideDist_ : std::uniform_int_distribution<int>
+}
+class "IOrderGenerator<TOrder,RandomOrderGenerator<TOrder>>" as C_0004956954676521976533
+class C_0004956954676521976533 {
+__
+}
+class "RandomOrderGenerator<BenchmarkOrder>" as C_0015811532509489930649
+class C_0015811532509489930649 {
++RandomOrderGenerator(MarketState & market, uint32_t maxQuantity, std::optional<uint32_t> seed) : void
+..
++generateOrder() : BenchmarkOrder
+__
+-marketState_ : MarketState *
+-maxQuantity_ : uint32_t
+-orderId_ : uint64_t
+-quantityDist_ : std::uniform_int_distribution<uint32_t>
+-rng_ : std::mt19937
+-sequence_number : uint64_t
+-sideDist_ : std::uniform_int_distribution<int>
+}
+class "IOrderGenerator<BenchmarkOrder,RandomOrderGenerator<BenchmarkOrder>>" as C_0000173975862990583336
+class C_0000173975862990583336 {
+__
+}
+class "CollectionOrderGenerator<TOrder>" as C_0006074800203009140101
+class C_0006074800203009140101 {
++CollectionOrderGenerator(std::vector<std::function<TOrder ()>> generators, std::optional<uint32_t> seed = std::nullopt) : void
+..
++generateOrder() : TOrder
+__
+-generatorsVector : std::vector<std::function<TOrder ()>>
+-orderGenerators : std::uniform_int_distribution<int>
+-orderId_ : uint64_t
+-rng_ : std::mt19937
+}
+class "IOrderGenerator<TOrder,CollectionOrderGenerator<TOrder>>" as C_0004426522355160941721
+class C_0004426522355160941721 {
+__
+}
+class "CollectionOrderGenerator<BenchmarkOrder>" as C_0012299635414718796748
+class C_0012299635414718796748 {
++CollectionOrderGenerator(std::vector<std::function<BenchmarkOrder ()>> generators, std::optional<uint32_t> seed) : void
+..
++generateOrder() : BenchmarkOrder
+__
+-generatorsVector : std::vector<std::function<BenchmarkOrder ()>>
+-orderGenerators : std::uniform_int_distribution<int>
+-orderId_ : uint64_t
+-rng_ : std::mt19937
+}
+class "IOrderGenerator<BenchmarkOrder,CollectionOrderGenerator<BenchmarkOrder>>" as C_0000953677447147803516
+class C_0000953677447147803516 {
+__
+}
+C_0015071573456055921610 ..> C_0018274157797402886569
+C_0007536631042685068852 ..> C_0007154198836549622057
+C_0007536631042685068852 ..|> C_0018274157797402886569
+C_0000139421699563582552 ..> C_0007536631042685068852
+C_0000139421699563582552 ..|> C_0015071573456055921610
+C_0007154198836549622057 o-- C_0001318154217281991402 : +type
+C_0006121784099919024875 o-- C_0005179919139826839286 : +basePrice
+C_0006121784099919024875 o-- C_0005179919139826839286 : +volatility
+C_0006121784099919024875 o-- C_0005179919139826839286 : +trendBias
+C_0006121784099919024875 o-- C_0011332686516704091328 : +lastOrderId
+C_0000970596797968374422 ..|> C_0000970596797968374422
+C_0000970596797968374422 ..> C_0016951693323196263165
+C_0000970596797968374422 --> C_0006121784099919024875 : -marketState_
+C_0000970596797968374422 o-- C_0011895198819008469883 : -rng_
+C_0000970596797968374422 o-- C_0016615085971629376192 : -quantityDist_
+C_0000970596797968374422 o-- C_0001157372402074594407 : -sideDist_
+C_0004956954676521976533 <|-- C_0000970596797968374422
+C_0004956954676521976533 ..> C_0000970596797968374422
+C_0004956954676521976533 ..|> C_0005927283058235908490
+C_0015811532509489930649 ..> C_0007154198836549622057
+C_0015811532509489930649 ..|> C_0000970596797968374422
+C_0015811532509489930649 ..> C_0016951693323196263165
+C_0015811532509489930649 --> C_0006121784099919024875 : -marketState_
+C_0015811532509489930649 o-- C_0011895198819008469883 : -rng_
+C_0015811532509489930649 o-- C_0016615085971629376192 : -quantityDist_
+C_0015811532509489930649 o-- C_0001157372402074594407 : -sideDist_
+C_0000173975862990583336 <|-- C_0015811532509489930649
+C_0000173975862990583336 ..> C_0007154198836549622057
+C_0000173975862990583336 ..> C_0015811532509489930649
+C_0000173975862990583336 ..|> C_0004956954676521976533
+C_0006074800203009140101 ..|> C_0006074800203009140101
+C_0006074800203009140101 ..> C_0016951693323196263165
+C_0006074800203009140101 o-- C_0011895198819008469883 : -rng_
+C_0006074800203009140101 o-- C_0001157372402074594407 : -orderGenerators
+C_0006074800203009140101 o-- C_0015071573456055921610 : -generatorsVector
+C_0004426522355160941721 <|-- C_0006074800203009140101
+C_0004426522355160941721 ..> C_0006074800203009140101
+C_0004426522355160941721 ..|> C_0005927283058235908490
+C_0012299635414718796748 ..> C_0007154198836549622057
+C_0012299635414718796748 ..|> C_0006074800203009140101
+C_0012299635414718796748 ..> C_0016951693323196263165
+C_0012299635414718796748 o-- C_0011895198819008469883 : -rng_
+C_0012299635414718796748 o-- C_0001157372402074594407 : -orderGenerators
+C_0012299635414718796748 o-- C_0000139421699563582552 : -generatorsVector
+C_0000953677447147803516 <|-- C_0012299635414718796748
+C_0000953677447147803516 ..> C_0007154198836549622057
+C_0000953677447147803516 ..> C_0012299635414718796748
+C_0000953677447147803516 ..|> C_0004426522355160941721
+
+'Generated with clang-uml, version 0.6.2
+'LLVM version Homebrew clang version 21.1.8
+@enduml
