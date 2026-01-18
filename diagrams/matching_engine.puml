@@ -1,0 +1,132 @@
+@startuml
+title Matching Engine
+class "std::vector<double>" as C_0004101108369970767411
+class C_0004101108369970767411 {
+__
+}
+class "std::vector<uint32_t>" as C_0008659206544950497298
+class C_0008659206544950497298 {
+__
+}
+class "BookOrder" as C_0013780657640751257014
+class C_0013780657640751257014 {
+__
++next : BookOrder *
++order_id : uint32_t
++prev : BookOrder *
++price_ticks : uint32_t
++quantity : uint32_t
++side : uint8_t
+}
+class "PriceLevel" as C_0014922468649063041969
+class C_0014922468649063041969 {
++clear() : void
++dequeue(BookOrder *) : void
++enqueue(BookOrder *) : void
++isEmpty() : bool
++move(PriceLevel & move_from) : void
+__
++head : BookOrder *
++tail : BookOrder *
++total_quantity : int
+}
+class "PriceBook" as C_0015763172650814613504
+class C_0015763172650814613504 {
++addOrder(BookOrder *) : void
++bestPriceLevel() const : int
++clearBit(int index) : void
++initialise(uint32_t centre) : void
++priceToIndex(uint32_t price) : int
++recentre(uint32_t centre) : void
++removeOrder(BookOrder *) : void
++setBit(int index) : void
++shift(uint32_t new_ticks) : void
+__
+{static} +BITMAP_WORDS : const int
+{static} +NUM_LEVELS : const int
++base_price_ticks : uint32_t
++bitmap : uint64_t[128]
++centre_price_ticks : uint32_t
++levels : PriceLevel[8192]
++side : uint8_t
+}
+enum "OrderType" as C_0001318154217281991402
+enum C_0001318154217281991402 {
+BUY
+SELL
+CANCEL
+}
+class "BenchmarkOrder" as C_0007154198836549622057
+class C_0007154198836549622057 {
+__
++order_id : uint64_t
++price : double
++quantity : uint32_t
++sequence_number : uint64_t
++timestamp : uint64_t
++type : OrderType
+}
+class "TradesCycle" as C_0001541704363114617379
+class C_0001541704363114617379 {
+__
++cycle : int
++prices : std::vector<double>
++quantities : std::vector<uint32_t>
+}
+class "MatchingEngine<TOrder>" as C_0012117148133954156937
+class C_0012117148133954156937 {
++MatchingEngine(double) : void
+..
++convertOrder(const TOrder &) : BookOrder
++matchBuy(BookOrder *) : TradesCycle
++matchSell(BookOrder *) : TradesCycle
++priceToTicks(double) : uint32_t
++processOrder(BookOrder *) : TradesCycle
++ticksToPrice(uint32_t) : double
+__
++buy_book : PriceBook
++cycle : int
++price_scale : uint32_t
++sell_book : PriceBook
++tick_size : double
+}
+class "MatchingEngine<BenchmarkOrder>" as C_0015036118073739753006
+class C_0015036118073739753006 {
++MatchingEngine(double centre_price) : void
+..
++convertOrder(const BenchmarkOrder & incoming) : BookOrder
++matchBuy(BookOrder * order) : TradesCycle
++matchSell(BookOrder * order) : TradesCycle
++priceToTicks(double price) : uint32_t
++processOrder(BookOrder * incoming) : TradesCycle
++ticksToPrice(uint32_t ticks) : double
+__
++buy_book : PriceBook
++cycle : int
++price_scale : uint32_t
++sell_book : PriceBook
++tick_size : double
+}
+C_0013780657640751257014 --> C_0013780657640751257014 : +prev
+C_0013780657640751257014 --> C_0013780657640751257014 : +next
+C_0014922468649063041969 --> C_0013780657640751257014 : +head
+C_0014922468649063041969 --> C_0013780657640751257014 : +tail
+C_0015763172650814613504 ..> C_0013780657640751257014
+C_0015763172650814613504 o-- "8192" C_0014922468649063041969 : +levels
+C_0007154198836549622057 o-- C_0001318154217281991402 : +type
+C_0001541704363114617379 o-- C_0004101108369970767411 : +prices
+C_0001541704363114617379 o-- C_0008659206544950497298 : +quantities
+C_0012117148133954156937 ..> C_0013780657640751257014
+C_0012117148133954156937 ..> C_0001541704363114617379
+C_0012117148133954156937 o-- C_0015763172650814613504 : +buy_book
+C_0012117148133954156937 o-- C_0015763172650814613504 : +sell_book
+C_0015036118073739753006 ..> C_0007154198836549622057
+C_0015036118073739753006 ..|> C_0012117148133954156937
+C_0015036118073739753006 ..> C_0013780657640751257014
+C_0015036118073739753006 ..> C_0001541704363114617379
+C_0015036118073739753006 o-- C_0015763172650814613504 : +buy_book
+C_0015036118073739753006 o-- C_0015763172650814613504 : +sell_book
+
+'Generated with clang-uml, version 0.6.2
+'LLVM version Homebrew clang version 21.1.8
+@enduml
