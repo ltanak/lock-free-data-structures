@@ -9,6 +9,8 @@ numpy = "*"
 pandas = "*"
 matplotlib = "*"
 mplfinance = "*"
+pillow = "*"
 
 [tasks]
-run = "python -m scripts.main"
+main = "python -m scripts.main"
+picture = "python -m scripts.image"
