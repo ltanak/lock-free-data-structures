@@ -2,6 +2,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from benchmarking.python.plotting.utils import get_graph_dir
 
 class OrderingPlot:
     def __init__(self, csv_path: Path):
@@ -148,5 +149,23 @@ class OrderingPlot:
         else:
             plt.show()
         plt.close()
+
+    # Plot all ordering graphs
+    def plot_all(self, out_dir: Path | None = None, id_range: tuple[int, int] | None = None):
+        """
+        Generate and save all ordering plots to the specified directory.
+        
+        Args:
+            out_dir: Output directory. If None, uses default ordering graphs directory.
+            id_range: Optional tuple (min, max) to filter data by ID range.
+        """
+        if out_dir is None:
+            out_dir = get_graph_dir("ordering")
+        
+        base_name = self.csv_path.stem
+        self.plot_out_of_order_pairs(out=out_dir / f"{base_name}_pairs.png", id_range=id_range)
+        self.plot_offset(out=out_dir / f"{base_name}_offset.png", id_range=id_range)
+        self.plot_displacement_heatmap(out=out_dir / f"{base_name}_heatmap.png", id_range=id_range)
+        self.plot_expected_vs_actual_colored(out=out_dir / f"{base_name}_colored.png", id_range=id_range)
 
     

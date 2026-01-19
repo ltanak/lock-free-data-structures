@@ -43,7 +43,8 @@
 # Build Directory
 build/
 .scratch/
-src/benchmarking/csvs
+src/benchmarking/csvs/**/*.csv
+src/benchmarking/graphs/**/*.png
 src/benchmarking/python/.pixi
 
 # Python cache

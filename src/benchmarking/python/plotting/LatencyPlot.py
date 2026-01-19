@@ -2,6 +2,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from benchmarking.python.plotting.utils import get_graph_dir
 
 class LatencyPlot:
     def __init__(self, csv_path: Path):
@@ -109,3 +110,19 @@ class LatencyPlot:
             "p99_ns": np.percentile(data, 99),
             "max_ns": np.max(data),
         }
+
+    # Plot all latency graphs
+    def plot_all(self, out_dir: Path | None = None, remove_outliers=True):
+        """
+        Generate and save all latency plots (histogram and CDF) to the specified directory.
+        
+        Args:
+            out_dir: Output directory. If None, uses default latency graphs directory.
+            remove_outliers: Whether to remove outliers using IQR method.
+        """
+        if out_dir is None:
+            out_dir = get_graph_dir("latencies")
+        
+        base_name = self.csv_path.stem
+        self.histogram(metric="enqueue", out=out_dir / f"{base_name}_hist.png", remove_outliers=remove_outliers)
+        self.cdf(metric="enqueue", out=out_dir / f"{base_name}_cdf.png", remove_outliers=remove_outliers)
