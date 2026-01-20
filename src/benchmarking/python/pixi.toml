@@ -13,4 +13,4 @@ pillow = "*"
 
 [tasks]
 main = "python -m scripts.main"
-picture = "python -m scripts.image"
+image = "python -m image_editing.image"

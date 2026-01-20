@@ -1,4 +1,5 @@
 from pathlib import Path
+
 """
 Code that contains all the utility functions for getting most recent graphs,
 csvs, and directory paths.
@@ -8,22 +9,24 @@ csvs, and directory paths.
 def get_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
+# returns the path for the specific csv directory (exchange, ordering, latencies)
 def get_csv_dir(dir: str) -> Path:
     return get_root() / "csvs" / dir
 
+# eturns the path for the specific graph directory (exchange, ordering, latencies)
 def get_graph_dir(dir: str) -> Path:
     path = get_root() / "graphs" / dir
     path.mkdir(parents=True, exist_ok=True)
     return path
 
-# get the most recent CSV from all directories (exchange, ordering, latencies).
+# get the most recent CSV from all directories (exchange, ordering, latencies)
 def get_latest_csv(must_match: bool = False) -> dict[str, Path]:
-    dirs = {"exchange": "exchange", "ordering": "ordering", "latencies": "latencies"}
+    dirs = ["exchange", "ordering", "latencies"]
     latest = {}
     timestamps = {}
     
-    for key, dir_name in dirs.items():
-        path = get_csv_dir(dir_name)
+    for key in dirs:
+        path = get_csv_dir(key)
         csvs = get_csvs_dir(path, reverse=True)
         if not csvs:
             raise FileNotFoundError(f"No CSVs found in {path}")
@@ -44,9 +47,11 @@ def get_latest_csv(must_match: bool = False) -> dict[str, Path]:
     
     return latest
 
+# returns the most recent csv in the directory specified
 def get_latest_csv_dir(dir: str) -> Path:
     return get_latest_csv()[dir]
 
+# returns all the csvs in the directory specified
 def get_csvs_dir(path: Path, reverse: bool = False):
     return sorted(path.glob("*.csv"), reverse=reverse)
 
@@ -60,13 +65,8 @@ def get_csv_all_dirs(name: str) -> dict[str, bool]:
     dirs = ["exchange", "ordering", "latencies"]
     return {dir_name: get_csv(name, dir_name) for dir_name in dirs}
 
+# returns a dictionary of directories to Paths if the file name is in any of the directories
 def get_csv_all_dirs_name(name: str) -> dict[str, Path]:
-    """
-    Find a CSV by name across all directories and return full paths.
-    
-    Returns:
-        Dictionary mapping dir names to full CSV paths where the file exists.
-    """
     dirs = ["exchange", "ordering", "latencies"]
     result = {}
     for dir_name in dirs:
