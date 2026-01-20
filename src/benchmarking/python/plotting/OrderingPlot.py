@@ -2,7 +2,11 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from benchmarking.python.plotting.utils import get_graph_dir
+from benchmarking.python.plotting.utils import *
+
+"""
+Class to plot all the graphs related to order-preservation
+"""
 
 class OrderingPlot:
     def __init__(self, csv_path: Path):
@@ -14,6 +18,7 @@ class OrderingPlot:
             "actual_id": df["actual_id"].astype(float).values,
         }
 
+    # checks if sequence is identical
     def order_preserved(self) -> bool:
         return np.array_equal(self.data["expected_id"], self.data["actual_id"])
 
@@ -65,7 +70,7 @@ class OrderingPlot:
         exp = self.data["expected_id"]
         act = self.data["actual_id"]
         
-        # Filter by id_range if provided
+        # id_range filter
         if id_range:
             mask = (exp >= id_range[0]) & (exp <= id_range[1])
             exp = exp[mask]
@@ -73,7 +78,7 @@ class OrderingPlot:
         
         delta = act - exp
         
-        # Only plot points with non-zero offset
+        # plot points with non-zero offset
         offset_mask = delta != 0
         exp_offset = exp[offset_mask]
         delta_offset = delta[offset_mask]
@@ -97,7 +102,6 @@ class OrderingPlot:
         exp = self.data["expected_id"]
         act = self.data["actual_id"]
         
-        # Filter by id_range if provided
         if id_range:
             mask = (exp >= id_range[0]) & (exp <= id_range[1])
             exp = exp[mask]
@@ -125,7 +129,6 @@ class OrderingPlot:
         exp = self.data["expected_id"]
         act = self.data["actual_id"]
         
-        # Filter by id_range if provided
         if id_range:
             mask = (exp >= id_range[0]) & (exp <= id_range[1])
             exp = exp[mask]
@@ -150,15 +153,8 @@ class OrderingPlot:
             plt.show()
         plt.close()
 
-    # Plot all ordering graphs
+    # plot all ordering graphs
     def plot_all(self, out_dir: Path | None = None, id_range: tuple[int, int] | None = None):
-        """
-        Generate and save all ordering plots to the specified directory.
-        
-        Args:
-            out_dir: Output directory. If None, uses default ordering graphs directory.
-            id_range: Optional tuple (min, max) to filter data by ID range.
-        """
         if out_dir is None:
             out_dir = get_graph_dir("ordering")
         

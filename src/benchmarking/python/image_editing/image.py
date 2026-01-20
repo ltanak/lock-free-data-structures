@@ -21,18 +21,22 @@ class ImageEditor:
         if self.image_2.size != self.image_1.size:
             self.image_2 = self.image_2.resize(image_1.size)
 
+    """
+    CURRENTLY WIP
+    - DOES NOT ACHIEVE DESIRED RESULT
+    """
     def diff(self, output_name: str = "diff.png"):
         copy_1 = self.image_1
         copy_2 = self.image_2
 
         diff = ImageChops.difference(copy_1, copy_2)
 
-        overlay = Image.alpha_composite(copy_1, copy_2)
+        # overlay = Image.alpha_composite(copy_1, copy_2)
 
         script_dir = Path(__file__).resolve().parent
         output_path = script_dir / output_name
 
-        overlay.save(output_path)
+        diff.save(output_path)
 
         print(f"Saved diff to: {output_path}")
 

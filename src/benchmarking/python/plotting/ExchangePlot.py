@@ -42,21 +42,9 @@ class ExchangePlot:
             }
 
     # 2D array of processed data frame into  [["Open", "Close", "High", "Low", "Volume"], ...]
+    # aggregates trades into candlesticks over 'cycles' instead of timestamp
+    # last value in array is the trade price
     def _process_csv(self, cycles: int = 10, cycle_range: tuple[int, int] | None = None, source: str = "expected") -> list[list[float]]:
-        """
-        agg trades into candlesticks over `cycles` rows.
-
-        Uses the last value of prices in a row as the trade price; volume is
-        the sum of quantities for that row. Empty rows (no trades) advance the
-        cycle window but do not change OHLCV unless a trade occurs in the window.
-        Returns a list of [Open, Close, High, Low, Volume].
-        
-        Args:
-            cycles: Number of rows per candlestick window.
-            cycle_range: Optional (min, max) tuple to filter rows by cycle number.
-            source: Either "expected" (exp_prices/exp_qtities) or "actual" (acc_prices/acc_qtities).
-        """
-
         candles: list[list[float]] = []
 
         open_price = None
@@ -112,11 +100,10 @@ class ExchangePlot:
 
         return candles
 
-
-
     def _split_column(self, col: str):
         if col not in self.df:
             return
+        
         def _to_float_list(value):
             if pd.isna(value):
                 return []
@@ -128,8 +115,10 @@ class ExchangePlot:
             except TypeError:
                 return [float(value)]
 
-        self.df[col] = self.df[col].apply(_to_float_list)
-
+        self.df[col] = self.df[col].apply(lambda x: _to_float_list(x))
+        # self.df[col] = self.df[col].apply(_to_float_list) is equivalent, e.g. x -> f -> f x
+        
+    # plots the candlestick chart
     def plot_candles(self, data, start="2026-01-01", freq="T", title="Stock Price", out: Path | None = None):
         df = pd.DataFrame(
             data,
@@ -155,19 +144,12 @@ class ExchangePlot:
         )
 
     def plot_all(self, out_dir: Path | None = None, cycle_range: tuple[int, int] | None = None):
-        """
-        Generate and save exchange candlestick plots for both expected and actual data.
-        
-        Args:
-            out_dir: Output directory. If None, uses default exchange graphs directory.
-            cycle_range: Optional (min, max) tuple to filter data by cycle range.
-        """
         if out_dir is None:
             out_dir = get_graph_dir("exchange")
         
         base_name = self.csv_path.stem
         
-        # Plot expected data
+        # process csv into useable form
         candles_expected = self._process_csv(cycle_range=cycle_range, source="expected")
         if candles_expected:
             self.plot_candles(
@@ -180,7 +162,7 @@ class ExchangePlot:
         else:
             print("No expected trades found")
         
-        # Plot actual data
+        # plot actual data
         candles_actual = self._process_csv(cycle_range=cycle_range, source="actual")
         if candles_actual:
             self.plot_candles(

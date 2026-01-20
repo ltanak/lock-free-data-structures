@@ -14,7 +14,7 @@ class LatencyPlot:
             "dequeue": df["dequeue_latency_ns"].astype(float).values,
         }
 
-    # Outlier removal (IQR)
+    # outlier removal (IQR)
     def _remove_outliers_iqr(self, data, k=1.5):
         q1 = np.percentile(data, 25)
         q3 = np.percentile(data, 75)
@@ -96,7 +96,7 @@ class LatencyPlot:
 
         plt.close()
 
-    # Summary
+    # plot summary of factors
     def summary(self, metric="enqueue", remove_outliers=True):
         data = self.data[metric]
         if remove_outliers:
