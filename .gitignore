@@ -42,10 +42,15 @@
 
 # Build Directory
 build/
+
+# Specific directories
 .scratch/
 src/benchmarking/csvs/**/*.csv
 src/benchmarking/graphs/**/*.png
 src/benchmarking/python/.pixi
+demos/
+diagrams/
+*.clang-uml
 
 # Python cache
 __pycache__/
