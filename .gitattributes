@@ -1,0 +1,39 @@
+*.c      linguist-language=C
+*.h      linguist-language=C
+
+*.cc     linguist-language=C++
+*.cpp    linguist-language=C++
+*.cxx    linguist-language=C++
+*.hpp    linguist-language=C++
+*.hh     linguist-language=C++
+*.hxx    linguist-language=C++
+*.inl    linguist-language=C++
+
+*.py     linguist-language=Python
+
+CMakeLists.txt linguist-language=CMake
+*.cmake        linguist-language=CMake
+*.make         linguist-language=Makefile
+Makefile       linguist-language=Makefile
+
+*.sh     linguist-language=Shell
+*.bash   linguist-language=Shell
+
+*.awk    linguist-language=Awk
+*.ps1    linguist-language=PowerShell
+
+
+# don't count generated or vendored code
+build/**        linguist-generated=true
+dist/**         linguist-generated=true
+out/**          linguist-generated=true
+
+third_party/**  linguist-vendored=true
+vendor/**       linguist-vendored=true
+external/**     linguist-vendored=true
+
+# don't count documentation
+*.md     linguist-documentation=true
+*.rst    linguist-documentation=true
+reports/**  linguist-documentation=true
+markdowns/** linguist-documentation=true
