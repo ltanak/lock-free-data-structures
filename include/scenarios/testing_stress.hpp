@@ -23,6 +23,7 @@
 // custom utils
 #include "utils/threads.hpp"
 #include "utils/structs.hpp"
+#include "utils/timing.hpp"
 
 /**
  * @brief Stress Test
@@ -46,11 +47,14 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
 
     std::barrier benchmark_barrier(TOTAL_THREADS);
 
+    std::cout << "testing 1" << std::endl;
+
     std::vector<llogs::LatencyStore> thread_latencies(TOTAL_THREADS);
     for (auto &t_l: thread_latencies){
-        t_l.enqueue_buffers = std::make_unique<uint64_t>(THREAD_LIMIT);
-        t_l.dequeue_buffers = std::make_unique<uint64_t>(THREAD_LIMIT);
+        t_l.enqueue_buffers = std::make_unique<uint64_t[]>(THREAD_LIMIT);
+        t_l.dequeue_buffers = std::make_unique<uint64_t[]>(THREAD_LIMIT);
     }
+
 
     MarketState market_state;
 
@@ -58,50 +62,84 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     for (int i = 0; i < PRODUCERS; ++i) {
         int tid = wrapper.addEnqThread();
         producers.emplace_back(
-            [&, tid]() {
+            [&, tid, index = i]() {
                 RandomOrderGenerator<BenchmarkOrder> gen(market_state, 100 * (tid + 1), SEED + tid);
                 
+                auto *local_buffer = thread_latencies[index].enqueue_buffers.get();
+
+
                 // perform preprocess here
-                // for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
-                //     BenchmarkOrder o{};
-                //     wrapper.preprocessEnqueue(o, tid);
-                // }
+                for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
+                    BenchmarkOrder o{};
+                    wrapper.preprocessEnqueue(o, tid);
+                }
                 
                 // once all threads done, starts actual benchmarking
                 benchmark_barrier.arrive_and_wait();
 
-                for (uint64_t count = 0; count < THREAD_LIMIT; ++count){
+                for (uint64_t i = 0; i < THREAD_LIMIT; ++i){
                     BenchmarkOrder o = gen.generate();
+
+                    // start timestamp
+                    uint64_t t0 = ltime::rdtsc_lfence();
+                    // enqueue datastructure
                     wrapper.enqueueOrder(o, tid);
+                    uint64_t t1 = ltime::rdtsc_lfence();
+                    local_buffer[i] = t1 - t0;
                 }
 
             }
         );
     }
+
+    std::cout << "here 2" << std::endl;
 
     std::vector<std::thread> consumers;
     for (int i = 0; i < CONSUMERS; ++i) {
         int tid = wrapper.addDeqThread();
         consumers.emplace_back(
-            [&, tid]() {
+            [&, tid, index = i]() {
                 BenchmarkOrder o;
-                uint64_t count = 0;
-                uint64_t *timestamps[THREAD_LIMIT];
+
+                auto *local_buffer = thread_latencies[index].dequeue_buffers.get();
+                
                 // perform preprocess here
-                // for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
-                //     wrapper.preprocessDequeue(o, tid);
-                // }
+                for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
+                    wrapper.preprocessDequeue(o, tid);
+                }
 
                 benchmark_barrier.arrive_and_wait();
 
                 for (uint64_t count = 0; count < THREAD_LIMIT; ++count){
+
+                    // start timestamp
+                    uint64_t t0 = ltime::rdtsc_lfence();
                     wrapper.dequeueLatency(o, tid);
+                    uint64_t t1 = ltime::rdtsc_lfence();
+                    local_buffer[count] = t1 - t0;
                 }
             }
         );
     }
 
+    std::cout << "here 3" << std::endl;
+
     lThread::close(producers, consumers);
+
+    std::cout << "here 4" << std::endl;
+
+    std::vector<uint64_t> local_enqueues;
+    std::vector<uint64_t> local_dequeues;
+    local_enqueues.reserve(PRODUCERS * THREAD_LIMIT);
+    local_dequeues.reserve(CONSUMERS * THREAD_LIMIT);
+
+    for (auto &t_l: thread_latencies){
+        std::copy(t_l.enqueue_buffers.get(), t_l.enqueue_buffers.get() + THREAD_LIMIT, std::back_inserter(local_enqueues));
+        std::copy(t_l.dequeue_buffers.get(), t_l.dequeue_buffers.get() + THREAD_LIMIT, std::back_inserter(local_dequeues));
+    }
+
+    wrapper.setLatencyVectors(local_enqueues, local_dequeues);
+    // wrapper.latencies_dequeue_ = std::move(local_dequeues);
 
     wrapper.processLatencies();
 }
