@@ -7,6 +7,7 @@
 #include <string>
 #include "scenarios/test_inputs.hpp"
 #include "utils/timing.hpp"
+#include "utils/structs.hpp"
 #include "exchange/matching_engine.hpp"
 
 // This will have to either be templ
@@ -15,6 +16,7 @@
 template<typename DataStructure, typename TOrder>
 class BenchmarkWrapper {
 public:
+
     ~BenchmarkWrapper();
     BenchmarkWrapper(DataStructure &structure, TestParams &params);
 
@@ -30,6 +32,8 @@ public:
     auto enqueueOrder(TOrder &o, int threadId) -> bool;
     auto dequeueLatency(TOrder &o, int threadId) -> bool;
     auto dequeueOrdering(TOrder &o, int threadId) -> bool;
+
+    auto setLatencyVectors(const std::vector<uint64_t> &enqueue, const std::vector<uint64_t> &dequeue) -> void;
 
     // csv writing entry functions
     auto processLatencies() -> void;
@@ -53,8 +57,10 @@ private:
     std::atomic<int> dequeue_thread_id{0};
 
     // contiguous allocation for latency writing - only used for enqueueOrder & dequeueLatency
-    uint64_t* latencies_enqueue_;
-    uint64_t* latencies_dequeue_;
+    // uint64_t* latencies_enqueue_;
+    // uint64_t* latencies_dequeue_;
+    std::vector<uint64_t> latencies_enqueue_;
+    std::vector<uint64_t> latencies_dequeue_;
 
     // contiguous allocation for order writing - only used for dequeueOrdering
     uint64_t* sequence_dequeue_;
@@ -62,6 +68,9 @@ private:
 
     std::vector<uint64_t> local_index_enq_; // per-producer counters
     std::vector<uint64_t> local_index_deq_; // per-consumer counters
+
+    // std::vector<uint64> enqueue_latencies_;
+    // std::
 
     // the matching engine
     MatchingEngine<TOrder> exchange_;
