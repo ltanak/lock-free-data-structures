@@ -48,6 +48,19 @@ int BenchmarkWrapper<DataStructure, TOrder>::addDeqThread(){
 }
 
 template<typename DataStructure, typename TOrder>
+bool BenchmarkWrapper<DataStructure, TOrder>::preprocessEnqueue(TOrder &o, int threadId) {
+    // pre-process data structure
+    bool enqueued = structure_.enqueue(o);
+    return enqueued;
+}
+
+template<typename DataStructure, typename TOrder>
+bool BenchmarkWrapper<DataStructure, TOrder>::preprocessDequeue(TOrder &o, int threadId) {
+    bool dequeued = structure_.dequeue(o);
+    return dequeued;
+}
+
+template<typename DataStructure, typename TOrder>
 bool BenchmarkWrapper<DataStructure, TOrder>::enqueueOrder(TOrder &o, int threadId) {
     // start timer
     uint64_t t0 = ltime::rdtsc_lfence();

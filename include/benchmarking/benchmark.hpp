@@ -22,6 +22,10 @@ public:
     auto addEnqThread() -> int;
     auto addDeqThread() -> int;
 
+    // pre-processing functions
+    auto preprocessEnqueue(TOrder &o, int threadId) -> bool;
+    auto preprocessDequeue(TOrder &o, int threadId) -> bool;
+    
     // operations for enqueing, and the different types of dequeueing
     auto enqueueOrder(TOrder &o, int threadId) -> bool;
     auto dequeueLatency(TOrder &o, int threadId) -> bool;

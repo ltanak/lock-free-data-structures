@@ -9,6 +9,7 @@
 #include <atomic>
 #include <functional>
 #include <chrono>
+#include <barrier>
 
 // Order simulation includes
 #include "order_simulation/benchmark_order.hpp"
@@ -21,6 +22,7 @@
 
 // custom utils
 #include "utils/threads.hpp"
+#include "utils/structs.hpp"
 
 /**
  * @brief Stress Test
@@ -36,9 +38,19 @@ template <typename Wrapper>
 void stressTest(Wrapper &wrapper, TestParams &params) {
     const uint64_t PRODUCERS = params.thread_count;
     const uint64_t CONSUMERS = params.thread_count;
+    const uint64_t TOTAL_THREADS = PRODUCERS + CONSUMERS;
     const uint64_t TOTAL_ORDERS = params.total_orders;
     const uint64_t THREAD_LIMIT = params.thread_order_limit;
     const uint32_t SEED = params.seed;
+    constexpr uint32_t PREPROCESS_LIMIT = 10000;
+
+    std::barrier benchmark_barrier(TOTAL_THREADS);
+
+    std::vector<llogs::LatencyStore> thread_latencies(TOTAL_THREADS);
+    for (auto &t_l: thread_latencies){
+        t_l.enqueue_buffers = std::make_unique<uint64_t>(THREAD_LIMIT);
+        t_l.dequeue_buffers = std::make_unique<uint64_t>(THREAD_LIMIT);
+    }
 
     MarketState market_state;
 
@@ -47,16 +59,22 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
         int tid = wrapper.addEnqThread();
         producers.emplace_back(
             [&, tid]() {
-                uint64_t count = 0;
                 RandomOrderGenerator<BenchmarkOrder> gen(market_state, 100 * (tid + 1), SEED + tid);
-                while (true){
-                    if (count >= THREAD_LIMIT) break;
+                
+                // perform preprocess here
+                // for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
+                //     BenchmarkOrder o{};
+                //     wrapper.preprocessEnqueue(o, tid);
+                // }
+                
+                // once all threads done, starts actual benchmarking
+                benchmark_barrier.arrive_and_wait();
 
+                for (uint64_t count = 0; count < THREAD_LIMIT; ++count){
                     BenchmarkOrder o = gen.generate();
-                    ++count;
-                    
                     wrapper.enqueueOrder(o, tid);
                 }
+
             }
         );
     }
@@ -68,10 +86,15 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
             [&, tid]() {
                 BenchmarkOrder o;
                 uint64_t count = 0;
-                while (true) {
-                    if (count >= THREAD_LIMIT) break;
-                    ++count;
+                uint64_t *timestamps[THREAD_LIMIT];
+                // perform preprocess here
+                // for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
+                //     wrapper.preprocessDequeue(o, tid);
+                // }
 
+                benchmark_barrier.arrive_and_wait();
+
+                for (uint64_t count = 0; count < THREAD_LIMIT; ++count){
                     wrapper.dequeueLatency(o, tid);
                 }
             }
