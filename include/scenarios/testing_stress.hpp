@@ -62,17 +62,17 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     for (int i = 0; i < PRODUCERS; ++i) {
         int tid = wrapper.addEnqThread();
         producers.emplace_back(
-            [&, tid, index = i]() {
+            [&, tid, index = i, cpu = tid]() {
                 RandomOrderGenerator<BenchmarkOrder> gen(market_state, 100 * (tid + 1), SEED + tid);
-                
+                lThread::pin_thread(cpu);
                 auto *local_buffer = thread_latencies[index].enqueue_buffers.get();
 
 
                 // perform preprocess here
-                for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
-                    BenchmarkOrder o{};
-                    wrapper.preprocessEnqueue(o, tid);
-                }
+                // for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
+                //     BenchmarkOrder o{};
+                //     wrapper.preprocessEnqueue(o, tid);
+                // }
                 
                 // once all threads done, starts actual benchmarking
                 benchmark_barrier.arrive_and_wait();
@@ -98,15 +98,16 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     for (int i = 0; i < CONSUMERS; ++i) {
         int tid = wrapper.addDeqThread();
         consumers.emplace_back(
-            [&, tid, index = i]() {
+            [&, tid, index = i, cpu = tid]() {
                 BenchmarkOrder o;
+                lThread::pin_thread(cpu);
 
                 auto *local_buffer = thread_latencies[index].dequeue_buffers.get();
                 
                 // perform preprocess here
-                for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
-                    wrapper.preprocessDequeue(o, tid);
-                }
+                // for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
+                //     wrapper.preprocessDequeue(o, tid);
+                // }
 
                 benchmark_barrier.arrive_and_wait();
 
