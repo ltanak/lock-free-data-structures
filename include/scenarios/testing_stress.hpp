@@ -67,7 +67,6 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
                 lThread::pin_thread(cpu);
                 auto *local_buffer = thread_latencies[index].enqueue_buffers.get();
 
-
                 // perform preprocess here
                 // for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
                 //     BenchmarkOrder o{};
@@ -123,11 +122,7 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
         );
     }
 
-    std::cout << "here 3" << std::endl;
-
     lThread::close(producers, consumers);
-
-    std::cout << "here 4" << std::endl;
 
     std::vector<uint64_t> local_enqueues;
     std::vector<uint64_t> local_dequeues;

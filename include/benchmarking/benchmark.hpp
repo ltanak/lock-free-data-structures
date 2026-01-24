@@ -34,6 +34,7 @@ public:
     auto dequeueOrdering(TOrder &o, int threadId) -> bool;
 
     auto setLatencyVectors(const std::vector<uint64_t> &enqueue, const std::vector<uint64_t> &dequeue) -> void;
+    auto setOrderingVectors(const std::vector<uint64_t> &timestamps, const std::vector<uint64_t> &sequence) -> void;
 
     // csv writing entry functions
     auto processLatencies() -> void;
@@ -63,8 +64,10 @@ private:
     std::vector<uint64_t> latencies_dequeue_;
 
     // contiguous allocation for order writing - only used for dequeueOrdering
-    uint64_t* sequence_dequeue_;
-    uint64_t* timestamps_dequeue_;
+    // uint64_t* sequence_dequeue_;
+    // uint64_t* timestamps_dequeue_;
+    std::vector<uint64_t> sequence_dequeue_;
+    std::vector<uint64_t> timestamps_dequeue_;
 
     std::vector<uint64_t> local_index_enq_; // per-producer counters
     std::vector<uint64_t> local_index_deq_; // per-consumer counters

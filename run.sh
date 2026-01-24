@@ -6,7 +6,7 @@ EXEC="lock_free_data_structures"
 
 if [[ ! -x "$BUILD_DIR/$EXEC" ]]; then
   echo "Building executable..."
-  cmake -S . -B "$BUILD_DIR"
+  cmake -S . -B -g "$BUILD_DIR"
   cmake --build "$BUILD_DIR" -j
 fi
 
@@ -14,6 +14,7 @@ SEED=""
 GDB=0
 VALGRIND=0
 PERF=0
+CACHEGRIND=0
 POSITIONAL=()
 
 while [[ $# -gt 0 ]]; do
@@ -30,6 +31,10 @@ while [[ $# -gt 0 ]]; do
       VALGRIND=1
       shift
       ;;
+    --cachegrind)
+      CACHEGRIND=1
+      shift
+      ;;
     --perf)
       PERF=1
       shift
@@ -43,6 +48,7 @@ while [[ $# -gt 0 ]]; do
       echo "  --gdb             Run under gdb"
       echo "  --valgrind        Run under valgrind (memcheck)"
       echo "  --perf            Run under perf record"
+      echo "  --cachegrind      Run under cachegrind"
       echo
       echo "Mode:"
       echo "  stress            Stress testing lock-free datastructure"
@@ -89,6 +95,12 @@ fi
 if [[ $VALGRIND -eq 1 ]]; then
   CMD=(valgrind --tool=memcheck --leak-check=full --track-origins=yes "${CMD[@]}")
 fi
+
+
+if [[ $CACHEGRIND -eq 1 ]]; then
+  CMD=(valgrind --tool=cachegrind --cache-sim=yes --branch-sim=yes "${CMD[@]}")
+fi
+# --tool=cachegrind ls -l
 
 # Running code
 
