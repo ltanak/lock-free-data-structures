@@ -96,10 +96,10 @@ bool BenchmarkWrapper<DataStructure, TOrder>::dequeueLatency(TOrder &o, int thre
 template<typename DataStructure, typename TOrder>
 bool BenchmarkWrapper<DataStructure, TOrder>::dequeueOrdering(TOrder &o, int threadId) {
     bool dequeued = structure_.dequeue(o);
-    uint64_t idx = threadId * THREAD_LIMIT_ + local_index_deq_[threadId]++;
+    // uint64_t idx = threadId * THREAD_LIMIT_ + local_index_deq_[threadId]++;
 
-    sequence_dequeue_[idx] = o.sequence_number;
-    timestamps_dequeue_[idx] = ltime::rdtsc_lfence();
+    // sequence_dequeue_[idx] = o.sequence_number;
+    // timestamps_dequeue_[idx] = ltime::rdtsc_lfence();
 
     // maybe add logic for if transaction wasn't successful
     return dequeued;
@@ -109,6 +109,12 @@ template<typename DataStructure, typename TOrder>
 void BenchmarkWrapper<DataStructure, TOrder>::setLatencyVectors(const std::vector<uint64_t> &enqueue, const std::vector<uint64_t> &dequeue){
     latencies_enqueue_ = enqueue;
     latencies_dequeue_ = dequeue;
+}
+
+template<typename DataStructure, typename TOrder>
+void BenchmarkWrapper<DataStructure, TOrder>::setOrderingVectors(const std::vector<uint64_t> &timestamps, const std::vector<uint64_t> &sequence){
+    timestamps_dequeue_ = timestamps;
+    sequence_dequeue_ = sequence;
 }
 
 template<typename DataStructure, typename TOrder>

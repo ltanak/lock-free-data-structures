@@ -8,6 +8,7 @@
 #include <queue>
 #include <thread>
 #include <memory>
+#include <barrier>
 #include "order_simulation/benchmark_order.hpp"
 #include "order_simulation/random_order_generator.hpp"
 #include "order_simulation/collection_order_generator.hpp"
@@ -15,6 +16,10 @@
 
 // Input parameters
 #include "scenarios/test_inputs.hpp"
+
+// Utils
+#include "utils/structs.hpp"
+#include "utils/timing.hpp"
 
 /**
  * @brief Order test
@@ -49,6 +54,14 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
     CollectionOrderGenerator<BenchmarkOrder> collection = initialiseGeneratorsOrder(marketState, SEED);
     CollectionOrderGenerator<BenchmarkOrder> checkGen = initialiseGeneratorsOrder(marketState, SEED);
 
+    std::barrier benchmark_barrier(CONSUMERS);
+
+    std::vector<llogs::OrderingStore> thread_ordering(CONSUMERS);
+    for (auto &t_o: thread_ordering){
+        t_o.sequence_buffers = std::make_unique<uint64_t[]>(THREAD_LIMIT);
+        t_o.timestamp_buffers = std::make_unique<uint64_t[]>(THREAD_LIMIT);
+    }
+
     for (int i = 0; i < TOTAL_ORDERS; ++i){
         BenchmarkOrder o = collection.generate();
         o.sequence_number = i + 1;
@@ -67,13 +80,25 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
     for (int i = 0; i < CONSUMERS; ++i) {
         int tid = wrapper.addDeqThread();
         consumers.emplace_back(
-            [&, tid]() {
+            [&, tid, index = i, cpu = tid]() {
                 BenchmarkOrder o;
-                uint64_t count = 0;
-                while (true){
-                    if (count >= THREAD_LIMIT) break;
-                    ++count;
+                lThread::pin_thread(cpu);
+                auto *sequence_buffer = thread_ordering[index].sequence_buffers.get();
+                auto *timestamp_buffer = thread_ordering[index].timestamp_buffers.get();
+                // uint64_t count = 0;
+                // while (true){
+                //     if (count >= THREAD_LIMIT) break;
+                //     ++count;
+                //     wrapper.dequeueOrdering(o, tid);
+                // }
+
+                // barrier for synchronisation
+                benchmark_barrier.arrive_and_wait();
+
+                for (uint64_t i = 0; i < THREAD_LIMIT; ++i){              
                     wrapper.dequeueOrdering(o, tid);
+                    timestamp_buffer[i] = ltime::rdtsc_lfence();
+                    sequence_buffer[i] = o.sequence_number;
                 }
             }
         );
@@ -81,6 +106,17 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
 
     lThread::close(consumers);
 
+    std::vector<uint64_t> local_timestamps;
+    std::vector<uint64_t> local_sequences;
+    local_timestamps.reserve(CONSUMERS * THREAD_LIMIT);
+    local_sequences.reserve(CONSUMERS * THREAD_LIMIT);
+
+    for (auto &t_o: thread_ordering){
+        std::copy(t_o.timestamp_buffers.get(), t_o.timestamp_buffers.get() + THREAD_LIMIT, std::back_inserter(local_timestamps));
+        std::copy(t_o.sequence_buffers.get(), t_o.sequence_buffers.get() + THREAD_LIMIT, std::back_inserter(local_sequences));
+    }
+
+    wrapper.setOrderingVectors(local_timestamps, local_sequences);
     // as order generators are seeded, this will provide the exact same sequence of transactions to compare to
     MarketState resetMarketstate;
     CollectionOrderGenerator<BenchmarkOrder> resetGen = initialiseGeneratorsOrder(resetMarketstate, SEED);
