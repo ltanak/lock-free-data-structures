@@ -23,5 +23,4 @@ namespace lThread {
         CPU_SET(cpu, &cpuset);
         int rc = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set_t), &cpuset);
     }
-
 }

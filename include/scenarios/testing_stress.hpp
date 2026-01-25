@@ -1,5 +1,6 @@
 #pragma once
 
+// regular includes
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -37,6 +38,8 @@
 
 template <typename Wrapper>
 void stressTest(Wrapper &wrapper, TestParams &params) {
+
+    // consts from TestParams
     const uint64_t PRODUCERS = params.thread_count;
     const uint64_t CONSUMERS = params.thread_count;
     const uint64_t TOTAL_THREADS = PRODUCERS + CONSUMERS;
@@ -45,19 +48,20 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     const uint32_t SEED = params.seed;
     constexpr uint32_t PREPROCESS_LIMIT = 10000;
 
+    // market state thread
+    MarketState market_state;
+
+    // barrier for synchronisation after preprocessing
     std::barrier benchmark_barrier(TOTAL_THREADS);
 
-    std::cout << "testing 1" << std::endl;
-
+    // per-thread buffers
     std::vector<llogs::LatencyStore> thread_latencies(TOTAL_THREADS);
     for (auto &t_l: thread_latencies){
         t_l.enqueue_buffers = std::make_unique<uint64_t[]>(THREAD_LIMIT);
         t_l.dequeue_buffers = std::make_unique<uint64_t[]>(THREAD_LIMIT);
     }
 
-
-    MarketState market_state;
-
+    // producer threads for enqueuing
     std::vector<std::thread> producers;
     for (int i = 0; i < PRODUCERS; ++i) {
         int tid = wrapper.addEnqThread();
@@ -67,11 +71,11 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
                 lThread::pin_thread(cpu);
                 auto *local_buffer = thread_latencies[index].enqueue_buffers.get();
 
-                // perform preprocess here
-                // for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
-                //     BenchmarkOrder o{};
-                //     wrapper.preprocessEnqueue(o, tid);
-                // }
+                // perform cachewarming here
+                for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
+                    BenchmarkOrder o{};
+                    wrapper.preprocessEnqueue(o, tid);
+                }
                 
                 // once all threads done, starts actual benchmarking
                 benchmark_barrier.arrive_and_wait();
@@ -86,13 +90,11 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
                     uint64_t t1 = ltime::rdtsc_lfence();
                     local_buffer[i] = t1 - t0;
                 }
-
             }
         );
     }
 
-    std::cout << "here 2" << std::endl;
-
+    // consumer threads
     std::vector<std::thread> consumers;
     for (int i = 0; i < CONSUMERS; ++i) {
         int tid = wrapper.addDeqThread();
@@ -103,10 +105,10 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
 
                 auto *local_buffer = thread_latencies[index].dequeue_buffers.get();
                 
-                // perform preprocess here
-                // for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
-                //     wrapper.preprocessDequeue(o, tid);
-                // }
+                // perform cachewarming here
+                for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
+                    wrapper.preprocessDequeue(o, tid);
+                }
 
                 benchmark_barrier.arrive_and_wait();
 
@@ -129,13 +131,12 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     local_enqueues.reserve(PRODUCERS * THREAD_LIMIT);
     local_dequeues.reserve(CONSUMERS * THREAD_LIMIT);
 
+    // combines all results from each individual buffer
     for (auto &t_l: thread_latencies){
         std::copy(t_l.enqueue_buffers.get(), t_l.enqueue_buffers.get() + THREAD_LIMIT, std::back_inserter(local_enqueues));
         std::copy(t_l.dequeue_buffers.get(), t_l.dequeue_buffers.get() + THREAD_LIMIT, std::back_inserter(local_dequeues));
     }
 
     wrapper.setLatencyVectors(local_enqueues, local_dequeues);
-    // wrapper.latencies_dequeue_ = std::move(local_dequeues);
-
     wrapper.processLatencies();
 }
