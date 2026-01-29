@@ -47,12 +47,14 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     const uint64_t THREAD_LIMIT = params.thread_order_limit;
     const uint32_t SEED = params.seed;
     constexpr uint32_t PREPROCESS_LIMIT = 10000;
+    constexpr uint32_t WARMUP_LIMIT = 10000;
 
     // market state thread
     MarketState market_state;
 
     // barrier for synchronisation after preprocessing
     std::barrier benchmark_barrier(TOTAL_THREADS);
+    std::barrier warmup_barrier(TOTAL_THREADS);
 
     // per-thread buffers
     std::vector<llogs::LatencyStore> thread_latencies(TOTAL_THREADS);
@@ -75,6 +77,13 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
                 for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
                     BenchmarkOrder o{};
                     wrapper.preprocessEnqueue(o, tid);
+                }
+
+                warmup_barrier.arrive_and_wait();
+
+                for (uint64_t i = 0; i < WARMUP_LIMIT; ++i){
+                    BenchmarkOrder o = gen.generate();
+                    wrapper.enqueueOrder(o, tid);
                 }
                 
                 // once all threads done, starts actual benchmarking
@@ -108,6 +117,12 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
                 // perform cachewarming here
                 for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
                     wrapper.preprocessDequeue(o, tid);
+                }
+
+                warmup_barrier.arrive_and_wait();
+
+                for (uint64_t i = 0; i < WARMUP_LIMIT; ++i){
+                    wrapper.dequeueLatency(o, tid);
                 }
 
                 benchmark_barrier.arrive_and_wait();
