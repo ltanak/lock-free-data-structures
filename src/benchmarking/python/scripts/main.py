@@ -18,6 +18,13 @@ def plot_graphs(file: str | None = None, must_match: bool = False, *, active: di
         files = get_latest_csv(must_match=must_match)
     else:
         files = get_csv_all_dirs_name(name=file)
+    
+    if len(files) > 0:
+        keys = files.keys()
+        for key in keys:
+            path = files[key].stem.split("/")[-1]
+            print(f"{key} file: {path}")
+    
 
     # latency plots
     if active["latencies"]:
@@ -50,8 +57,9 @@ def plot_graphs(file: str | None = None, must_match: bool = False, *, active: di
 
 if __name__ == "__main__":
 
-    file = "GOOD_matching_15_01_2026_10_32_38.csv"
-    active = {"exchange": True, "ordering": True, "latencies": True}
+    # file = "GOOD_matching_15_01_2026_10_32_38.csv"
+    file = None
+    active = {"exchange": True, "ordering": True, "latencies": False}
     if file:
         active = get_csv_all_dirs(name= file)
 

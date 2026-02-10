@@ -33,8 +33,9 @@ TOrder RandomOrderGenerator<TOrder>::generateOrder(){
     double price = priceDist(rng_);
     price = std::ceil(price * 100.00) / 100.00;
 
-    // Adjust side probability based on trend bias
-    bool isBuy = (sideDist_(rng_) < (0.5 + bias * 0.5));
+    // Adjust side probability based on bias (bias > 0.5 favors buys)
+    std::uniform_real_distribution<double> bias_dist(0.0, 1.0);
+    bool isBuy = bias_dist(rng_) < bias;
     OrderType type = isBuy ? OrderType::BUY : OrderType::SELL;
 
     uint32_t quantity = quantityDist_(rng_);
