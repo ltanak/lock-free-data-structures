@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import datetime
 
 """
 Code that contains all the utility functions for getting most recent graphs,
@@ -33,7 +34,7 @@ def get_latest_csv(must_match: bool = False) -> dict[str, Path]:
         
         latest[key] = csvs[0]
 
-        # timestamp format: prefix_DD_MM_YYYY_HH_MM_SS.csv
+        # timestamp format: prefix_MM_DD_YYYY_HH_MM_SS.csv
         parts = csvs[0].stem.split("_")
         if len(parts) >= 6:
             timestamps[key] = "_".join(parts[-6:])
@@ -53,7 +54,20 @@ def get_latest_csv_dir(dir: str) -> Path:
 
 # returns all the csvs in the directory specified
 def get_csvs_dir(path: Path, reverse: bool = False):
-    return sorted(path.glob("*.csv"), reverse=reverse)
+    csvs = list(path.glob("*.csv"))
+    if not csvs:
+        return []
+
+    def parse_timestamp(p: Path) -> datetime:
+        parts = p.stem.split("_")
+        if len(parts) >= 6:
+            try:
+                return datetime.strptime("_".join(parts[-6:]), "%m_%d_%Y_%H_%M_%S")
+            except ValueError:
+                pass
+        return datetime.min
+
+    return sorted(csvs, key=parse_timestamp, reverse=reverse)
 
 # returns True if the csv is found in the specified directory
 def get_csv(name: str, dir: str) -> bool:

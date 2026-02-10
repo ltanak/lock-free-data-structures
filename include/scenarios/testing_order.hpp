@@ -11,6 +11,9 @@
 #include <barrier>
 #include "order_simulation/benchmark_order.hpp"
 #include "order_simulation/random_order_generator.hpp"
+#include "order_simulation/market_maker_generator.hpp"
+#include "order_simulation/momentum_generator.hpp"
+#include "order_simulation/mean_revert_generator.hpp"
 #include "order_simulation/collection_order_generator.hpp"
 #include "order_simulation/market_state.hpp"
 
@@ -29,15 +32,23 @@
  */
 
 auto initialiseGeneratorsOrder(MarketState &market, const uint32_t SEED) -> CollectionOrderGenerator<BenchmarkOrder> {
-    auto g1 = std::make_shared<RandomOrderGenerator<BenchmarkOrder>>(market, 10, SEED);
-    auto g2 = std::make_shared<RandomOrderGenerator<BenchmarkOrder>>(market, 100, SEED + 1);
+    auto random1 = std::make_shared<RandomOrderGenerator<BenchmarkOrder>>(market, 10, SEED);
+    auto random2 = std::make_shared<RandomOrderGenerator<BenchmarkOrder>>(market, 100, SEED + 1);
+    auto market_maker = std::make_shared<MarketMakerGenerator<BenchmarkOrder>>(market, SEED + 2);
+    auto momentum = std::make_shared<MomentumGenerator<BenchmarkOrder>>(market, SEED + 3);
+    auto mean_revert = std::make_shared<MeanRevertGenerator<BenchmarkOrder>>(market, 100.0, SEED + 4);
 
     std::vector<std::function<BenchmarkOrder()>> gens {
-        [g1]() { return g1->generate();},
-        [g2]() { return g2->generate();}
+        [random1]() { return random1->generateOrder();},
+        [random2]() { return random2->generateOrder();},
+        [market_maker]() { return market_maker->generateOrder();},
+        [momentum]() { return momentum->generateOrder();},
+        [mean_revert]() { return mean_revert->generateOrder();}
     };
 
+    // Weights: 20% random1, 20% random2, 30% market maker, 15% momentum, 15% mean revert
     CollectionOrderGenerator<BenchmarkOrder> collection(gens, 42);
+    collection.setWeights({0.20, 0.20, 0.30, 0.15, 0.15});
     return collection;
 }
 
@@ -63,9 +74,17 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
     }
 
     for (int i = 0; i < TOTAL_ORDERS; ++i){
+        // Update market price with drift and volatility
+        marketState.updatePrice();
+        
         BenchmarkOrder o = collection.generate();
         o.sequence_number = i + 1;
         ordersQueue.emplace(o); // emplace copies the actual thing, rather than doing it by pointer
+        
+        // event triggering every 1000 orders
+        if ((i + 1) % 1000 == 0) {
+            marketState.checkAndApplyEvent(i + 1);
+        }
     }
 
     // enqueueing onto the data structure

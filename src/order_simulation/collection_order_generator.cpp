@@ -5,20 +5,30 @@
 template<typename TOrder>
 CollectionOrderGenerator<TOrder>::CollectionOrderGenerator(std::vector<std::function<TOrder()>> generators, std::optional<uint32_t> seed){
     generatorsVector = std::move(generators);
+    // Default uniform weights
+    weights_.resize(generatorsVector.size(), 1.0 / generatorsVector.size());
+    generatorDist_ = std::discrete_distribution<int>(weights_.begin(), weights_.end());
+    
     if (seed.has_value()) {
         rng_ = std::mt19937(seed.value());
     } else {
         std::random_device rd;
         rng_ = std::mt19937(rd());
     }
-    orderGenerators = std::uniform_int_distribution<int>(0, generatorsVector.size() - 1);
+}
+
+template<typename TOrder>
+void CollectionOrderGenerator<TOrder>::setWeights(const std::vector<double>& weights) noexcept {
+    if (weights.size() == generatorsVector.size()) {
+        weights_ = weights;
+        generatorDist_ = std::discrete_distribution<int>(weights_.begin(), weights_.end());
+    }
 }
 
 template<typename TOrder>
 TOrder CollectionOrderGenerator<TOrder>::generateOrder() {
-    // uint64_t id = orderId_.fetch_add(1, std::memory_order_relaxed);
     orderId_++;
-    int index = orderGenerators(rng_);
+    int index = generatorDist_(rng_);
     TOrder order = generatorsVector[index](); // calls the order generator function
     order.order_id = orderId_;
     order.timestamp = ltime::rdtsc_lfence();

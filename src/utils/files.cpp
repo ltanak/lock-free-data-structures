@@ -17,7 +17,7 @@ namespace latencies {
         auto t = std::time(nullptr);
         auto tm = *std::localtime(&t);
         std::ostringstream oss;
-        oss << std::put_time(&tm, "%d_%m_%Y_%H_%M_%S");
+        oss << std::put_time(&tm, "%m_%d_%Y_%H_%M_%S");
         auto str = "latencies_" + oss.str() + ".csv";
         return str;
     }
@@ -57,7 +57,7 @@ namespace ordering {
         auto t = std::time(nullptr);
         auto tm = *std::localtime(&t);
         std::ostringstream oss;
-        oss << std::put_time(&tm, "%d_%m_%Y_%H_%M_%S");
+        oss << std::put_time(&tm, "%m_%d_%Y_%H_%M_%S");
         auto str = "ordering_" + oss.str() + ".csv";
         return str;
     }
@@ -95,7 +95,7 @@ namespace exchange {
         auto t = std::time(nullptr);
         auto tm = *std::localtime(&t);
         std::ostringstream oss;
-        oss << std::put_time(&tm, "%d_%m_%Y_%H_%M_%S");
+        oss << std::put_time(&tm, "%m_%d_%Y_%H_%M_%S");
         auto str = "matching_" + oss.str() + ".csv";
         return str;
     }
