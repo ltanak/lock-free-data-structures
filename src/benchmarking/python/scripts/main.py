@@ -48,7 +48,7 @@ def plot_graphs(file: str | None = None, must_match: bool = False, *, active: di
         ep = ExchangePlot(exchange_csv_path)
         print("\n=== EXCHANGE SUMMARY ===")
         # ep.plot_all()
-        ep.plot_all(cycle_range=(200, 1000))
+        ep.plot_all(cycle_range=(0, 1000))
 
 
     # CSV = "GOOD_matching_15_01_2026_10_32_38.csv"

@@ -32,8 +32,8 @@
  */
 
 auto initialiseGeneratorsOrder(MarketState &market, const uint32_t SEED) -> CollectionOrderGenerator<BenchmarkOrder> {
-    auto random1 = std::make_shared<RandomOrderGenerator<BenchmarkOrder>>(market, 10, SEED);
-    auto random2 = std::make_shared<RandomOrderGenerator<BenchmarkOrder>>(market, 100, SEED + 1);
+    auto random1 = std::make_shared<RandomOrderGenerator<BenchmarkOrder>>(market, 20, SEED);
+    auto random2 = std::make_shared<RandomOrderGenerator<BenchmarkOrder>>(market, 80, SEED + 1);
     auto market_maker = std::make_shared<MarketMakerGenerator<BenchmarkOrder>>(market, SEED + 2);
     auto momentum = std::make_shared<MomentumGenerator<BenchmarkOrder>>(market, SEED + 3);
     auto mean_revert = std::make_shared<MeanRevertGenerator<BenchmarkOrder>>(market, 100.0, SEED + 4);
@@ -46,9 +46,9 @@ auto initialiseGeneratorsOrder(MarketState &market, const uint32_t SEED) -> Coll
         [mean_revert]() { return mean_revert->generateOrder();}
     };
 
-    // Weights: 20% random1, 20% random2, 30% market maker, 15% momentum, 15% mean revert
+    // Weights: 10% retail small, 10% retail large, 40% market maker, 20% momentum, 20% mean revert
     CollectionOrderGenerator<BenchmarkOrder> collection(gens, 42);
-    collection.setWeights({0.20, 0.20, 0.30, 0.15, 0.15});
+    collection.setWeights({0.10, 0.10, 0.40, 0.20, 0.20});
     return collection;
 }
 
@@ -81,8 +81,8 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
         o.sequence_number = i + 1;
         ordersQueue.emplace(o); // emplace copies the actual thing, rather than doing it by pointer
         
-        // event triggering every 1000 orders
-        if ((i + 1) % 1000 == 0) {
+        // event triggering every 200 orders (scales well for 1k-100k)
+        if ((i + 1) % 200 == 0) {
             marketState.checkAndApplyEvent(i + 1);
         }
     }
@@ -140,6 +140,6 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
     MarketState resetMarketstate;
     CollectionOrderGenerator<BenchmarkOrder> resetGen = initialiseGeneratorsOrder(resetMarketstate, SEED);
 
-    wrapper.processOrders(resetGen);
+    wrapper.processOrders(resetGen, resetMarketstate);
     std::cout << "Ordering test completed with " << CONSUMERS << " consumers.\n";
 }

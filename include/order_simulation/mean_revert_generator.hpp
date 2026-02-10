@@ -16,6 +16,6 @@ private:
     double equilibrium_price_;
     uint64_t order_id_ = 0;
     std::mt19937 rng_;
-    std::uniform_real_distribution<double> fade_dist_{0.1, 1.0};
-    std::uniform_int_distribution<uint32_t> qty_dist_{5, 30};
+    std::uniform_real_distribution<double> fade_dist_{0.05, 0.5}; // fraction of deviation to fade
+    std::uniform_int_distribution<uint32_t> qty_dist_{5, 40};
 };

@@ -18,7 +18,7 @@ private:
     MarketState *market_state_;
 
     std::mt19937 rng_;
-    std::uniform_real_distribution<double> spread_dist_{0.5, 2.0};
-    std::uniform_int_distribution<uint32_t> qty_dist_{1, 20};
+    std::uniform_real_distribution<double> spread_frac_{0.3, 1.2}; // fraction of market spread
+    std::uniform_int_distribution<uint32_t> qty_dist_{5, 50};
     std::uniform_int_distribution<int> side_dist_{0, 1};
 };

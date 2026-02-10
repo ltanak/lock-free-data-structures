@@ -112,7 +112,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
 }
 
 template<typename DataStructure, typename TOrder>
-void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGenerator<BenchmarkOrder> &generator){
+void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGenerator<BenchmarkOrder> &generator, MarketState &market){
     std::vector<uint64_t> actual_order;
     std::vector<uint64_t> expected_order;
     std::vector<TOrder> orders;
@@ -138,10 +138,17 @@ void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGener
     }
 
     // use seeded generator to get expected sequence of IDs
+    // mirror the original generation loop: update price and check events
     for (size_t i = 0; i < TOTAL_ORDERS_; ++i){
+        market.updatePrice();
         TOrder order = generator.generate();
+        order.sequence_number = i + 1;
         orders.push_back(order);
         expected_order.push_back(order.order_id);
+
+        if ((i + 1) % 200 == 0) {
+            market.checkAndApplyEvent(i + 1);
+        }
     }
     ordering::write(expected_order, actual_order);
 

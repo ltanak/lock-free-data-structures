@@ -9,6 +9,7 @@
 #include "utils/timing.hpp"
 #include "utils/structs.hpp"
 #include "exchange/matching_engine.hpp"
+#include "order_simulation/market_state.hpp"
 
 // This will have to either be templ
 #include "order_simulation/collection_order_generator.hpp"
@@ -38,7 +39,7 @@ public:
 
     // csv writing entry functions
     auto processLatencies() -> void;
-    auto processOrders(CollectionOrderGenerator<BenchmarkOrder> &generator) -> void;
+    auto processOrders(CollectionOrderGenerator<BenchmarkOrder> &generator, MarketState &market) -> void;
     auto processMatching(std::vector<TOrder>& orders, std::vector<uint64_t>& actual_order) -> void;
 
 private:
