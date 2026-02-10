@@ -16,13 +16,14 @@ TOrder MarketMakerGenerator<TOrder>::generateOrder() {
     order_id_++;
     
     double mid = market_state_->getPrice();
-    double spread_offset = spread_dist_(rng_);
+    double spread = market_state_->getSpread();
+    double spread_offset = spread * spread_frac_(rng_);
     
-    // quote near price with tight spread
+    // quote near mid price with tight spread (provides liquidity)
     bool is_bid = side_dist_(rng_) == 0;
     // if bid, quote below mid; if ask, quote above mid
     double price = is_bid ? mid - spread_offset : mid + spread_offset;
-    price = std::ceil(price * 100.0) / 100.0; // normalise 2DP
+    price = std::round(price * 100.0) / 100.0;
     
     OrderType type = is_bid ? OrderType::BUY : OrderType::SELL;
     uint32_t quantity = qty_dist_(rng_);

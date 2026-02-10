@@ -22,19 +22,20 @@ double MarketState::getSpread() const noexcept { return spread_.load(std::memory
 MarketEvent MarketState::getEvent() const noexcept { return event_.load(std::memory_order_relaxed); }
 
 /**
- * sample volatility as decimals, representing percentages
+ * Sample volatility as a fraction of price (basis points / 10000)
+ * e.g. 20 bps => 0.002 => 0.2% per tick
  */
 
 double MarketState::sampleVolatility(Volatility vol) noexcept {
     switch(vol){
         case Volatility::LOW:
-            return low_vol_dist_(rng_) / 100.0;
+            return low_vol_dist_(rng_) / 10000.0;
         case Volatility::MEDIUM:
-            return med_vol_dist_(rng_) / 100.0;
+            return med_vol_dist_(rng_) / 10000.0;
         case Volatility::HIGH:
-            return high_vol_dist_(rng_) / 100.0;
+            return high_vol_dist_(rng_) / 10000.0;
         default:
-            return 0.15;
+            return 0.002;
     }
 }
 
@@ -51,10 +52,12 @@ void MarketState::updatePrice() noexcept {
     double drift = drift_.load(std::memory_order_relaxed);
     double vol = volatility_.load(std::memory_order_relaxed);
     
-    std::normal_distribution<double> price_noise{0.0, vol};
+    // geometric-style noise: drift and noise scale price change
+    std::normal_distribution<double> price_noise{0.0, current_price * vol};
     double price_change = drift + price_noise(rng_);
     
-    double new_price = std::clamp(current_price + price_change, 85.0, 115.0);
+    // clamp to range around starting price
+    double new_price = std::clamp(current_price + price_change, 70.0, 130.0);
     base_price_.store(new_price, std::memory_order_relaxed);
 }
 
@@ -85,40 +88,33 @@ void MarketState::checkAndApplyEvent(uint64_t cycle_count) noexcept {
     // check if current event expired
     uint64_t end_cycle = event_end_.load(std::memory_order_relaxed);
     if (cycle_count > 0 && end_cycle > 0 && cycle_count >= end_cycle) {
-        // Event expired; trigger new one every N cycles or return to BASE
-        if ((cycle_count - last_event_cycle_) % 1000 == 0) {
-            // Randomly pick next event
-            std::uniform_int_distribution<int> event_dist{0, 5};
-            int choice = event_dist(rng_);
-            
-            MarketEvent next_event;
-            switch(choice) {
-                case 1: next_event = MarketEvent::UP_TREND; break;
-                case 2: next_event = MarketEvent::DOWN_TREND; break;
-                case 3: next_event = MarketEvent::CRASH; break;
-                case 4: next_event = MarketEvent::SURGE; break;
-                case 5: next_event = MarketEvent::PULL_BACK; break;
-                default: next_event = MarketEvent::BASE;
-            }
-            
-            applyEvent(next_event, cycle_count);
-            last_event_cycle_ = cycle_count;
+        // event has expired, pick a new one
+        // weighted towards base so not every period is an event
+        std::uniform_int_distribution<int> event_dist{0, 9};
+        int choice = event_dist(rng_);
+        
+        MarketEvent next_event;
+        switch(choice) {
+            case 1: next_event = MarketEvent::UP_TREND; break;
+            case 2: next_event = MarketEvent::DOWN_TREND; break;
+            case 3: next_event = MarketEvent::CRASH; break;
+            case 4: next_event = MarketEvent::SURGE; break;
+            case 5: next_event = MarketEvent::PULL_BACK; break;
+            default: next_event = MarketEvent::BASE; // 50% chance of returning to normal
         }
+        
+        applyEvent(next_event, cycle_count);
+        last_event_cycle_ = cycle_count;
+    }
+    // if no event is currently active (event_end_ == 0), apply base event
+    else if (end_cycle == 0 && cycle_count > 0) {
+        applyEvent(MarketEvent::BASE, cycle_count);
+        last_event_cycle_ = cycle_count;
     }
 }
 
-void MarketState::applyEvent(MarketEvent event_type) noexcept {
-    // Legacy override - just call the new version with cycle 0
-    applyEvent(event_type, 0);
-}
-
-void MarketState::checkEvent(uint64_t cycle_count) noexcept {
-    // Legacy method for compatibility
-    checkAndApplyEvent(cycle_count);
-}
-
 void MarketState::setParameters(EventParams params) noexcept {
-    volatility_.store(params.drift, std::memory_order_relaxed);
+    volatility_.store(sampleVolatility(params.volatility), std::memory_order_relaxed);
     drift_.store(params.drift, std::memory_order_relaxed);
     bias_.store(params.bias, std::memory_order_relaxed);
     spread_.store(params.spread, std::memory_order_relaxed);

@@ -16,6 +16,6 @@ private:
     double last_price_;
     uint64_t order_id_ = 0;
     std::mt19937 rng_;
-    std::uniform_real_distribution<double> offset_dist_{0.0, 0.5};
-    std::uniform_int_distribution<uint32_t> qty_dist_{10, 50};
+    std::uniform_real_distribution<double> offset_dist_{0.01, 0.15}; // small aggressive offset
+    std::uniform_int_distribution<uint32_t> qty_dist_{10, 80};
 };
