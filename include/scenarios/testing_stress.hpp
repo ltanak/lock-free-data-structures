@@ -46,15 +46,25 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     const uint64_t TOTAL_ORDERS = params.total_orders;
     const uint64_t THREAD_LIMIT = params.thread_order_limit;
     const uint32_t SEED = params.seed;
-    constexpr uint32_t PREPROCESS_LIMIT = 10000;
-    constexpr uint32_t WARMUP_LIMIT = 10000;
+    
+    // warmup iterations
+    constexpr uint32_t WARMUP_ITERS = 5000;
 
     // market state thread
     MarketState market_state;
 
-    // barrier for synchronisation after preprocessing
+    // after cache warming, before warmup
+    std::barrier warmup_start_barrier(TOTAL_THREADS);
+    // after warmup drain, before benchmark (empties queue)
+    std::barrier drain_barrier(TOTAL_THREADS);
+    // benchmark start
     std::barrier benchmark_barrier(TOTAL_THREADS);
-    std::barrier warmup_barrier(TOTAL_THREADS);
+
+    // atomic to signal producers have finished warmup enqueuing
+    std::atomic<bool> warmup_producers_done{false};
+    // atomic counter to drain the queue between warmup and benchmark
+    std::atomic<uint64_t> warmup_enqueued{0};
+    std::atomic<uint64_t> warmup_dequeued{0};
 
     // per-thread buffers
     std::vector<llogs::LatencyStore> thread_latencies(TOTAL_THREADS);
@@ -73,20 +83,25 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
                 lThread::pin_thread(cpu);
                 auto *local_buffer = thread_latencies[index].enqueue_buffers.get();
 
-                // perform cachewarming here
-                for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
-                    BenchmarkOrder o{};
-                    wrapper.preprocessEnqueue(o, tid);
+                // touch the latency buffer pages
+                for (uint64_t i = 0; i < THREAD_LIMIT; ++i){
+                    local_buffer[i] = 0;
                 }
 
-                warmup_barrier.arrive_and_wait();
-
-                for (uint64_t i = 0; i < WARMUP_LIMIT; ++i){
+                // enqueue real orders to warm data structure caches
+                warmup_start_barrier.arrive_and_wait();
+                
+                for (uint64_t i = 0; i < WARMUP_ITERS; ++i){
                     BenchmarkOrder o = gen.generate();
                     wrapper.enqueueOrder(o, tid);
+                    warmup_enqueued.fetch_add(1, std::memory_order_relaxed);
                 }
-                
-                // once all threads done, starts actual benchmarking
+                warmup_producers_done.store(true, std::memory_order_release);
+
+                // wait for queue to be fully drained before starting benchmark
+                drain_barrier.arrive_and_wait();
+
+                // actual benchmark
                 benchmark_barrier.arrive_and_wait();
 
                 for (uint64_t i = 0; i < THREAD_LIMIT; ++i){
@@ -114,17 +129,30 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
 
                 auto *local_buffer = thread_latencies[index].dequeue_buffers.get();
                 
-                // perform cachewarming here
-                for (uint64_t i = 0; i < PREPROCESS_LIMIT; ++i){
-                    wrapper.preprocessDequeue(o, tid);
+                // touch latency buffer
+                for (uint64_t i = 0; i < THREAD_LIMIT; ++i){
+                    local_buffer[i] = 0;
                 }
 
-                warmup_barrier.arrive_and_wait();
-
-                for (uint64_t i = 0; i < WARMUP_LIMIT; ++i){
-                    wrapper.dequeueLatency(o, tid);
+                // dequeue alongside producers
+                warmup_start_barrier.arrive_and_wait();
+                
+                // spin-dequeue: keep dequeuing until producers are done and queue is drained
+                while (true) {
+                    if (wrapper.dequeueLatency(o, tid)) {
+                        warmup_dequeued.fetch_add(1, std::memory_order_relaxed);
+                    }
+                    // exit when producers are done and drained everything
+                    if (warmup_producers_done.load(std::memory_order_acquire) &&
+                        warmup_dequeued.load(std::memory_order_relaxed) >= warmup_enqueued.load(std::memory_order_relaxed)) {
+                        break;
+                    }
                 }
 
+                // queue empty signal ready
+                drain_barrier.arrive_and_wait();
+                
+                // actual benchmark
                 benchmark_barrier.arrive_and_wait();
 
                 for (uint64_t count = 0; count < THREAD_LIMIT; ++count){
