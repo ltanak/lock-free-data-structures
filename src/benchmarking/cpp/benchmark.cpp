@@ -8,6 +8,8 @@
 #include "data_structures/queues/regular_queue.hpp"
 #include "data_structures/queues/mc_lockfree_queue.hpp"
 #include "data_structures/queues/mc_mpmc_queue.hpp"
+#include "data_structures/ring_buffers/wilt_mpmc_blocking_ring.hpp"
+#include "data_structures/ring_buffers/wilt_mpmc_nonblock_ring.hpp"
 #include "exchange/trades_cycle.hpp"
 #include "order_simulation/benchmark_order.hpp"
 #include "order_simulation/collection_order_generator.hpp"
@@ -231,3 +233,5 @@ void BenchmarkWrapper<DataStructure, TOrder>::processMatching(std::vector<TOrder
 template class BenchmarkWrapper<RegularQueue<BenchmarkOrder>, BenchmarkOrder>;
 template class BenchmarkWrapper<MCLockFreeQueue<BenchmarkOrder>, BenchmarkOrder>;
 template class BenchmarkWrapper<MCConcurrentQueue<BenchmarkOrder>, BenchmarkOrder>;
+template class BenchmarkWrapper<WiltMPMCBlockRing<BenchmarkOrder>, BenchmarkOrder>;
+template class BenchmarkWrapper<WiltMPMCNonBlockRing<BenchmarkOrder>, BenchmarkOrder>;
