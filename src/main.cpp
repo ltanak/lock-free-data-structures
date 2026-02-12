@@ -19,6 +19,8 @@
 #include "data_structures/queues/regular_queue.hpp"
 #include "data_structures/queues/mc_lockfree_queue.hpp"
 #include "data_structures/queues/mc_mpmc_queue.hpp"
+#include "data_structures/ring_buffers/wilt_mpmc_blocking_ring.hpp"
+#include "data_structures/ring_buffers/wilt_mpmc_nonblock_ring.hpp"
 
 // Benchmark
 #include "benchmarking/benchmark.hpp"
@@ -40,10 +42,21 @@
 int main(int argc, char* argv[]) {
     TestParams params;
     parseArgs(argc, argv, params);
-
+    
+    // Ring buffer needs large capacity for MPMC contention
+    // Producers = thread_count, Consumers = thread_count
+    // Need buffer to absorb bursts when producers run ahead of consumers
+    size_t ring_capacity = std::max(
+        static_cast<size_t>(100000),  // minimum safe capacity
+        params.total_orders * params.thread_count * 2  // scale with workload
+    );
+    
+    // WiltMPMCBlockRing<BenchmarkOrder> ring(ring_capacity);
+    WiltMPMCNonBlockRing<BenchmarkOrder> ring(ring_capacity);
     MCConcurrentQueue<BenchmarkOrder> queue;
-    BenchmarkWrapper<MCConcurrentQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
-
+    // BenchmarkWrapper<MCConcurrentQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
+    BenchmarkWrapper<WiltMPMCNonBlockRing<BenchmarkOrder>, BenchmarkOrder> wrapper(ring, params);
+    
     switch (params.test){
         case TestType::STRESS: stressTest(wrapper, params); break;
         case TestType::ORDER:  orderTest(wrapper, params); break;
