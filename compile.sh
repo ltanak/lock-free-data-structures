@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BUILD_DIR="${BUILD_DIR:-build}"
+BUILD_DIR="${BUILD_DIR:-$(pwd)/build}"
 BUILD_TYPE="${BUILD_TYPE:-Debug}"
+GENERATOR="${GENERATOR:-Ninja}"
 
-cmake -S . -B "$BUILD_DIR" -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
+cmake -S . -B "$BUILD_DIR" -G "$GENERATOR" -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
+
 cmake --build "$BUILD_DIR" -j
