@@ -12,5 +12,5 @@ mplfinance = "*"
 pillow = "*"
 
 [tasks]
-main = "python -m scripts.main"
-image = "python -m image_editing.image"
+main = { cmd = ["python", "-m", "scripts.main"] }
+image = { cmd = ["python", "-m", "image_editing.image"] }

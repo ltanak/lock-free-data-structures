@@ -123,7 +123,7 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     for (int i = 0; i < CONSUMERS; ++i) {
         int tid = wrapper.addDeqThread();
         consumers.emplace_back(
-            [&, tid, index = i, cpu = tid]() {
+            [&, tid, index = PRODUCERS + i, cpu = tid]() {
                 BenchmarkOrder o;
                 lThread::pin_thread(cpu);
 
@@ -175,8 +175,12 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     local_dequeues.reserve(CONSUMERS * THREAD_LIMIT);
 
     // combines all results from each individual buffer
-    for (auto &t_l: thread_latencies){
+    for (uint64_t i = 0; i < PRODUCERS; ++i){
+        auto &t_l = thread_latencies[i];
         std::copy(t_l.enqueue_buffers.get(), t_l.enqueue_buffers.get() + THREAD_LIMIT, std::back_inserter(local_enqueues));
+    }
+    for (uint64_t i = 0; i < CONSUMERS; ++i){
+        auto &t_l = thread_latencies[PRODUCERS + i];
         std::copy(t_l.dequeue_buffers.get(), t_l.dequeue_buffers.get() + THREAD_LIMIT, std::back_inserter(local_dequeues));
     }
 

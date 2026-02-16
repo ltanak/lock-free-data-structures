@@ -13,8 +13,9 @@ namespace ltime {
     }
 #else
     inline auto rdtsc_lfence() -> uint64_t {
-        uint32_t lo, hi, aux;
+        uint64_t lo, hi, aux;
         asm volatile("lfence; rdtsc" : "=a"(lo), "=d"(hi) :: "memory");
+        // return (static_cast<uint64_t>(hi) << 32) | static_cast<uint64_t>(lo);
         return (hi << 32) | lo;
     }
 #endif

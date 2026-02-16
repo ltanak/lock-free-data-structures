@@ -22,8 +22,8 @@ namespace latencies {
     auto getPath() -> filesystem::path;
 
     // "latencies_DD_MM_YYYY_HH_MM_SS.csv".
-    auto createFileName() -> string;
-    auto write(const vector<double>& enqueue_vec, const vector<double>& dequeue_vec) -> bool;
+    auto createFileName(const string& run_id) -> string;
+    auto write(const vector<double>& enqueue_vec, const vector<double>& dequeue_vec, const string& run_id) -> bool;
 }
 
 namespace ordering {
@@ -31,8 +31,8 @@ namespace ordering {
     auto getPath() -> filesystem::path;
 
     // "orders_DD_MM_YYYY_HH_MM_SS.csv"
-    auto createFileName() -> string;
-    auto write(const vector<uint64_t>& expected_order, const vector<uint64_t>& actual_order) -> bool;
+    auto createFileName(const string& run_id) -> string;
+    auto write(const vector<uint64_t>& expected_order, const vector<uint64_t>& actual_order, const string& run_id) -> bool;
 }
 
 namespace exchange {
@@ -40,6 +40,6 @@ namespace exchange {
     auto getPath() -> filesystem::path;
 
     // "matching_DD_MM_YYYY_HH_MM_SS.csv"
-    auto createFileName() -> string;
-    auto write(const vector<TradesCycle> expected, const vector<TradesCycle> actual) -> bool;
+    auto createFileName(const string& run_id) -> string;
+    auto write(const vector<TradesCycle> expected, const vector<TradesCycle> actual, const string& run_id) -> bool;
 }
