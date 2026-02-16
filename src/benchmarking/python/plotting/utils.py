@@ -24,6 +24,7 @@ def get_graph_dir(dir: str) -> Path:
 def get_latest_csv(must_match: bool = False) -> dict[str, Path]:
     dirs = ["exchange", "ordering", "latencies"]
     latest = {}
+    run_ids = {}
     timestamps = {}
     
     for key in dirs:
@@ -33,20 +34,57 @@ def get_latest_csv(must_match: bool = False) -> dict[str, Path]:
             raise FileNotFoundError(f"No CSVs found in {path}")
         
         latest[key] = csvs[0]
-
-        # timestamp format: prefix_MM_DD_YYYY_HH_MM_SS.csv
-        parts = csvs[0].stem.split("_")
-        if len(parts) >= 6:
-            timestamps[key] = "_".join(parts[-6:])
-        else:
-            timestamps[key] = csvs[0].stem
+        run_ids[key] = extract_run_id(csvs[0])
+        timestamps[key] = extract_timestamp(csvs[0])
     
     if must_match:
-        unique_timestamps = set(timestamps.values())
-        if len(unique_timestamps) > 1:
-            raise ValueError(f"CSV timestamps do not match: {timestamps}. Set must_match=False to allow different timestamps.")
+        # match by run_id first (preferred for grouped runs)
+        unique_run_ids = set(r for r in run_ids.values() if r is not None)
+        if len(unique_run_ids) > 1:
+            raise ValueError(f"CSV run IDs do not match: {run_ids}. Set must_match=False to allow different run IDs.")
+        elif len(unique_run_ids) == 0:
+            # no run_ids, fall back to timestamp matching
+            unique_timestamps = set(timestamps.values())
+            if len(unique_timestamps) > 1:
+                raise ValueError(f"CSV timestamps do not match: {timestamps}. Set must_match=False to allow different timestamps.")
     
     return latest
+
+# CSVs with a specific run_id from all directories
+def get_csv_by_run_id(run_id: str) -> dict[str, Path]:
+    dirs = ["exchange", "ordering", "latencies"]
+    result = {}
+    
+    for dir_name in dirs:
+        path = get_csv_dir(dir_name)
+        csvs = get_csvs_dir(path)
+        
+        for csv_file in csvs:
+            file_run_id = extract_run_id(csv_file)
+            if file_run_id == run_id:
+                result[dir_name] = csv_file
+                break
+    
+    if not result:
+        raise FileNotFoundError(f"No CSVs found with run_id: {run_id}")
+    
+    return result
+
+# Get all unique run_ids from CSV files
+def get_all_run_ids() -> list[str]:
+    dirs = ["exchange", "ordering", "latencies"]
+    run_ids = set()
+    
+    for dir_name in dirs:
+        path = get_csv_dir(dir_name)
+        csvs = get_csvs_dir(path)
+        
+        for csv_file in csvs:
+            run_id = extract_run_id(csv_file)
+            if run_id:
+                run_ids.add(run_id)
+    
+    return sorted(list(run_ids), reverse=True)  # Most recent first
 
 # returns the most recent csv in the directory specified
 def get_latest_csv_dir(dir: str) -> Path:
@@ -68,6 +106,28 @@ def get_csvs_dir(path: Path, reverse: bool = False):
         return datetime.min
 
     return sorted(csvs, key=parse_timestamp, reverse=reverse)
+
+# Extract run_id from filename if present
+# Format: {type}_{run_id}_{timestamp}.csv or {type}_{timestamp}.csv
+def extract_run_id(filename: Path) -> str | None:
+    parts = filename.stem.split("_")
+    # New format: type_runid_MM_DD_YYYY_HH_MM_SS (8 parts with single runid)
+    # Old format with timestamp_pid: type_runid1_runid2_MM_DD_YYYY_HH_MM_SS (9+ parts)
+    # Old format: type_MM_DD_YYYY_HH_MM_SS (7 parts without runid)
+    if len(parts) == 8:
+        # Simple run_id format: parts[1] is the run_id
+        return parts[1]
+    elif len(parts) >= 9:
+        # Old timestamp_pid format: parts[1] and parts[2] make up the run_id
+        return f"{parts[1]}_{parts[2]}"
+    return None
+
+# Extract timestamp from filename
+def extract_timestamp(filename: Path) -> str:
+    parts = filename.stem.split("_")
+    if len(parts) >= 6:
+        return "_".join(parts[-6:])
+    return filename.stem
 
 # returns True if the csv is found in the specified directory
 def get_csv(name: str, dir: str) -> bool:

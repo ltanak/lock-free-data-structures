@@ -50,6 +50,7 @@ private:
     const uint64_t TOTAL_ORDERS_;
     const uint64_t NUM_THREADS_;
     const uint64_t THREAD_LIMIT_;
+    const std::string RUN_ID_;
 
     // data structure templated argument
     DataStructure& structure_;

@@ -19,7 +19,7 @@
 
 template<typename DataStructure, typename TOrder>
 BenchmarkWrapper<DataStructure, TOrder>::BenchmarkWrapper(DataStructure &structure, TestParams &params)
-: structure_(structure), TOTAL_ORDERS_(params.total_orders), NUM_THREADS_(params.thread_count), THREAD_LIMIT_(params.thread_order_limit), exchange_(100)
+: structure_(structure), TOTAL_ORDERS_(params.total_orders), NUM_THREADS_(params.thread_count), THREAD_LIMIT_(params.thread_order_limit), RUN_ID_(params.run_id), exchange_(100)
 {
     if (NUM_THREADS_ == 0 || THREAD_LIMIT_ == 0 || TOTAL_ORDERS_ == 0) {
         std::cerr << "Invalid params (zero)" << std::endl;
@@ -110,7 +110,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processLatencies(){
     // std out for average latencies (will be later included in report generation)
     std::cout << "Avg Enqueue Latency (ns): " << sumEnq << std::endl;
     std::cout << "Avg Dequeue Latency (ns): " << sumDeq << std::endl;
-    latencies::write(e_ns_latencies, d_ns_latencies);
+    latencies::write(e_ns_latencies, d_ns_latencies, RUN_ID_);
 }
 
 template<typename DataStructure, typename TOrder>
@@ -152,7 +152,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processOrders(CollectionOrderGener
             market.checkAndApplyEvent(i + 1);
         }
     }
-    ordering::write(expected_order, actual_order);
+    ordering::write(expected_order, actual_order, RUN_ID_);
 
     processMatching(orders, actual_order);
 }
@@ -227,7 +227,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processMatching(std::vector<TOrder
     }
 
     // write results to csv
-    exchange::write(expected_cycles, actual_cycles);
+    exchange::write(expected_cycles, actual_cycles, RUN_ID_);
 }
 
 template class BenchmarkWrapper<RegularQueue<BenchmarkOrder>, BenchmarkOrder>;

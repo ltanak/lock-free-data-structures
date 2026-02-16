@@ -13,20 +13,24 @@ namespace latencies {
         return std::filesystem::path(PROJECT_SOURCE_DIR) / "src/benchmarking/csvs/latencies/";
     }
 
-    auto createFileName() -> std::string {
+    auto createFileName(const std::string& run_id) -> std::string {
         auto t = std::time(nullptr);
         auto tm = *std::localtime(&t);
         std::ostringstream oss;
         oss << std::put_time(&tm, "%m_%d_%Y_%H_%M_%S");
-        auto str = "latencies_" + oss.str() + ".csv";
+        std::string str = "latencies_";
+        if (!run_id.empty()) {
+            str += run_id + "_";
+        }
+        str += oss.str() + ".csv";
         return str;
     }
 
-    bool write(const std::vector<double>& enqueue_vec, const std::vector<double>& dequeue_vec) {
+    bool write(const std::vector<double>& enqueue_vec, const std::vector<double>& dequeue_vec, const std::string& run_id) {
         namespace fs = std::filesystem;
 
         fs::path dirPath = getPath();
-        fs::path filePath = dirPath / createFileName();
+        fs::path filePath = dirPath / createFileName(run_id);
     
         if (!fs::exists(filePath)) {
             std::ofstream(filePath) << "enqueue_latency_ns,dequeue_latency_ns\n"; // header
@@ -53,20 +57,24 @@ namespace ordering {
         return std::filesystem::path(PROJECT_SOURCE_DIR) / "src/benchmarking/csvs/ordering/";
     }
 
-    auto createFileName() -> std::string {
+    auto createFileName(const std::string& run_id) -> std::string {
         auto t = std::time(nullptr);
         auto tm = *std::localtime(&t);
         std::ostringstream oss;
         oss << std::put_time(&tm, "%m_%d_%Y_%H_%M_%S");
-        auto str = "ordering_" + oss.str() + ".csv";
+        std::string str = "ordering_";
+        if (!run_id.empty()) {
+            str += run_id + "_";
+        }
+        str += oss.str() + ".csv";
         return str;
     }
 
-    bool write(const vector<uint64_t>& expected_order, const vector<uint64_t>& actual_order) {
+    bool write(const vector<uint64_t>& expected_order, const vector<uint64_t>& actual_order, const std::string& run_id) {
         namespace fs = std::filesystem;
 
         fs::path dirPath = getPath();
-        fs::path filePath = dirPath / createFileName();
+        fs::path filePath = dirPath / createFileName(run_id);
         if (!fs::exists(filePath)) {
             std::ofstream(filePath) << "expected_id,actual_id\n"; // header
         }
@@ -91,20 +99,24 @@ namespace exchange {
         return std::filesystem::path(PROJECT_SOURCE_DIR) / "src/benchmarking/csvs/exchange/";
     }
 
-    auto createFileName() -> string {
+    auto createFileName(const string& run_id) -> string {
         auto t = std::time(nullptr);
         auto tm = *std::localtime(&t);
         std::ostringstream oss;
         oss << std::put_time(&tm, "%m_%d_%Y_%H_%M_%S");
-        auto str = "matching_" + oss.str() + ".csv";
+        std::string str = "matching_";
+        if (!run_id.empty()) {
+            str += run_id + "_";
+        }
+        str += oss.str() + ".csv";
         return str;
     }
 
-    auto write(const vector<TradesCycle> expected, const vector<TradesCycle> actual) -> bool {
+    auto write(const vector<TradesCycle> expected, const vector<TradesCycle> actual, const std::string& run_id) -> bool {
         namespace fs = std::filesystem;
         
         fs::path dirPath = getPath();
-        fs::path filePath = dirPath / createFileName();
+        fs::path filePath = dirPath / createFileName(run_id);
 
         if (!fs::exists(filePath)) {
             std::ofstream(filePath) << "cycle,exp_prices,exp_qtities,cycle2,acc_prices,acc_qtities\n"; // header
