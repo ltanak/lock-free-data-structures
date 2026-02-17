@@ -13,7 +13,13 @@ from benchmarking.python.plotting.utils import *
 from benchmarking.python.plotting.ExchangePlot import ExchangePlot
 
 # first arguments are positional / optional, final are keyword-only
-def plot_graphs(file: str | None = None, run_id: str | None = None, must_match: bool = False, *, active: dict[str, bool]):
+def plot_graphs(
+        file: str | None = None, 
+        run_id: str | None = None, 
+        must_match: bool = False, 
+        id_range: tuple[int, int] | None = None, 
+        *, active: dict[str, bool]
+    ):
     files = {}
     
     if run_id:
@@ -53,7 +59,7 @@ def plot_graphs(file: str | None = None, run_id: str | None = None, must_match: 
         op = OrderingPlot(ordering_csv_path)
         print("\n=== ORDERING SUMMARY ===")
         print(op.mismatch_summary())
-        op.plot_all(id_range=(0, 1000))
+        op.plot_all(id_range=id_range if id_range else None)
 
     # Exchange Plotting
     if active.get("exchange") and "exchange" in files:
@@ -61,7 +67,7 @@ def plot_graphs(file: str | None = None, run_id: str | None = None, must_match: 
         ep = ExchangePlot(exchange_csv_path)
         print("\n=== EXCHANGE SUMMARY ===")
         # ep.plot_all()
-        ep.plot_all(cycle_range=(0, 1000))
+        ep.plot_all(cycle_range=id_range if id_range else None)
 
 
     # CSV = "GOOD_matching_15_01_2026_10_32_38.csv"
@@ -72,6 +78,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot benchmarking results from CSV files")
     parser.add_argument("--file", type=str, help="CSV filename to plot")
     parser.add_argument("--run-id", type=str, help="ID to plot (e.g. 1771246990)")
+    parser.add_argument("--id-range", type=int, nargs=2, metavar=('START', 'END'), help="The range of IDs that are to be plotted (e.g. --id-range 0 1000)")
     parser.add_argument("--ls", action="store_true", help="List all available run IDs")
     parser.add_argument("--must-match", action="store_true", help="Require all CSVs to have matching timestamps/run_ids")
     parser.add_argument("--latencies", action="store_true", help="Plot latency graphs")
@@ -102,10 +109,14 @@ if __name__ == "__main__":
             "exchange": args.exchange
         }
     
+    # Convert id_range list to tuple if provided
+    id_range = tuple(args.id_range) if args.id_range else None
+    
     plot_graphs(
         file=args.file,
         run_id=args.run_id,
         must_match=args.must_match,
+        id_range=id_range,
         active=active
     )
 
