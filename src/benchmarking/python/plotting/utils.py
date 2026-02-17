@@ -70,7 +70,7 @@ def get_csv_by_run_id(run_id: str) -> dict[str, Path]:
     
     return result
 
-# Get all unique run_ids from CSV files
+# all unique run_ids from CSV files
 def get_all_run_ids() -> list[str]:
     dirs = ["exchange", "ordering", "latencies"]
     run_ids = set()
@@ -111,9 +111,9 @@ def get_csvs_dir(path: Path, reverse: bool = False):
 # Format: {type}_{run_id}_{timestamp}.csv or {type}_{timestamp}.csv
 def extract_run_id(filename: Path) -> str | None:
     parts = filename.stem.split("_")
-    # New format: type_runid_MM_DD_YYYY_HH_MM_SS (8 parts with single runid)
-    # Old format with timestamp_pid: type_runid1_runid2_MM_DD_YYYY_HH_MM_SS (9+ parts)
-    # Old format: type_MM_DD_YYYY_HH_MM_SS (7 parts without runid)
+    # current format: type_runid_MM_DD_YYYY_HH_MM_SS (8 parts with single runid)
+    # old format with timestamp_pid: type_runid1_runid2_MM_DD_YYYY_HH_MM_SS (9+ parts)
+    # old format: type_MM_DD_YYYY_HH_MM_SS (7 parts without runid)
     if len(parts) == 8:
         # Simple run_id format: parts[1] is the run_id
         return parts[1]
@@ -122,7 +122,7 @@ def extract_run_id(filename: Path) -> str | None:
         return f"{parts[1]}_{parts[2]}"
     return None
 
-# Extract timestamp from filename
+# extract timestamp from filename
 def extract_timestamp(filename: Path) -> str:
     parts = filename.stem.split("_")
     if len(parts) >= 6:
