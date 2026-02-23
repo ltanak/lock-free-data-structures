@@ -174,3 +174,82 @@ class ExchangePlot:
             )
         else:
             print("No actual trades found")
+
+    def report_summary(self) -> tuple[list[list[str]], list[int]]:
+        """Return (summary_rows, differing_cycles) for the report."""
+        total_cycles = len(self.data["cycle"])
+        cycles_with_exp = 0
+        cycles_with_act = 0
+        cycles_differ = 0
+        total_exp_trades = 0
+        total_act_trades = 0
+        differing_cycles: list[int] = []
+
+        for row in self.iter_rows():
+            exp_p = row.get("exp_prices", []) or []
+            act_p = row.get("acc_prices", []) or []
+            exp_q = row.get("exp_qtities", []) or []
+            act_q = row.get("acc_qtities", []) or []
+
+            has_exp = len(exp_p) > 0
+            has_act = len(act_p) > 0
+
+            if has_exp:
+                cycles_with_exp += 1
+                total_exp_trades += len(exp_p)
+            if has_act:
+                cycles_with_act += 1
+                total_act_trades += len(act_p)
+
+            if exp_p != act_p or exp_q != act_q:
+                if has_exp or has_act:
+                    cycles_differ += 1
+                    differing_cycles.append(row.get("cycle", -1))
+
+        comparable = max(cycles_with_exp, cycles_with_act, 1)
+        match_rate = 100.0 * (1 - cycles_differ / comparable) if comparable else 0.0
+
+        summary_rows = [
+            ["Total cycles", f"{total_cycles:,}"],
+            ["Cycles with expected trades", f"{cycles_with_exp:,}"],
+            ["Cycles with actual trades", f"{cycles_with_act:,}"],
+            ["Cycles where sequences differ", f"{cycles_differ:,}"],
+            ["Match rate", f"{match_rate:.2f}%"],
+            ["Total expected trades", f"{total_exp_trades:,}"],
+            ["Total actual trades", f"{total_act_trades:,}"],
+        ]
+        return summary_rows, differing_cycles
+
+    def plot_report_candles(self, out_dir: Path, cycle_range: tuple[int, int] | None = None) -> dict[str, Path | None]:
+        """
+        Generate expected/actual candlestick PNGs and an overlay to out_dir.
+        Returns dict with keys 'expected', 'actual', 'overlay' mapping to paths (or None if no trades).
+        """
+        from benchmarking.python.image_editing.image import ImageEditor
+
+        out_dir.mkdir(parents=True, exist_ok=True)
+        result: dict[str, Path | None] = {"expected": None, "actual": None, "overlay": None}
+
+        candles_exp = self._process_csv(cycle_range=cycle_range, source="expected")
+        candles_act = self._process_csv(cycle_range=cycle_range, source="actual")
+
+        if candles_exp:
+            exp_path = out_dir / "expected.png"
+            self.plot_candles(candles_exp, title="Expected Matching", out=exp_path)
+            result["expected"] = exp_path
+
+        if candles_act:
+            act_path = out_dir / "actual.png"
+            self.plot_candles(candles_act, title="Actual Matching", out=act_path)
+            result["actual"] = act_path
+
+        if result["expected"] and result["actual"]:
+            try:
+                editor = ImageEditor(result["expected"], result["actual"])
+                overlay_path = str(out_dir / "overlay.png")
+                editor.transparency(out=overlay_path)
+                result["overlay"] = Path(overlay_path)
+            except Exception:
+                pass
+
+        return result

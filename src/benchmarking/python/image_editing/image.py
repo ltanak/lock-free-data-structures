@@ -41,7 +41,7 @@ class ImageEditor:
         print(f"Saved diff to: {output_path}")
 
     # 128 is 50% transparency. 0 is fully transparent, 255 is opaque
-    def transparency(self, alpha: int = 192, output_name: str = "overlay.png"):
+    def transparency(self, alpha: int = 192, output_name: str = "overlay.png", out: str | None = None):
         copy_2 = self.image_2
         copy_2.putalpha(alpha)
 
@@ -49,9 +49,13 @@ class ImageEditor:
 
         overlay = Image.alpha_composite(copy_1, copy_2)
 
-        script_dir = Path(__file__).resolve().parent
-        output_path = script_dir / output_name
+        if out is not None:
+            output_path = Path(out)
+        else:
+            script_dir = Path(__file__).resolve().parent
+            output_path = script_dir / output_name
 
+        output_path.parent.mkdir(parents=True, exist_ok=True)
         overlay.save(output_path)
 
         print(f"Saved overlay to: {output_path}")
