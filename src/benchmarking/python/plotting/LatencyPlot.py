@@ -23,7 +23,7 @@ class LatencyPlot:
         hi = q3 + k * iqr
         return data[(data >= lo) & (data <= hi)], (lo, hi)
 
-    def histogram(self, metric="enqueue", title="Latency Histogram", out: Path | None = None, remove_outliers=True):
+    def histogram(self, metric="enqueue", title="Latency Histogram", out: Path | None = None, remove_outliers=True, return_fig=False):
         data = self.data[metric]
         data = data[data > 0]
 
@@ -35,7 +35,7 @@ class LatencyPlot:
         xmin, xmax = data.min(), data.max()
         span = xmax - xmin
 
-        plt.figure()
+        fig = plt.figure()
 
         # tight fast-path
         if span <= 50:
@@ -63,6 +63,9 @@ class LatencyPlot:
         plt.title(f"{title} – {metric}{cutoff_info}")
         plt.grid(True, which="both", linestyle="--", alpha=0.4)
 
+        if return_fig:
+            return fig
+
         if out:
             out.parent.mkdir(parents=True, exist_ok=True)
             plt.savefig(out, dpi=150, bbox_inches="tight")
@@ -72,7 +75,7 @@ class LatencyPlot:
         plt.close()
 
     # CDF
-    def cdf(self, metric="enqueue", title="Latency CDF", out: Path | None = None, remove_outliers=True):
+    def cdf(self, metric="enqueue", title="Latency CDF", out: Path | None = None, remove_outliers=True, return_fig=False):
         data = self.data[metric]
 
         if remove_outliers:
@@ -81,12 +84,15 @@ class LatencyPlot:
         data = np.sort(data)
         percentiles = np.linspace(0, 100, len(data))
 
-        plt.figure()
+        fig = plt.figure()
         plt.plot(percentiles, data)
         plt.xlabel("Percentile")
         plt.ylabel("Latency (ns)")
         plt.title(f"{title} – {metric}")
         plt.grid(True)
+
+        if return_fig:
+            return fig
 
         if out:
             out.parent.mkdir(parents=True, exist_ok=True)
@@ -110,6 +116,63 @@ class LatencyPlot:
             "p99_ns": np.percentile(data, 99),
             "max_ns": np.max(data),
         }
+    
+    def report_summary(self, metric="enqueue", remove_outliers=True):
+        raw = self.data[metric]
+        if not remove_outliers:
+            clean_data, (low, high) = self._remove_outliers_iqr(raw)
+        else:
+            clean_data = raw
+            low = np.min(clean_data)
+            high = np.max(clean_data)
+        
+        summary_rows = [
+            ["Total samples", f"{len(raw):,}"],
+            ["After IQR filter", f"{len(clean_data):,}"],
+            ["IQR bounds (ns)", f"[{low:.2f}, {high:.2f}]"],
+            ["Mean (ns)", f"{np.mean(clean_data):.2f}"],
+            ["Median (ns)", f"{np.median(clean_data):.2f}"],
+            ["Std. dev (ns)", f"{np.std(clean_data):.2f}"],
+            ["Min (ns)", f"{np.min(clean_data):.2f}"],
+            ["Max (ns)", f"{np.max(clean_data):.2f}"],
+            ["P50 (ns)", f"{np.percentile(clean_data, 50):.2f}"],
+            ["P90 (ns)", f"{np.percentile(clean_data, 90):.2f}"],
+            ["P95 (ns)", f"{np.percentile(clean_data, 95):.2f}"],
+            ["P99 (ns)", f"{np.percentile(clean_data, 99):.2f}"],
+            ["P99.9 (ns)", f"{np.percentile(clean_data, 99.9):.2f}"],
+        ]
+        return summary_rows
+
+    # bar chart of key tail-latency percentiles
+    def percentile_chart(self, metric="enqueue", title="Tail-Latency Percentiles", out: Path | None = None, remove_outliers=True, return_fig=False):
+        data = self.data[metric]
+        if remove_outliers:
+            data, _ = self._remove_outliers_iqr(data)
+
+        percentiles = [50, 75, 90, 95, 99, 99.5, 99.9]
+        values = [np.percentile(data, p) for p in percentiles]
+        labels = [f"P{p}" for p in percentiles]
+
+        fig, ax = plt.subplots(figsize=(8, 4))
+        bars = ax.bar(labels, values, color="#3366cc", alpha=0.85)
+        ax.set_ylabel("Latency (ns)")
+        ax.set_title(f"{title} – {metric}")
+        ax.grid(True, axis="y", linestyle="--", alpha=0.4)
+
+        for bar, val in zip(bars, values):
+            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height(),
+                    f"{val:.1f}", ha="center", va="bottom", fontsize=8)
+
+        if return_fig:
+            return fig
+
+        if out:
+            out.parent.mkdir(parents=True, exist_ok=True)
+            plt.savefig(out, dpi=150, bbox_inches="tight")
+        else:
+            plt.show()
+
+        plt.close()
 
     # Plot all latency graphs
     def plot_all(self, out_dir: Path | None = None, remove_outliers=True):

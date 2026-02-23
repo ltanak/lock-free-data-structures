@@ -28,14 +28,44 @@ class OrderingPlot:
     def mismatch_summary(self):
         idx = self.mismatch_indices()
         total = len(self.data["expected_id"])
+        act = self.data["actual_id"]
         return {
             "total": total,
             "mismatches": len(idx),
             "mismatch_pct": 100.0 * len(idx) / total if total else 0.0,
-            "first_mismatch_index": int(idx[0]) if len(idx) else None,
+            "first_mismatch_index": int(idx[0]) if len(idx) else "--No mistmatches--",
+            "out_of_order_pairs": int(np.sum(act[:-1] > act[1:]))
         }
+    
+    def report_summary(self):
+        mismatches_dict = self.mismatch_summary()
 
-    def plot_out_of_order_pairs(self, title="Expected vs Actual", out: Path | None = None, id_range: tuple[int, int] | None = None):
+        summary_rows = [
+            ["Total IDs", f"{mismatches_dict["total"]:,}"],
+            ["Mismatched IDs", f"{mismatches_dict["mismatches"]:,}"],
+            ["Mismatch %", f"{mismatches_dict["mismatch_pct"]:.4f}%"],
+            ["Out-of-order Pairs", f"{mismatches_dict["out_of_order_pairs"]:,}"],
+            ["First mismatch index", f"{mismatches_dict["first_mismatch_index"]}"],
+            # ["Longest mismatch chain", f"{longest_chain:,}"],
+        ]
+        return summary_rows
+    
+        # @staticmethod
+    # def _longest_mismatch_chain(mismatch_idx: np.ndarray) -> int:
+    #     if len(mismatch_idx) == 0:
+    #         return 0
+    #     diffs = np.diff(mismatch_idx)
+    #     longest = 1
+    #     current = 1
+    #     for d in diffs:
+    #         if d == 1:
+    #             current += 1
+    #             longest = max(longest, current)
+    #         else:
+    #             current = 1
+    #     return longest
+
+    def plot_out_of_order_pairs(self, title="Expected vs Actual", out: Path | None = None, id_range: tuple[int, int] | None = None, return_fig=False):
         exp = self.data["expected_id"]
         act = self.data["actual_id"]
         
@@ -47,7 +77,7 @@ class OrderingPlot:
         
         mism = exp != act
 
-        plt.figure()
+        fig = plt.figure()
         plt.scatter(exp[~mism], act[~mism], s=1, c="tab:gray", label="match", alpha=0.6)
         if mism.any():
             plt.scatter(exp[mism], act[mism], s=1, c="tab:red", label="mismatch", alpha=0.9)
@@ -59,6 +89,9 @@ class OrderingPlot:
         plt.legend()
         plt.grid(True, linestyle="--", alpha=0.4)
 
+        if return_fig:
+            return fig
+
         if out:
             out.parent.mkdir(parents=True, exist_ok=True)
             plt.savefig(out, dpi=150, bbox_inches="tight")
@@ -66,7 +99,7 @@ class OrderingPlot:
             plt.show()
         plt.close()
 
-    def plot_offset(self, title="Actual - Expected", out: Path | None = None, id_range: tuple[int, int] | None = None):
+    def plot_offset(self, title="Actual - Expected", out: Path | None = None, id_range: tuple[int, int] | None = None, return_fig=False):
         exp = self.data["expected_id"]
         act = self.data["actual_id"]
         
@@ -83,13 +116,16 @@ class OrderingPlot:
         exp_offset = exp[offset_mask]
         delta_offset = delta[offset_mask]
 
-        plt.figure()
+        fig = plt.figure()
         plt.plot(exp_offset, delta_offset, linestyle="none", marker="o", markersize=1, alpha=0.7, c="tab:red")
         plt.axhline(0, color="k", linestyle="--", linewidth=1)
         plt.xlabel("expected_id")
         plt.ylabel("offset (actual - expected)")
         plt.title(title)
         plt.grid(True, linestyle="--", alpha=0.4)
+
+        if return_fig:
+            return fig
 
         if out:
             out.parent.mkdir(parents=True, exist_ok=True)
@@ -98,7 +134,7 @@ class OrderingPlot:
             plt.show()
         plt.close()
 
-    def plot_displacement_heatmap(self, title="Displacement Magnitude", out: Path | None = None, id_range: tuple[int, int] | None = None):
+    def plot_displacement_heatmap(self, title="Displacement Magnitude", out: Path | None = None, id_range: tuple[int, int] | None = None, return_fig=False):
         exp = self.data["expected_id"]
         act = self.data["actual_id"]
         
@@ -109,7 +145,7 @@ class OrderingPlot:
         
         delta = np.abs(act - exp)
 
-        plt.figure(figsize=(12, 3))
+        fig = plt.figure(figsize=(12, 3))
         scatter = plt.scatter(exp, np.zeros_like(exp), c=delta, s=1, cmap="YlOrRd", alpha=0.8)
         plt.colorbar(scatter, label="displacement (|actual - expected|)")
         plt.xlabel("position (expected_id)")
@@ -118,6 +154,9 @@ class OrderingPlot:
         plt.title(title)
         plt.grid(True, axis="x", linestyle="--", alpha=0.4)
 
+        if return_fig:
+            return fig
+
         if out:
             out.parent.mkdir(parents=True, exist_ok=True)
             plt.savefig(out, dpi=150, bbox_inches="tight")
@@ -125,7 +164,7 @@ class OrderingPlot:
             plt.show()
         plt.close()
 
-    def plot_expected_vs_actual_colored(self, title="Expected vs Actual (colored by displacement)", out: Path | None = None, id_range: tuple[int, int] | None = None):
+    def plot_expected_vs_actual_colored(self, title="Expected vs Actual (colored by displacement)", out: Path | None = None, id_range: tuple[int, int] | None = None, return_fig=False):
         exp = self.data["expected_id"]
         act = self.data["actual_id"]
         
@@ -136,7 +175,7 @@ class OrderingPlot:
         
         delta = np.abs(act - exp)
 
-        plt.figure()
+        fig = plt.figure()
         scatter = plt.scatter(exp, act, c=delta, s=1, cmap="YlOrRd", alpha=0.7)
         plt.plot([exp.min(), exp.max()], [exp.min(), exp.max()], "k--", linewidth=1.5, label="ideal (no offset)")
         plt.colorbar(scatter, label="displacement")
@@ -145,6 +184,9 @@ class OrderingPlot:
         plt.title(title)
         plt.legend()
         plt.grid(True, linestyle="--", alpha=0.4)
+
+        if return_fig:
+            return fig
 
         if out:
             out.parent.mkdir(parents=True, exist_ok=True)

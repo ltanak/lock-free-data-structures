@@ -1,6 +1,11 @@
 from pathlib import Path
 from datetime import datetime
-
+import io
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import base64
+import tempfile
 """
 Code that contains all the utility functions for getting most recent graphs,
 csvs, and directory paths.
@@ -17,6 +22,12 @@ def get_csv_dir(dir: str) -> Path:
 # eturns the path for the specific graph directory (exchange, ordering, latencies)
 def get_graph_dir(dir: str) -> Path:
     path = get_root() / "graphs" / dir
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+# returns the path for the generated reports
+def get_report_dir() -> Path:
+    path = get_root() / "reports"
     path.mkdir(parents=True, exist_ok=True)
     return path
 
@@ -147,3 +158,20 @@ def get_csv_all_dirs_name(name: str) -> dict[str, Path]:
         if get_csv(name, dir_name):
             result[dir_name] = get_csv_dir(dir_name) / name
     return result
+
+# given a matplotlib image, convert into into bytes
+def fig_encode(fig) -> str:
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    buf.seek(0)
+    return base64.b64encode(buf.read()).decode("utf-8")
+
+# given a path, encode the image at the path
+def fig_encode_path(path: Path) -> str:
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode("utf-8")
+
+# return html string for an encoded image
+def get_html_img_tag(b64: str, alt: str = "", width: str = "100%") -> str:
+    return f'<img src="data:image/png;base64,{b64}" alt="{alt}" style="max-width:{width};">'

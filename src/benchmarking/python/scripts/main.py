@@ -11,6 +11,8 @@ from benchmarking.python.plotting.LatencyPlot import LatencyPlot
 from benchmarking.python.plotting.OrderingPlot import OrderingPlot
 from benchmarking.python.plotting.utils import *
 from benchmarking.python.plotting.ExchangePlot import ExchangePlot
+from benchmarking.python.plotting.ReportGenerator import ReportGenerator
+from benchmarking.python.plotting.utils import extract_run_id
 
 # first arguments are positional / optional, final are keyword-only
 def plot_graphs(
@@ -18,6 +20,7 @@ def plot_graphs(
         run_id: str | None = None, 
         must_match: bool = False, 
         id_range: tuple[int, int] | None = None, 
+        report: bool = False,
         *, active: dict[str, bool]
     ):
     files = {}
@@ -43,7 +46,25 @@ def plot_graphs(
     else:
         print("No CSV files found.")
         return
-    
+
+    # Report generation
+    if report:
+        resolved_run_id = run_id
+        if not resolved_run_id:
+            # try to extract from the first available file
+            for v in files.values():
+                resolved_run_id = extract_run_id(v)
+                if resolved_run_id:
+                    break
+        rg = ReportGenerator(
+            files=files,
+            run_id=resolved_run_id,
+            active=active,
+            id_range=id_range,
+        )
+        out_path = rg.generate_report()
+        print(f"Report saved to: {out_path}")
+        return
 
     # latency plots
     if active.get("latencies") and "latencies" in files:
@@ -69,7 +90,6 @@ def plot_graphs(
         # ep.plot_all()
         ep.plot_all(cycle_range=id_range if id_range else None)
 
-
     # CSV = "GOOD_matching_15_01_2026_10_32_38.csv"
     # plotter = ExchangePlot(getExchangeCsv(CSV))
     
@@ -85,21 +105,20 @@ if __name__ == "__main__":
     parser.add_argument("--ordering", action="store_true", help="Plot ordering graphs")
     parser.add_argument("--exchange", action="store_true", help="Plot exchange graphs")
     parser.add_argument("--all", action="store_true", help="Plot all graph types")
+    parser.add_argument("--report", action="store_true", help="Generate full HTML Report for data structure test / a specific Run ID")
     
     args = parser.parse_args()
     
-    # List available run IDs if requested
+    # list available run IDs if requested
     if args.ls:
         run_ids = get_all_run_ids()
-        if run_ids:
-            print("Available run IDs:")
-            for rid in run_ids:
-                print(f"  {rid}")
-        else:
-            print("No run IDs found.")
+        print("Available run IDs:")
+        for rid in run_ids:
+            print(f"- {rid}")
+        print("------------------")
         sys.exit(0)
     
-    # Determine which plots to generate
+    # which plots to gen
     if args.all:
         active = {"exchange": True, "ordering": True, "latencies": True}
     else:
@@ -109,14 +128,11 @@ if __name__ == "__main__":
             "exchange": args.exchange
         }
     
-    # Convert id_range list to tuple if provided
-    id_range = tuple(args.id_range) if args.id_range else None
-    
     plot_graphs(
         file=args.file,
         run_id=args.run_id,
         must_match=args.must_match,
-        id_range=id_range,
-        active=active
+        id_range= tuple(args.id_range) if args.id_range else None,
+        active=active,
+        report=args.report
     )
-
