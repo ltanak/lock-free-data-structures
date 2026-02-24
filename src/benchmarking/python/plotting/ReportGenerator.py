@@ -109,9 +109,6 @@ class ReportGenerator:
 
         preserved = op.order_preserved()
 
-        # longest contiguous mismatch chain
-        # longest_chain = self._longest_mismatch_chain(mismatch_idx)
-
         status_cls = "ok" if preserved else "warn"
         status_txt = "Fully preserved" if preserved else "Mismatches detected"
 
@@ -140,13 +137,12 @@ class ReportGenerator:
         return "\n".join(html_strs), mismatch_window
 
     def _ordering_graph_figs(self, op: OrderingPlot, id_range: tuple[int, int] | None = None) -> list[tuple[str, plt.Figure]]:
-        if id_range is None:
+        if not id_range:
             id_range = self.id_range
+
         return [
             ("Expected vs Actual", op.plot_out_of_order_pairs(id_range=id_range, return_fig=True)),
             ("Offset", op.plot_offset(id_range=id_range, return_fig=True)),
-            # ("Displacement Heatmap", op.plot_displacement_heatmap(id_range=id_range, return_fig=True)),
-            # ("Colored by Displacement", op.plot_expected_vs_actual_colored(id_range=id_range, return_fig=True)),
         ]
 
     # ------------------------------------------------------------------
@@ -184,7 +180,7 @@ class ReportGenerator:
                 html_strs.append(get_html_img_tag(fig_encode_path(imgs["overlay"]), "Overlay"))
                 html_strs.append("</div>")
 
-            # Display zoomed overlay for mismatch window
+            # zoomed overlay for mismatch window
             if imgs["overlay_zoom"] and mismatch_window:
                 html_strs.append("<h3>Overlay - Mismatch Window Detail</h3>")
                 html_strs.append(f'<p class="meta">Focused on order index range: {mismatch_window[0]} - {mismatch_window[1]}</p>')

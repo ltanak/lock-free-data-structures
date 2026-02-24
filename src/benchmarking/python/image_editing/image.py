@@ -15,27 +15,7 @@ class ImageEditor:
     def __init__(self, image_1: Path, image_2: Path):
         self.image_1 = Image.open(image_1).convert("RGBA")
         self.image_2 = Image.open(image_2).convert("RGBA")
-        if self.image_2.size != self.image_1.size:
-            self.image_2 = self.image_2.resize(image_1.size)
-
-    """
-    CURRENTLY WIP
-    - DOES NOT ACHIEVE DESIRED RESULT
-    """
-    def diff(self, output_name: str = "diff.png"):
-        copy_1 = self.image_1
-        copy_2 = self.image_2
-
-        diff = ImageChops.difference(copy_1, copy_2)
-
-        # overlay = Image.alpha_composite(copy_1, copy_2)
-
-        script_dir = Path(__file__).resolve().parent
-        output_path = script_dir / output_name
-
-        diff.save(output_path)
-
-        print(f"Saved diff to: {output_path}")
+        self.image_2 = self.image_2 if self.image_2.size == self.image_1.size else self.image_2.resize(image_1.size)
 
     # 128 is 50% transparency. 0 is fully transparent, 255 is opaque
     def transparency(self, alpha: int = 192, output_name: str = "overlay.png", out: str | None = None):
@@ -58,8 +38,9 @@ class ImageEditor:
         print(f"Saved overlay to: {output_path}")
 
 if __name__ == "__main__":
-    i1 = get_graph_dir("exchange") / "expected_matching_GOOD_matching_15_01_2026_10_32_38.png"
-    i2 = get_graph_dir("exchange") / "actual_matching_GOOD_matching_15_01_2026_10_32_38.png"
-    imgEditor = ImageEditor(i2, i1)
-    imgEditor.diff()
-    imgEditor.transparency()
+    pass
+
+    # i1 = get_graph_dir("exchange") / "expected_matching_GOOD_matching_15_01_2026_10_32_38.png"
+    # i2 = get_graph_dir("exchange") / "actual_matching_GOOD_matching_15_01_2026_10_32_38.png"
+    # imgEditor = ImageEditor(i2, i1)
+    # imgEditor.transparency()

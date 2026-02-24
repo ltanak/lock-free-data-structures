@@ -230,22 +230,21 @@ class ExchangePlot:
     def plot_report_candles(self, out_dir: Path, cycle_range: tuple[int, int] | None = None, mismatch_window: tuple[int, int] | None = None) -> dict[str, Path | None]:
         out_dir.mkdir(parents=True, exist_ok=True)
         result: dict[str, Path | None] = {"expected": None, "actual": None, "overlay": None, "overlay_zoom": None}
+        try:
+            candles_exp = self._process_csv(cycle_range=cycle_range, source="expected")
+            candles_act = self._process_csv(cycle_range=cycle_range, source="actual")
 
-        candles_exp = self._process_csv(cycle_range=cycle_range, source="expected")
-        candles_act = self._process_csv(cycle_range=cycle_range, source="actual")
+            if candles_exp:
+                exp_path = out_dir / "expected.png"
+                self.plot_candles(candles_exp, title="Expected Matching", out=exp_path)
+                result["expected"] = exp_path
 
-        if candles_exp:
-            exp_path = out_dir / "expected.png"
-            self.plot_candles(candles_exp, title="Expected Matching", out=exp_path)
-            result["expected"] = exp_path
+            if candles_act:
+                act_path = out_dir / "actual.png"
+                self.plot_candles(candles_act, title="Actual Matching", out=act_path)
+                result["actual"] = act_path
 
-        if candles_act:
-            act_path = out_dir / "actual.png"
-            self.plot_candles(candles_act, title="Actual Matching", out=act_path)
-            result["actual"] = act_path
-
-        if result["expected"] and result["actual"]:
-            try:
+            if result["expected"] and result["actual"]:
                 editor = ImageEditor(result["expected"], result["actual"])
                 overlay_path = str(out_dir / "overlay.png")
                 editor.transparency(out=overlay_path)
@@ -281,7 +280,8 @@ class ExchangePlot:
                         overlay_zoom_path = str(out_dir / "overlay_zoom.png")
                         editor_zoom.transparency(out=overlay_zoom_path)
                         result["overlay_zoom"] = Path(overlay_zoom_path)
-            except Exception:
-                pass
+                        
+        except Exception:
+            pass
 
         return result

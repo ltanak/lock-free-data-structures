@@ -23,32 +23,31 @@ def plot_graphs(
         report: bool = False,
         *, active: dict[str, bool]
     ):
-    files = {}
-    
-    if run_id:
-        try:
+    try:      
+        if run_id:
             files = get_csv_by_run_id(run_id)
             print(f"Using run_id: {run_id}")
-        except FileNotFoundError as e:
-            print(f"Error: {e}")
-            return
-    elif file:
-        files = get_csv_all_dirs_name(name=file)
-    else:
-        # gest most recent CSVs
-        files = get_latest_csv(must_match=must_match)
+        elif file:
+            files = get_csv_all_dirs_name(name=file)
+        else:
+            # gest most recent CSVs
+            files = get_latest_csv(must_match=must_match)
+    except FileNotFoundError as e:
+        print(f"Error: {e}")
+        return
     
-    if len(files) > 0:
-        keys = files.keys()
-        for key in keys:
-            path = files[key].stem.split("/")[-1]
-            print(f"{key} file: {path}")
-    else:
+    if len(files) <= 0:
         print("No CSV files found.")
         return
+    
+    keys = files.keys()
+    for key in keys:
+        path = files[key].stem.split("/")[-1]
+        print(f"{key} file: {path}")
 
     # Report generation
     if report:
+
         resolved_run_id = run_id
         if not resolved_run_id:
             # try to extract from the first available file
@@ -87,12 +86,7 @@ def plot_graphs(
         exchange_csv_path = files["exchange"]
         ep = ExchangePlot(exchange_csv_path)
         print("\n=== EXCHANGE SUMMARY ===")
-        # ep.plot_all()
         ep.plot_all(cycle_range=id_range if id_range else None)
-
-    # CSV = "GOOD_matching_15_01_2026_10_32_38.csv"
-    # plotter = ExchangePlot(getExchangeCsv(CSV))
-    
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Plot benchmarking results from CSV files")
@@ -111,11 +105,7 @@ if __name__ == "__main__":
     
     # list available run IDs if requested
     if args.ls:
-        run_ids = get_all_run_ids()
-        print("Available run IDs:")
-        for rid in run_ids:
-            print(f"- {rid}")
-        print("------------------")
+        print(f"Available run IDs: \n{"\n".join(get_all_run_ids())}\n------------------")
         sys.exit(0)
     
     # which plots to gen
