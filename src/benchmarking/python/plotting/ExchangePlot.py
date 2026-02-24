@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mplfinance as mpf
 from benchmarking.python.plotting.utils import *
+from benchmarking.python.image_editing.image import ImageEditor
 import math
 
 
@@ -51,7 +52,7 @@ class ExchangePlot:
         num_orders = len(self.df)
         # candles = orders / cyccles
         if fixed_candles:
-            cycles = math.ceil(num_orders / 100) 
+            cycles = math.ceil(num_orders / 80) 
 
         open_price = None
         close_price = None
@@ -192,10 +193,10 @@ class ExchangePlot:
         differing_cycles: list[int] = []
 
         for row in self.iter_rows():
-            exp_p = row.get("exp_prices", []) or []
-            act_p = row.get("acc_prices", []) or []
-            exp_q = row.get("exp_qtities", []) or []
-            act_q = row.get("acc_qtities", []) or []
+            exp_p = row.get("exp_prices", [])
+            act_p = row.get("acc_prices", [])
+            exp_q = row.get("exp_qtities", [])
+            act_q = row.get("acc_qtities", [])
 
             has_exp = len(exp_p) > 0
             has_act = len(act_p) > 0
@@ -227,12 +228,6 @@ class ExchangePlot:
         return summary_rows, differing_cycles
 
     def plot_report_candles(self, out_dir: Path, cycle_range: tuple[int, int] | None = None, mismatch_window: tuple[int, int] | None = None) -> dict[str, Path | None]:
-        """
-        Generate expected/actual candlestick PNGs and an overlay to out_dir.
-        Returns dict with keys 'expected', 'actual', 'overlay' mapping to paths (or None if no trades).
-        """
-        from benchmarking.python.image_editing.image import ImageEditor
-
         out_dir.mkdir(parents=True, exist_ok=True)
         result: dict[str, Path | None] = {"expected": None, "actual": None, "overlay": None, "overlay_zoom": None}
 
@@ -257,8 +252,21 @@ class ExchangePlot:
                 result["overlay"] = Path(overlay_path)
 
                 if mismatch_window:
-                    candles_exp_zoom = self._process_csv(cycle_range=mismatch_window, source="expected")
-                    candles_act_zoom = self._process_csv(cycle_range=mismatch_window, source="actual")
+                    window_len = max(10, mismatch_window[1] - mismatch_window[0] + 1)
+                    zoom_cycles = max(10, math.ceil(window_len / 200))
+
+                    candles_exp_zoom = self._process_csv(
+                        cycles=zoom_cycles,
+                        cycle_range=mismatch_window,
+                        source="expected",
+                        fixed_candles=False,
+                    )
+                    candles_act_zoom = self._process_csv(
+                        cycles=zoom_cycles,
+                        cycle_range=mismatch_window,
+                        source="actual",
+                        fixed_candles=False,
+                    )
                     
                     if candles_exp_zoom:
                         exp_zoom_path = out_dir / "expected_zoom.png"

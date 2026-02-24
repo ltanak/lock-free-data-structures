@@ -7,10 +7,7 @@ PROJECT_SRC = Path(__file__).resolve().parents[3]
 if str(PROJECT_SRC) not in sys.path:
     sys.path.insert(0, str(PROJECT_SRC))
 
-from benchmarking.python.plotting.LatencyPlot import LatencyPlot
-from benchmarking.python.plotting.OrderingPlot import OrderingPlot
 from benchmarking.python.plotting.utils import *
-from benchmarking.python.plotting.ExchangePlot import ExchangePlot
 from benchmarking.python.plotting.utils import *
 
 class ImageEditor:
