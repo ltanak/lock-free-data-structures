@@ -175,3 +175,19 @@ def fig_encode_path(path: Path) -> str:
 # return html string for an encoded image
 def get_html_img_tag(b64: str, alt: str = "", width: str = "100%") -> str:
     return f'<img src="data:image/png;base64,{b64}" alt="{alt}" style="max-width:{width};">'
+
+# creates a html table given the headers and the rows
+def create_html_table(headers: list[str], rows: list[list[str]]) -> str:
+
+    parts = ["<table>", "<thead><tr>"]
+    for h in headers:
+        parts.append(f"<th>{h}</th>")
+
+    parts.append("</tr></thead><tbody>")
+    for row in rows:
+        parts.append("<tr>")
+        for cell in row:
+            parts.append(f"<td>{cell}</td>")
+        parts.append("</tr>")
+    parts.append("</tbody></table>")
+    return "\n".join(parts)
