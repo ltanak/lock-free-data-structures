@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import base64
 import tempfile
+
 """
 Code that contains all the utility functions for getting most recent graphs,
 csvs, and directory paths.
