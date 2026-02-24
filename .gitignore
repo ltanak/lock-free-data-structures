@@ -48,6 +48,7 @@ build/
 src/benchmarking/csvs/**/*.csv
 src/benchmarking/graphs/**/*.png
 src/benchmarking/python/.pixi
+src/benchmarking/reports/.html
 demos/
 diagrams/
 *.clang-uml

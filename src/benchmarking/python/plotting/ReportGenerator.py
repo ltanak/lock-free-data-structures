@@ -188,6 +188,7 @@ class ReportGenerator:
             if imgs["overlay_zoom"] and mismatch_window:
                 html_strs.append("<h3>Overlay - Mismatch Window Detail</h3>")
                 html_strs.append(f'<p class="meta">Focused on order index range: {mismatch_window[0]} - {mismatch_window[1]}</p>')
+                html_strs.append(f'<div class="summary-box"><strong>Note: The cycle size on the focused overlay is more granular compared to the original graph.</strong></div>')
                 html_strs.append('<div class="graph-full">')
                 html_strs.append(get_html_img_tag(fig_encode_path(imgs["overlay_zoom"]), "Overlay (zoomed to mismatch window)"))
                 html_strs.append("</div>")
