@@ -12,6 +12,7 @@ class OrderingPlot:
     def __init__(self, csv_path: Path):
         self.csv_path = csv_path
         df = pd.read_csv(csv_path)
+        self.size = len(df)
 
         self.data = {
             "expected_id": df["expected_id"].astype(float).values,
@@ -64,6 +65,38 @@ class OrderingPlot:
     #         else:
     #             current = 1
     #     return longest
+
+    def window_most_mismatches(self, window_size: int | None = None) -> tuple[int, int] | None:
+        """Find the index range (start, end) with the most mismatches in a sliding window.
+        
+        Args:
+            window_size: Size of the sliding window. If None, defaults to 20% of data.
+            
+        Returns:
+            Tuple of (start_index, end_index) for the window with most mismatches,
+            or None if there are no mismatches.
+        """
+        if not window_size:
+            window_size = self.size // 5  # 20% of the test size
+        
+        mismatch_idx = self.mismatch_indices()
+        if len(mismatch_idx) == 0:
+            return None
+        
+        # Slide a window across all indices and count mismatches in each window
+        max_mismatches = 0
+        best_window = (0, window_size)
+        
+        for start in range(self.size - window_size + 1):
+            end = start + window_size
+            # Count mismatches in this window
+            window_mismatches = np.sum((mismatch_idx >= start) & (mismatch_idx < end))
+            if window_mismatches > max_mismatches:
+                max_mismatches = window_mismatches
+                best_window = (start, end - 1)  # end-1 because we want inclusive range
+        
+        return best_window
+        
 
     def plot_out_of_order_pairs(self, title="Expected vs Actual", out: Path | None = None, id_range: tuple[int, int] | None = None, return_fig=False):
         exp = self.data["expected_id"]

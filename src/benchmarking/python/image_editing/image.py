@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from PIL import Image, ImageChops
 
 # repo src directory is on sys.path
 PROJECT_SRC = Path(__file__).resolve().parents[3]
@@ -11,7 +12,6 @@ from benchmarking.python.plotting.OrderingPlot import OrderingPlot
 from benchmarking.python.plotting.utils import *
 from benchmarking.python.plotting.ExchangePlot import ExchangePlot
 from benchmarking.python.plotting.utils import *
-from PIL import Image, ImageChops
 
 class ImageEditor:
 

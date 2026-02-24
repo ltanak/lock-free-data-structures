@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import mplfinance as mpf
 from benchmarking.python.plotting.utils import *
+import math
 
 
 class ExchangePlot:
@@ -44,8 +45,13 @@ class ExchangePlot:
     # 2D array of processed data frame into  [["Open", "Close", "High", "Low", "Volume"], ...]
     # aggregates trades into candlesticks over 'cycles' instead of timestamp
     # last value in array is the trade price
-    def _process_csv(self, cycles: int = 10, cycle_range: tuple[int, int] | None = None, source: str = "expected") -> list[list[float]]:
+    def _process_csv(self, cycles: int = 10, cycle_range: tuple[int, int] | None = None, source: str = "expected", fixed_candles: bool = True) -> list[list[float]]:
         candles: list[list[float]] = []
+        
+        num_orders = len(self.df)
+        # candles = orders / cyccles
+        if fixed_candles:
+            cycles = math.ceil(num_orders / 100) 
 
         open_price = None
         close_price = None
@@ -220,7 +226,7 @@ class ExchangePlot:
         ]
         return summary_rows, differing_cycles
 
-    def plot_report_candles(self, out_dir: Path, cycle_range: tuple[int, int] | None = None) -> dict[str, Path | None]:
+    def plot_report_candles(self, out_dir: Path, cycle_range: tuple[int, int] | None = None, mismatch_window: tuple[int, int] | None = None) -> dict[str, Path | None]:
         """
         Generate expected/actual candlestick PNGs and an overlay to out_dir.
         Returns dict with keys 'expected', 'actual', 'overlay' mapping to paths (or None if no trades).
@@ -228,7 +234,7 @@ class ExchangePlot:
         from benchmarking.python.image_editing.image import ImageEditor
 
         out_dir.mkdir(parents=True, exist_ok=True)
-        result: dict[str, Path | None] = {"expected": None, "actual": None, "overlay": None}
+        result: dict[str, Path | None] = {"expected": None, "actual": None, "overlay": None, "overlay_zoom": None}
 
         candles_exp = self._process_csv(cycle_range=cycle_range, source="expected")
         candles_act = self._process_csv(cycle_range=cycle_range, source="actual")
@@ -249,6 +255,24 @@ class ExchangePlot:
                 overlay_path = str(out_dir / "overlay.png")
                 editor.transparency(out=overlay_path)
                 result["overlay"] = Path(overlay_path)
+
+                if mismatch_window:
+                    candles_exp_zoom = self._process_csv(cycle_range=mismatch_window, source="expected")
+                    candles_act_zoom = self._process_csv(cycle_range=mismatch_window, source="actual")
+                    
+                    if candles_exp_zoom:
+                        exp_zoom_path = out_dir / "expected_zoom.png"
+                        self.plot_candles(candles_exp_zoom, title="Expected Matching (mismatch window)", out=exp_zoom_path)
+                    
+                    if candles_act_zoom:
+                        act_zoom_path = out_dir / "actual_zoom.png"
+                        self.plot_candles(candles_act_zoom, title="Actual Matching (mismatch window)", out=act_zoom_path)
+                    
+                    if exp_zoom_path.exists() and act_zoom_path.exists():
+                        editor_zoom = ImageEditor(str(exp_zoom_path), str(act_zoom_path))
+                        overlay_zoom_path = str(out_dir / "overlay_zoom.png")
+                        editor_zoom.transparency(out=overlay_zoom_path)
+                        result["overlay_zoom"] = Path(overlay_zoom_path)
             except Exception:
                 pass
 
