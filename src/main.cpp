@@ -53,7 +53,7 @@ int main(int argc, char* argv[]) {
     
     // WiltMPMCBlockRing<BenchmarkOrder> ring(ring_capacity);
     WiltMPMCNonBlockRing<BenchmarkOrder> ring(ring_capacity);
-    MCConcurrentQueue<BenchmarkOrder> queue;
+    // MCConcurrentQueue<BenchmarkOrder> queue;
     // BenchmarkWrapper<MCConcurrentQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
     BenchmarkWrapper<WiltMPMCNonBlockRing<BenchmarkOrder>, BenchmarkOrder> wrapper(ring, params);
     

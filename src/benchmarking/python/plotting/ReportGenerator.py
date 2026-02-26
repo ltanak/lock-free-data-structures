@@ -89,7 +89,7 @@ class ReportGenerator:
             html_strs.append("</div>")
 
             # percentile graph
-            fig_pct = lp.percentile_chart(metric=metric, return_fig=True)
+            fig_pct = lp.percentile_chart(metric=metric, return_fig=True, remove_outliers=False)
             html_strs.append('<div class="graph-full">')
             html_strs.append(get_html_img_tag(fig_encode(fig_pct), f"{metric} percentile"))
             html_strs.append("</div>")
