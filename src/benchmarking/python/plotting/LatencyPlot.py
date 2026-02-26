@@ -158,6 +158,10 @@ class LatencyPlot:
         ax.set_ylabel("Latency (ns)")
         ax.set_title(f"{title} – {metric}")
         ax.grid(True, axis="y", linestyle="--", alpha=0.4)
+        
+        # Set ylim with padding for text labels
+        max_val = max(values)
+        ax.set_ylim(0, max_val * 1.15)
 
         for bar, val in zip(bars, values):
             ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height(),
