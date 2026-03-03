@@ -3,12 +3,12 @@
 #include <cstdint>
 
 struct alignas(64) HardwareMetrics {
-    uint64_t cycles = 0;
-    uint64_t instructions = 0;
-    uint64_t cache_refs = 0;
-    uint64_t cache_misses = 0;
-    uint64_t branch_insts = 0;
-    uint64_t branch_misses = 0;
+    double cycles = 0.0;
+    double instructions = 0.0;
+    double cache_refs = 0.0;
+    double cache_misses = 0.0;
+    double branch_insts = 0.0;
+    double branch_misses = 0.0;
 
     double ipc() const;
     double cache_miss_ratio() const;
