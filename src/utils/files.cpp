@@ -7,6 +7,17 @@
 #include <sstream>
 #include "utils/files.hpp"
 
+namespace {
+
+    auto getTime() -> std::string {
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%m_%d_%Y_%H_%M_%S");
+        return oss.str();
+    }
+}
+
 namespace latencies {
 
     auto getPath() -> std::filesystem::path {
@@ -14,15 +25,11 @@ namespace latencies {
     }
 
     auto createFileName(const std::string& run_id) -> std::string {
-        auto t = std::time(nullptr);
-        auto tm = *std::localtime(&t);
-        std::ostringstream oss;
-        oss << std::put_time(&tm, "%m_%d_%Y_%H_%M_%S");
         std::string str = "latencies_";
         if (!run_id.empty()) {
             str += run_id + "_";
         }
-        str += oss.str() + ".csv";
+        str += getTime() + ".csv";
         return str;
     }
 
@@ -59,15 +66,11 @@ namespace ordering {
     }
 
     auto createFileName(const std::string& run_id) -> std::string {
-        auto t = std::time(nullptr);
-        auto tm = *std::localtime(&t);
-        std::ostringstream oss;
-        oss << std::put_time(&tm, "%m_%d_%Y_%H_%M_%S");
         std::string str = "ordering_";
         if (!run_id.empty()) {
             str += run_id + "_";
         }
-        str += oss.str() + ".csv";
+        str += getTime() + ".csv";
         return str;
     }
 
@@ -102,15 +105,11 @@ namespace exchange {
     }
 
     auto createFileName(const string& run_id) -> string {
-        auto t = std::time(nullptr);
-        auto tm = *std::localtime(&t);
-        std::ostringstream oss;
-        oss << std::put_time(&tm, "%m_%d_%Y_%H_%M_%S");
         std::string str = "matching_";
         if (!run_id.empty()) {
             str += run_id + "_";
         }
-        str += oss.str() + ".csv";
+        str += getTime() + ".csv";
         return str;
     }
 
@@ -182,15 +181,11 @@ namespace hardware {
     }
 
     auto createFileName(const std::string& run_id) -> std::string {
-        auto t = std::time(nullptr);
-        auto tm = *std::localtime(&t);
-        std::ostringstream oss;
-        oss << std::put_time(&tm, "%m_%d_%Y_%H_%M_%S");
         std::string str = "hardware_";
         if (!run_id.empty()) {
             str += run_id + "_";
         }
-        str += oss.str() + ".csv";
+        str += getTime() + ".csv";
         return str;
     }
 

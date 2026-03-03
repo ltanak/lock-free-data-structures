@@ -11,7 +11,5 @@ namespace lThread {
 
     void close(vector<thread> &threads);
     void close(vector<thread> &producers, vector<thread> &consumers);
-
     void pin_thread(int cpu);
-
 }

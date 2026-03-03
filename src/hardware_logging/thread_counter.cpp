@@ -79,7 +79,7 @@ void ThreadHardwareCounter::stop() {
     for (size_t i = 0; i < HW_COUNTERS; ++i){
         ioctl(fds_[i], PERF_EVENT_IOC_DISABLE, 0);
 
-        // Default read format for perf fd is a single uint64_t counter value.
+        // default read format for perf fd is a single uint64_t counter value (instead of using rdpmc)
         uint64_t value = 0;
         ssize_t n = read(fds_[i], &value, sizeof(value));
         accumulated_[i] += (n == static_cast<ssize_t>(sizeof(value))) ? value : 0;
