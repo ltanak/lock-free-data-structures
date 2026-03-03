@@ -83,6 +83,9 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
                 lThread::pin_thread(cpu);
                 auto *local_buffer = thread_latencies[index].enqueue_buffers.get();
 
+                // get thread-local hardware counter
+                auto &hw_counter = wrapper.getThreadCounter();
+
                 // touch the latency buffer pages
                 for (uint64_t i = 0; i < THREAD_LIMIT; ++i){
                     local_buffer[i] = 0;
@@ -103,6 +106,7 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
 
                 // actual benchmark
                 benchmark_barrier.arrive_and_wait();
+                hw_counter.start();  // Start hardware counters for benchmark
 
                 for (uint64_t i = 0; i < THREAD_LIMIT; ++i){
                     BenchmarkOrder o = gen.generate();
@@ -114,6 +118,7 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
                     uint64_t t1 = ltime::rdtsc_lfence();
                     local_buffer[i] = t1 - t0;
                 }
+                hw_counter.stop();
             }
         );
     }
@@ -128,6 +133,9 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
                 lThread::pin_thread(cpu);
 
                 auto *local_buffer = thread_latencies[index].dequeue_buffers.get();
+
+                // get thread-local hardware counter
+                auto &hw_counter = wrapper.getThreadCounter();
                 
                 // touch latency buffer
                 for (uint64_t i = 0; i < THREAD_LIMIT; ++i){
@@ -137,37 +145,42 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
                 // dequeue alongside producers
                 warmup_start_barrier.arrive_and_wait();
                 
-                // spin-dequeue: keep dequeuing until producers are done and queue is drained
+                // spin-dequeue, keep dequeuing until producers are done and queue is drained
                 while (true) {
                     if (wrapper.dequeueLatency(o, tid)) {
                         warmup_dequeued.fetch_add(1, std::memory_order_relaxed);
                     }
                     // exit when producers are done and drained everything
                     if (warmup_producers_done.load(std::memory_order_acquire) &&
-                        warmup_dequeued.load(std::memory_order_relaxed) >= warmup_enqueued.load(std::memory_order_relaxed)) {
+                    warmup_dequeued.load(std::memory_order_relaxed) >= warmup_enqueued.load(std::memory_order_relaxed)) {
                         break;
                     }
                 }
-
+                
                 // queue empty signal ready
                 drain_barrier.arrive_and_wait();
                 
                 // actual benchmark
                 benchmark_barrier.arrive_and_wait();
-
+                hw_counter.start();
+                
                 for (uint64_t count = 0; count < THREAD_LIMIT; ++count){
-
+                    
                     // start timestamp
                     uint64_t t0 = ltime::rdtsc_lfence();
                     wrapper.dequeueLatency(o, tid);
                     uint64_t t1 = ltime::rdtsc_lfence();
                     local_buffer[count] = t1 - t0;
                 }
+
+                hw_counter.stop();
             }
         );
     }
 
     lThread::close(producers, consumers);
+
+    wrapper.aggregateHardwareMetrics(TOTAL_THREADS);
 
     std::vector<uint64_t> local_enqueues;
     std::vector<uint64_t> local_dequeues;
@@ -185,5 +198,7 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     }
 
     wrapper.setLatencyVectors(local_enqueues, local_dequeues);
+    
     wrapper.processLatencies();
+    wrapper.processHardwareCounters();
 }

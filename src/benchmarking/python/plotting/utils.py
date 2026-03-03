@@ -12,17 +12,43 @@ Code that contains all the utility functions for getting most recent graphs,
 csvs, and directory paths.
 """
 
-# ../benchmarking
+# ../benchmarking to ../.. (results)
 def get_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    return Path(__file__).resolve().parents[4] / "results"
 
-# returns the path for the specific csv directory (exchange, ordering, latencies)
+# returns the path for the specific csv directory (exchange, ordering, latencies, hardware)
+# latencies and hardware are in stress_testing, exchange and ordering are in order_testing
+# for hardware, you specify "hardware_stress" or "hardware_order" for specific location
 def get_csv_dir(dir: str) -> Path:
-    return get_root() / "csvs" / dir
+    if dir == "latencies":
+        return get_root() / "stress_testing" / "latencies"
+    elif dir in ["hardware", "hardware_stress"]:
+        return get_root() / "stress_testing" / "hardware"
+    elif dir == "hardware_order":
+        return get_root() / "order_testing" / "hardware"
+    elif dir == "ordering":
+        return get_root() / "order_testing" / "ordering"
+    elif dir == "exchange":
+        return get_root() / "order_testing" / "exchange"
+    else:
+        raise ValueError(f"Unknown CSV directory: {dir}")
 
-# eturns the path for the specific graph directory (exchange, ordering, latencies)
+# returns the path for the specific graph directory (exchange, ordering, latencies, hardware)
+# latencies and hardware graphs are in stress_testing, exchange and ordering graphs are in order_testing
+# For hardware, you can specify "hardware_stress" or "hardware_order" for specific location
 def get_graph_dir(dir: str) -> Path:
-    path = get_root() / "graphs" / dir
+    if dir == "latencies":
+        path = get_root() / "stress_testing" / "latencies"
+    elif dir in ["hardware", "hardware_stress"]:
+        path = get_root() / "stress_testing" / "hardware"
+    elif dir == "hardware_order":
+        path = get_root() / "order_testing" / "hardware"
+    elif dir == "ordering":
+        path = get_root() / "order_testing" / "ordering"
+    elif dir == "exchange":
+        path = get_root() / "order_testing" / "exchange"
+    else:
+        raise ValueError(f"Unknown graph directory: {dir}")
     path.mkdir(parents=True, exist_ok=True)
     return path
 
@@ -32,7 +58,7 @@ def get_report_dir() -> Path:
     path.mkdir(parents=True, exist_ok=True)
     return path
 
-# get the most recent CSV from all directories (exchange, ordering, latencies)
+# get the most recent CSV from all directories (exchange, ordering, latencies, hardware)
 def get_latest_csv(must_match: bool = False) -> dict[str, Path]:
     dirs = ["exchange", "ordering", "latencies"]
     latest = {}
@@ -48,6 +74,20 @@ def get_latest_csv(must_match: bool = False) -> dict[str, Path]:
         latest[key] = csvs[0]
         run_ids[key] = extract_run_id(csvs[0])
         timestamps[key] = extract_timestamp(csvs[0])
+    
+    # check hardware in both locations and pick the most recent
+    hw_stress_path = get_csv_dir("hardware_stress")
+    hw_order_path = get_csv_dir("hardware_order")
+    hw_stress_csvs = get_csvs_dir(hw_stress_path, reverse=True)
+    hw_order_csvs = get_csvs_dir(hw_order_path, reverse=True)
+    
+    if hw_stress_csvs or hw_order_csvs:
+        # pick most recent hardware CSV from either location
+        all_hw_csvs = hw_stress_csvs + hw_order_csvs
+        all_hw_csvs.sort(key=lambda p: extract_timestamp(p), reverse=True)
+        latest["hardware"] = all_hw_csvs[0]
+        run_ids["hardware"] = extract_run_id(all_hw_csvs[0])
+        timestamps["hardware"] = extract_timestamp(all_hw_csvs[0])
     
     if must_match:
         # match by run_id first (preferred for grouped runs)
@@ -77,6 +117,21 @@ def get_csv_by_run_id(run_id: str) -> dict[str, Path]:
                 result[dir_name] = csv_file
                 break
     
+    # check hardware in both locations
+    for hw_dir in ["hardware_stress", "hardware_order"]:
+        path = get_csv_dir(hw_dir)
+        csvs = get_csvs_dir(path)
+        
+        for csv_file in csvs:
+            file_run_id = extract_run_id(csv_file)
+            if file_run_id == run_id:
+                # Store as "hardware" regardless of location
+                result["hardware"] = csv_file
+                break
+        
+        if "hardware" in result:
+            break
+    
     if not result:
         raise FileNotFoundError(f"No CSVs found with run_id: {run_id}")
     
@@ -89,6 +144,16 @@ def get_all_run_ids() -> list[str]:
     
     for dir_name in dirs:
         path = get_csv_dir(dir_name)
+        csvs = get_csvs_dir(path)
+        
+        for csv_file in csvs:
+            run_id = extract_run_id(csv_file)
+            if run_id:
+                run_ids.add(run_id)
+    
+    # check hardware in both locations
+    for hw_dir in ["hardware_stress", "hardware_order"]:
+        path = get_csv_dir(hw_dir)
         csvs = get_csvs_dir(path)
         
         for csv_file in csvs:
@@ -149,7 +214,10 @@ def get_csv(name: str, dir: str) -> bool:
 # returns a dictionary mapping directory names to whether the csv exists in them
 def get_csv_all_dirs(name: str) -> dict[str, bool]:
     dirs = ["exchange", "ordering", "latencies"]
-    return {dir_name: get_csv(name, dir_name) for dir_name in dirs}
+    result = {dir_name: get_csv(name, dir_name) for dir_name in dirs}
+    # Check hardware in both locations
+    result["hardware"] = get_csv(name, "hardware_stress") or get_csv(name, "hardware_order")
+    return result
 
 # returns a dictionary of directories to Paths if the file name is in any of the directories
 def get_csv_all_dirs_name(name: str) -> dict[str, Path]:
@@ -158,6 +226,11 @@ def get_csv_all_dirs_name(name: str) -> dict[str, Path]:
     for dir_name in dirs:
         if get_csv(name, dir_name):
             result[dir_name] = get_csv_dir(dir_name) / name
+    # Check hardware in both locations
+    if get_csv(name, "hardware_stress"):
+        result["hardware"] = get_csv_dir("hardware_stress") / name
+    elif get_csv(name, "hardware_order"):
+        result["hardware"] = get_csv_dir("hardware_order") / name
     return result
 
 # given a matplotlib image, convert into into bytes

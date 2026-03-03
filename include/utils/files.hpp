@@ -7,14 +7,21 @@
 
 #include "exchange/book_order.hpp"
 #include "exchange/trades_cycle.hpp"
+#include "hardware_logging/hardware_metrics.hpp"
 using namespace std;
 
 /**
  * Namespaces for different types of csv writing
  * Each namespace creates and writes the csv file of the results after a test
- * latencies - stress testing
- * ordering - order testing
- * exchange - order testing (downstream effects)
+ * 
+ * Directory structure:
+ * - stress_testing: latencies and hardware (stress testing results)
+ * - order_testing: ordering, exchange and hardware (order testing results)
+ * 
+ * latencies - latency measurements during stress testing
+ * hardware - hardware counter data during stress testing
+ * ordering - order preservation testing during order testing
+ * exchange - matching engine results during order testing
  */
 
 namespace latencies {
@@ -42,4 +49,13 @@ namespace exchange {
     // "matching_DD_MM_YYYY_HH_MM_SS.csv"
     auto createFileName(const string& run_id) -> string;
     auto write(const vector<TradesCycle> expected, const vector<TradesCycle> actual, const string& run_id) -> bool;
+}
+
+namespace hardware {
+
+    // test_type: "stress" or "order" - determines subdirectory
+    auto getPath(const string& test_type = "stress") -> filesystem::path;
+
+    auto createFileName(const string& run_id) -> string;
+    auto write(const HardwareMetrics& metrics, const string& run_id, const string& test_type = "stress") -> bool;
 }

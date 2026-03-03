@@ -19,7 +19,7 @@
 
 template<typename DataStructure, typename TOrder>
 BenchmarkWrapper<DataStructure, TOrder>::BenchmarkWrapper(DataStructure &structure, TestParams &params)
-: structure_(structure), TOTAL_ORDERS_(params.total_orders), NUM_THREADS_(params.thread_count), THREAD_LIMIT_(params.thread_order_limit), RUN_ID_(params.run_id), exchange_(100)
+: structure_(structure), TOTAL_ORDERS_(params.total_orders), NUM_THREADS_(params.thread_count), THREAD_LIMIT_(params.thread_order_limit), RUN_ID_(params.run_id), TEST_TYPE_(params.test), exchange_(100)
 {
     if (NUM_THREADS_ == 0 || THREAD_LIMIT_ == 0 || TOTAL_ORDERS_ == 0) {
         std::cerr << "Invalid params (zero)" << std::endl;
@@ -40,19 +40,6 @@ int BenchmarkWrapper<DataStructure, TOrder>::addEnqThread(){
 template<typename DataStructure, typename TOrder>
 int BenchmarkWrapper<DataStructure, TOrder>::addDeqThread(){
     return dequeue_thread_id.fetch_add(1, std::memory_order_relaxed);
-}
-
-template<typename DataStructure, typename TOrder>
-bool BenchmarkWrapper<DataStructure, TOrder>::preprocessEnqueue(TOrder &o, int threadId) {
-    // pre-process data structure
-    bool enqueued = structure_.enqueue(o);
-    return enqueued;
-}
-
-template<typename DataStructure, typename TOrder>
-bool BenchmarkWrapper<DataStructure, TOrder>::preprocessDequeue(TOrder &o, int threadId) {
-    bool dequeued = structure_.dequeue(o);
-    return dequeued;
 }
 
 template<typename DataStructure, typename TOrder>
@@ -233,6 +220,50 @@ void BenchmarkWrapper<DataStructure, TOrder>::processMatching(std::vector<TOrder
 template<typename DataStructure, typename TOrder>
 HardwareLogger& BenchmarkWrapper<DataStructure, TOrder>::getHardwareLogger() {
     return hw_logger;
+}
+
+template<typename DataStructure, typename TOrder>
+ThreadHardwareCounter& BenchmarkWrapper<DataStructure, TOrder>::getThreadCounter() {
+    auto tid = std::this_thread::get_id();
+    std::lock_guard<std::mutex> lock(hw_lock_);
+
+    if (thread_hw_counters_.find(tid) == thread_hw_counters_.end()){
+        auto counter = std::make_unique<ThreadHardwareCounter>();
+        counter->setup();
+        thread_hw_counters_[tid] = std::move(counter);
+    }
+    return *thread_hw_counters_[tid];
+}
+
+template<typename DataStructure, typename TOrder>
+void BenchmarkWrapper<DataStructure, TOrder>::aggregateHardwareMetrics(uint64_t num_threads) {
+    std::lock_guard<std::mutex> lock(hw_lock_);
+    int thread_id = 0;
+    for (auto& [tid, counter] : thread_hw_counters_){
+        hw_logger.registerThreadMetrics(thread_id++, counter->snapshot());
+    }
+}
+
+template<typename DataStructure, typename TOrder>
+void BenchmarkWrapper<DataStructure, TOrder>::processHardwareCounters() {
+    std::vector<HardwareMetrics> per_thread = hw_logger.getListMetrics();
+    if (per_thread.empty()) {
+        return;
+    }
+
+    HardwareMetrics total_metrics = hw_logger.getMetrics();
+    const uint64_t n = static_cast<uint64_t>(per_thread.size());
+
+    HardwareMetrics avg_metrics;
+    avg_metrics.cycles = total_metrics.cycles / n;
+    avg_metrics.instructions = total_metrics.instructions / n;
+    avg_metrics.cache_refs = total_metrics.cache_refs / n;
+    avg_metrics.cache_misses = total_metrics.cache_misses / n;
+    avg_metrics.branch_insts = total_metrics.branch_insts / n;
+    avg_metrics.branch_misses = total_metrics.branch_misses / n;
+
+    const std::string test_type = (TEST_TYPE_ == TestType::ORDER) ? "order" : "stress";
+    hardware::write(avg_metrics, RUN_ID_, test_type);
 }
 
 template class BenchmarkWrapper<RegularQueue<BenchmarkOrder>, BenchmarkOrder>;

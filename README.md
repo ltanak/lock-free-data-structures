@@ -126,7 +126,18 @@ Examples:
 - `./run.sh --valgrind order 1 1000`
 
 ## Benchmarking
-Once you have ran the code, a .csv will be created in `src/benchmarking/csvs` in the corresponding folder. They have their associated timestamp in the file name.
+Once you have run the code, CSV files will be created in the `results` directory with the following structure:
+- `results/stress_testing/` - Contains latencies and hardware CSVs/graphs from stress testing
+  - `latencies/` - Latency measurements
+  - `hardware/` - Hardware counter data (from stress tests)
+- `results/order_testing/` - Contains ordering, exchange, and hardware CSVs from order testing
+  - `ordering/` - Order preservation testing
+  - `exchange/` - Matching engine results
+  - `hardware/` - Hardware counter data (from order tests)
+- `results/reports/` - Generated HTML reports
+
+Note: Hardware metrics are collected for both test types and stored in the corresponding directory.
+All files have their associated timestamp in the file name.
 
 ### Report generation (recommended)
 The out‑of‑the‑box way to benchmark and compare results is the HTML report. It aggregates latency, ordering, and exchange sections with graphs and summaries:
