@@ -252,7 +252,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processHardwareCounters() {
     }
 
     HardwareMetrics total_metrics = hw_logger.getMetrics();
-    const uint64_t n = static_cast<uint64_t>(per_thread.size());
+    const double n = static_cast<double>(per_thread.size());
 
     HardwareMetrics avg_metrics;
     avg_metrics.cycles = total_metrics.cycles / n;

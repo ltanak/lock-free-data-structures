@@ -201,6 +201,7 @@ namespace hardware {
         }
 
         std::ofstream out(filePath, std::ios::app);
+        out << std::fixed << std::setprecision(6);
         out << metrics.cycles << "," 
             << metrics.instructions << ","
             << metrics.cache_refs << ","

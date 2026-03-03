@@ -93,11 +93,11 @@ void ThreadHardwareCounter::clear() {
 
 HardwareMetrics ThreadHardwareCounter::snapshot() {
     HardwareMetrics metrics;
-    metrics.cycles = accumulated_[0];
-    metrics.instructions = accumulated_[1];
-    metrics.cache_refs = accumulated_[2];
-    metrics.cache_misses = accumulated_[3];
-    metrics.branch_insts = accumulated_[4];
-    metrics.branch_misses = accumulated_[5];
+    metrics.cycles = static_cast<double>(accumulated_[0]);
+    metrics.instructions = static_cast<double>(accumulated_[1]);
+    metrics.cache_refs = static_cast<double>(accumulated_[2]);
+    metrics.cache_misses = static_cast<double>(accumulated_[3]);
+    metrics.branch_insts = static_cast<double>(accumulated_[4]);
+    metrics.branch_misses = static_cast<double>(accumulated_[5]);
     return metrics;
 }
