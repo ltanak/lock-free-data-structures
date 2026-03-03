@@ -10,7 +10,7 @@
 namespace latencies {
 
     auto getPath() -> std::filesystem::path {
-        return std::filesystem::path(PROJECT_SOURCE_DIR) / "src/benchmarking/csvs/latencies/";
+        return std::filesystem::path(PROJECT_SOURCE_DIR) / "results/stress_testing/latencies/";
     }
 
     auto createFileName(const std::string& run_id) -> std::string {
@@ -30,6 +30,7 @@ namespace latencies {
         namespace fs = std::filesystem;
 
         fs::path dirPath = getPath();
+        fs::create_directories(dirPath);  // Ensure directory exists
         fs::path filePath = dirPath / createFileName(run_id);
     
         if (!fs::exists(filePath)) {
@@ -54,7 +55,7 @@ namespace latencies {
 namespace ordering {
 
     auto getPath() -> std::filesystem::path {
-        return std::filesystem::path(PROJECT_SOURCE_DIR) / "src/benchmarking/csvs/ordering/";
+        return std::filesystem::path(PROJECT_SOURCE_DIR) / "results/order_testing/ordering/";
     }
 
     auto createFileName(const std::string& run_id) -> std::string {
@@ -74,6 +75,7 @@ namespace ordering {
         namespace fs = std::filesystem;
 
         fs::path dirPath = getPath();
+        fs::create_directories(dirPath);  // Ensure directory exists
         fs::path filePath = dirPath / createFileName(run_id);
         if (!fs::exists(filePath)) {
             std::ofstream(filePath) << "expected_id,actual_id\n"; // header
@@ -96,7 +98,7 @@ namespace ordering {
 namespace exchange {
 
     auto getPath() -> filesystem::path {
-        return std::filesystem::path(PROJECT_SOURCE_DIR) / "src/benchmarking/csvs/exchange/";
+        return std::filesystem::path(PROJECT_SOURCE_DIR) / "results/order_testing/exchange/";
     }
 
     auto createFileName(const string& run_id) -> string {
@@ -116,6 +118,7 @@ namespace exchange {
         namespace fs = std::filesystem;
         
         fs::path dirPath = getPath();
+        fs::create_directories(dirPath);  // Ensure directory exists
         fs::path filePath = dirPath / createFileName(run_id);
 
         if (!fs::exists(filePath)) {
@@ -164,6 +167,51 @@ namespace exchange {
         
         out.flush();
         out.close();
+        return true;
+    }
+}
+
+namespace hardware {
+
+    auto getPath(const std::string& test_type) -> std::filesystem::path {
+        if (test_type == "order") {
+            return std::filesystem::path(PROJECT_SOURCE_DIR) / "results/order_testing/hardware/";
+        }
+        // Default to stress testing
+        return std::filesystem::path(PROJECT_SOURCE_DIR) / "results/stress_testing/hardware/";
+    }
+
+    auto createFileName(const std::string& run_id) -> std::string {
+        auto t = std::time(nullptr);
+        auto tm = *std::localtime(&t);
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%m_%d_%Y_%H_%M_%S");
+        std::string str = "hardware_";
+        if (!run_id.empty()) {
+            str += run_id + "_";
+        }
+        str += oss.str() + ".csv";
+        return str;
+    }
+
+    auto write(const HardwareMetrics& metrics, const string& run_id, const string& test_type) -> bool {
+        namespace fs = std::filesystem;
+        
+        fs::path dirPath = getPath(test_type);
+        fs::create_directories(dirPath);  // Ensure directory exists
+        fs::path filePath = dirPath / createFileName(run_id);
+
+        if (!fs::exists(filePath)) {
+            std::ofstream(filePath) << "cpu_cycles,cpu_insts,cache_refs,cache_misses,branch_insts,branch_misses\n"; // header
+        }
+
+        std::ofstream out(filePath, std::ios::app);
+        out << metrics.cycles << "," 
+            << metrics.instructions << ","
+            << metrics.cache_refs << ","
+            << metrics.cache_misses << ","
+            << metrics.branch_insts << ","
+            << metrics.branch_misses << "\n";
         return true;
     }
 }

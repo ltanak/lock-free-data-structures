@@ -18,8 +18,13 @@ ThreadHardwareCounter::ThreadHardwareCounter() : initialised_(false) {
 }
 
 ThreadHardwareCounter::~ThreadHardwareCounter() {
+    if (!initialised_) return;
+    
     for (int fd : fds_){
-        if (fd >= 0) close(fd);
+        if (fd >= 0) {
+            ioctl(fd, PERF_EVENT_IOC_DISABLE, 0);
+            close(fd);
+        }
     }
 }
 
@@ -54,9 +59,6 @@ bool ThreadHardwareCounter::setup() {
             std::cerr << "Perf event failed: " << i << std::endl;
             return false;
         }
-
-        // tells kernel to start counting, but as we have disabled will only start when we enable
-        ioctl(fds_[i], PERF_EVENT_IOC_ENABLE, 0);
     }
     initialised_ = true;
     return true;
@@ -66,7 +68,8 @@ void ThreadHardwareCounter::start() {
     if (!initialised_) return;
 
     for (size_t i = 0; i < HW_COUNTERS; ++i){
-        initial_[i] = lcounter::rdpmc(i);
+        ioctl(fds_[i], PERF_EVENT_IOC_RESET, 0);
+        ioctl(fds_[i], PERF_EVENT_IOC_ENABLE, 0);
     }
 }
 
@@ -74,8 +77,12 @@ void ThreadHardwareCounter::stop() {
     if (!initialised_) return;
 
     for (size_t i = 0; i < HW_COUNTERS; ++i){
-        uint64_t end = lcounter::rdpmc(i);
-        accumulated_[i] += (end - initial_[i]);
+        ioctl(fds_[i], PERF_EVENT_IOC_DISABLE, 0);
+
+        // Default read format for perf fd is a single uint64_t counter value.
+        uint64_t value = 0;
+        ssize_t n = read(fds_[i], &value, sizeof(value));
+        accumulated_[i] += (n == static_cast<ssize_t>(sizeof(value))) ? value : 0;
     }
 }
 
@@ -89,7 +96,7 @@ HardwareMetrics ThreadHardwareCounter::snapshot() {
     metrics.cycles = accumulated_[0];
     metrics.instructions = accumulated_[1];
     metrics.cache_refs = accumulated_[2];
-    metrics.cache_refs = accumulated_[3];
+    metrics.cache_misses = accumulated_[3];
     metrics.branch_insts = accumulated_[4];
     metrics.branch_misses = accumulated_[5];
     return metrics;

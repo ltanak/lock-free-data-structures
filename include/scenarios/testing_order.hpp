@@ -46,7 +46,7 @@ auto initialiseGeneratorsOrder(MarketState &market, const uint32_t SEED) -> Coll
         [mean_revert]() { return mean_revert->generateOrder();}
     };
 
-    // Weights: 10% retail small, 10% retail large, 40% market maker, 20% momentum, 20% mean revert
+    // weights, 10% retail small, 10% retail large, 40% market maker, 20% momentum, 20% mean revert
     CollectionOrderGenerator<BenchmarkOrder> collection(gens, 42);
     collection.setWeights({0.10, 0.10, 0.40, 0.20, 0.20});
     return collection;
@@ -104,26 +104,26 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
                 lThread::pin_thread(cpu);
                 auto *sequence_buffer = thread_ordering[index].sequence_buffers.get();
                 auto *timestamp_buffer = thread_ordering[index].timestamp_buffers.get();
-                // uint64_t count = 0;
-                // while (true){
-                //     if (count >= THREAD_LIMIT) break;
-                //     ++count;
-                //     wrapper.dequeueOrdering(o, tid);
-                // }
+                
+                auto &hw_counter = wrapper.getThreadCounter();
 
                 // barrier for synchronisation
                 benchmark_barrier.arrive_and_wait();
+                hw_counter.start();
 
                 for (uint64_t i = 0; i < THREAD_LIMIT; ++i){              
                     wrapper.dequeueOrdering(o, tid);
                     timestamp_buffer[i] = ltime::rdtsc_lfence();
                     sequence_buffer[i] = o.sequence_number;
                 }
+                hw_counter.stop();
             }
         );
     }
 
     lThread::close(consumers);
+
+    wrapper.aggregateHardwareMetrics(CONSUMERS);
 
     std::vector<uint64_t> local_timestamps;
     std::vector<uint64_t> local_sequences;
@@ -141,5 +141,7 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
     CollectionOrderGenerator<BenchmarkOrder> resetGen = initialiseGeneratorsOrder(resetMarketstate, SEED);
 
     wrapper.processOrders(resetGen, resetMarketstate);
+    wrapper.processHardwareCounters();
     std::cout << "Ordering test completed with " << CONSUMERS << " consumers.\n";
+
 }

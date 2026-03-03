@@ -3,7 +3,7 @@
 #include <cstdint>
 
 double HardwareMetrics::ipc() const {
-    return (instructions > 0) ? static_cast<double>(instructions) / cycles : 0.0;
+    return (cycles > 0) ? static_cast<double>(instructions) / cycles : 0.0;
 }
 
 double HardwareMetrics::cache_miss_ratio() const {

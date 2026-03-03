@@ -29,10 +29,6 @@ public:
     auto addEnqThread() -> int;
     auto addDeqThread() -> int;
 
-    // pre-processing functions
-    auto preprocessEnqueue(TOrder &o, int threadId) -> bool;
-    auto preprocessDequeue(TOrder &o, int threadId) -> bool;
-    
     // operations for enqueing, and the different types of dequeueing
     auto enqueueOrder(TOrder &o, int threadId) -> bool;
     auto dequeueLatency(TOrder &o, int threadId) -> bool;
@@ -45,12 +41,12 @@ public:
     auto processLatencies() -> void;
     auto processOrders(CollectionOrderGenerator<BenchmarkOrder> &generator, MarketState &market) -> void;
     auto processMatching(std::vector<TOrder>& orders, std::vector<uint64_t>& actual_order) -> void;
+    auto processHardwareCounters() -> void;
 
     // hardware logger functions
     auto getHardwareLogger() -> HardwareLogger&;
-    // auto 
-
-    // CONTINUE HERE
+    auto getThreadCounter() -> ThreadHardwareCounter&;
+    auto aggregateHardwareMetrics(uint64_t num_threads) -> void;
 
 private:
     // cycle count for exchange
@@ -61,6 +57,7 @@ private:
     const uint64_t NUM_THREADS_;
     const uint64_t THREAD_LIMIT_;
     const std::string RUN_ID_;
+    const TestType TEST_TYPE_;
 
     // data structure templated argument
     DataStructure& structure_;
@@ -83,5 +80,5 @@ private:
     // hardware logging
     HardwareLogger hw_logger;
     mutable std::mutex hw_lock_;
-    std::unordered_map<std::thread::id, std::unique_ptr<ThreadHardwareCounter>> thread_hw_counters_;
+    std::unordered_map<std::thread::id, std::unique_ptr<ThreadHardwareCounter>, std::hash<std::thread::id>> thread_hw_counters_;
 };
