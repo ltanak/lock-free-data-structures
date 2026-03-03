@@ -60,3 +60,12 @@ diagrams/
 __pycache__/
 *.pyc
 *.pyo
+
+# VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/c_cpp_properties.json
+*.code-workspace

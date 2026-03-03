@@ -53,7 +53,7 @@ namespace exchange {
 
 namespace hardware {
 
-    // test_type: "stress" or "order" - determines subdirectory
+    // test_type "stress" or "order" determines subdirectory
     auto getPath(const string& test_type = "stress") -> filesystem::path;
 
     auto createFileName(const string& run_id) -> string;
