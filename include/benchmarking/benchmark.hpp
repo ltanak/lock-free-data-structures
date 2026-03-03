@@ -5,6 +5,7 @@
 #include <atomic>
 #include <vector>
 #include <string>
+#include <mutex>
 #include "scenarios/test_inputs.hpp"
 #include "utils/timing.hpp"
 #include "utils/structs.hpp"
@@ -13,6 +14,9 @@
 
 // This will have to either be templ
 #include "order_simulation/collection_order_generator.hpp"
+
+#include "hardware_logging/hardware_logger.hpp"
+#include "hardware_logging/thread_counter.hpp"
 
 template<typename DataStructure, typename TOrder>
 class BenchmarkWrapper {
@@ -42,6 +46,12 @@ public:
     auto processOrders(CollectionOrderGenerator<BenchmarkOrder> &generator, MarketState &market) -> void;
     auto processMatching(std::vector<TOrder>& orders, std::vector<uint64_t>& actual_order) -> void;
 
+    // hardware logger functions
+    auto getHardwareLogger() -> HardwareLogger&;
+    // auto 
+
+    // CONTINUE HERE
+
 private:
     // cycle count for exchange
     uint64_t current_cycle_ = 0;
@@ -69,4 +79,9 @@ private:
 
     // the matching engine
     MatchingEngine<TOrder> exchange_;
+
+    // hardware logging
+    HardwareLogger hw_logger;
+    mutable std::mutex hw_lock_;
+    std::unordered_map<std::thread::id, std::unique_ptr<ThreadHardwareCounter>> thread_hw_counters_;
 };

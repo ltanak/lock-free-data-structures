@@ -230,6 +230,11 @@ void BenchmarkWrapper<DataStructure, TOrder>::processMatching(std::vector<TOrder
     exchange::write(expected_cycles, actual_cycles, RUN_ID_);
 }
 
+template<typename DataStructure, typename TOrder>
+HardwareLogger& BenchmarkWrapper<DataStructure, TOrder>::getHardwareLogger() {
+    return hw_logger;
+}
+
 template class BenchmarkWrapper<RegularQueue<BenchmarkOrder>, BenchmarkOrder>;
 template class BenchmarkWrapper<MCLockFreeQueue<BenchmarkOrder>, BenchmarkOrder>;
 template class BenchmarkWrapper<MCConcurrentQueue<BenchmarkOrder>, BenchmarkOrder>;

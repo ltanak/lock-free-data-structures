@@ -7,7 +7,9 @@
 
 #include "hardware_logging/hardware_metrics.hpp"
 #include "hardware_logging/thread_counter.hpp"
+
 #include "utils/timing.hpp"
+#include "utils/counter.hpp"
 
 ThreadHardwareCounter::ThreadHardwareCounter() : initialised_(false) {
     fds_.fill(-1);
@@ -40,7 +42,7 @@ bool ThreadHardwareCounter::setup() {
     unsigned long flags = 0;
     int group_fd = -1; // each counter is independent
 
-    for (int i = 0; i < HW_COUNTERS; ++i){
+    for (size_t i = 0; i < HW_COUNTERS; ++i){
         events[i].size = sizeof(struct perf_event_attr);
         events[i].disabled = 1; // start counter in disabled state, we enable it later
         events[i].exclude_kernel = 1; // exclude time spent in kernel mode
@@ -58,4 +60,37 @@ bool ThreadHardwareCounter::setup() {
     }
     initialised_ = true;
     return true;
+}
+
+void ThreadHardwareCounter::start() {
+    if (!initialised_) return;
+
+    for (size_t i = 0; i < HW_COUNTERS; ++i){
+        initial_[i] = lcounter::rdpmc(i);
+    }
+}
+
+void ThreadHardwareCounter::stop() {
+    if (!initialised_) return;
+
+    for (size_t i = 0; i < HW_COUNTERS; ++i){
+        uint64_t end = lcounter::rdpmc(i);
+        accumulated_[i] += (end - initial_[i]);
+    }
+}
+
+void ThreadHardwareCounter::clear() {
+    accumulated_.fill(0);
+    initial_.fill(0);
+}
+
+HardwareMetrics ThreadHardwareCounter::snapshot() {
+    HardwareMetrics metrics;
+    metrics.cycles = accumulated_[0];
+    metrics.instructions = accumulated_[1];
+    metrics.cache_refs = accumulated_[2];
+    metrics.cache_refs = accumulated_[3];
+    metrics.branch_insts = accumulated_[4];
+    metrics.branch_misses = accumulated_[5];
+    return metrics;
 }
