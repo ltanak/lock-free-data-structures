@@ -50,21 +50,6 @@ class OrderingPlot:
             # ["Longest mismatch chain", f"{longest_chain:,}"],
         ]
         return summary_rows
-    
-        # @staticmethod
-    # def _longest_mismatch_chain(mismatch_idx: np.ndarray) -> int:
-    #     if len(mismatch_idx) == 0:
-    #         return 0
-    #     diffs = np.diff(mismatch_idx)
-    #     longest = 1
-    #     current = 1
-    #     for d in diffs:
-    #         if d == 1:
-    #             current += 1
-    #             longest = max(longest, current)
-    #         else:
-    #             current = 1
-    #     return longest
 
     def window_most_mismatches(self, window_size: int | None = None) -> tuple[int, int] | None:
         """Find the index range (start, end) with the most mismatches in a sliding window.
@@ -97,7 +82,7 @@ class OrderingPlot:
         
         return best_window
         
-
+    @report(name="Out-of-order Pairs", layout="grid")
     def plot_out_of_order_pairs(self, title="Expected vs Actual", out: Path | None = None, id_range: tuple[int, int] | None = None, return_fig=False):
         exp = self.data["expected_id"]
         act = self.data["actual_id"]
@@ -132,6 +117,7 @@ class OrderingPlot:
             plt.show()
         plt.close()
 
+    @report(name="Offset", layout="grid")
     def plot_offset(self, title="Actual - Expected", out: Path | None = None, id_range: tuple[int, int] | None = None, return_fig=False):
         exp = self.data["expected_id"]
         act = self.data["actual_id"]
@@ -197,6 +183,7 @@ class OrderingPlot:
             plt.show()
         plt.close()
 
+    @report(name="Expected vs Actual", layout="full")
     def plot_expected_vs_actual_colored(self, title="Expected vs Actual (colored by displacement)", out: Path | None = None, id_range: tuple[int, int] | None = None, return_fig=False):
         exp = self.data["expected_id"]
         act = self.data["actual_id"]

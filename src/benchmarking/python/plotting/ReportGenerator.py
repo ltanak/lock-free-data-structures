@@ -6,6 +6,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import inspect
 
 from benchmarking.python.plotting.ExchangePlot import ExchangePlot
 from benchmarking.python.plotting.LatencyPlot import LatencyPlot
@@ -76,25 +77,48 @@ class ReportGenerator:
             report_summary_rows = lp.report_summary(metric=metric)
             html_strs.append(create_html_table(["Metric", "Value"], report_summary_rows))
 
-            # --------------------
-            # LATENCY PLOT FIGURES
-            # --------------------
+            # latency plot figures
+            latency_figs = self._latency_graph_figs(lp, id_range=None, metric=metric)
 
-            fig_hist = lp.histogram(metric=metric, return_fig=True)
-            fig_cdf = lp.cdf(metric=metric, return_fig=True)
-
+            # grid figures
             html_strs.append('<div class="graph-grid">')
-            html_strs.append(get_html_img_tag(fig_encode(fig_hist), f"{metric} histogram"))
-            html_strs.append(get_html_img_tag(fig_encode(fig_cdf), f"{metric} CDF"))
+            for name, layout, fig in latency_figs:
+                if layout != "grid":
+                    continue
+                html_strs.append(get_html_img_tag(fig_encode(fig), f"{metric} {name}"))
             html_strs.append("</div>")
 
-            # percentile graph
-            fig_pct = lp.percentile_chart(metric=metric, return_fig=True, remove_outliers=False)
+            # full figures
             html_strs.append('<div class="graph-full">')
-            html_strs.append(get_html_img_tag(fig_encode(fig_pct), f"{metric} percentile"))
+            for name, layout, fig in latency_figs:
+                if layout != "full":
+                    continue
+
+                html_strs.append(get_html_img_tag(fig_encode(fig), f"{metric} {name}"))
             html_strs.append("</div>")
 
         return "\n".join(html_strs)
+    
+    def _latency_graph_figs(self, lp: LatencyPlot, id_range: tuple[int, int] | None = None, metric: str = "enqueue") -> list[tuple[str, plt.Figure]]:
+        if not id_range:
+            id_range = self.id_range
+
+        tags = []
+        for _, method in inspect.getmembers(lp, predicate=callable):
+            meta = getattr(method, "_report_meta", None)
+            if meta is None and hasattr(method, "__func__"):
+                meta = getattr(method.__func__, "_report_figure_meta", None)
+            if meta:
+                tags.append((meta, method))
+
+        tags.sort(key=lambda x: x[0].get("order", 1000))
+
+        figs: list[tuple[str, str, plt.Figure]] = []
+        for meta, method in tags:
+            fig = method(metric=metric, return_fig=True, id_range=id_range)
+            figs.append((meta["name"], meta.get("layout", "grid"), fig))
+
+        return figs
 
     # ------------------------------------------------------------------
     # ordering
@@ -119,9 +143,19 @@ class ReportGenerator:
         # graphs - full range
         html_strs.append("<h3>Graphs - Full Range</h3>")
         graph_figs = self._ordering_graph_figs(op, id_range=self.id_range)
+        
         html_strs.append('<div class="graph-grid">')
-        for label, fig in graph_figs:
-            html_strs.append(get_html_img_tag(fig_encode(fig), label))
+        for name, layout, fig in graph_figs:
+            if layout != "grid":
+                continue
+            html_strs.append(get_html_img_tag(fig_encode(fig), name))
+        html_strs.append("</div>")
+
+        html_strs.append('<div class="graph-full">')
+        for name, layout, fig in graph_figs:
+            if layout != "full":
+                continue
+            html_strs.append(get_html_img_tag(fig_encode(fig), name))
         html_strs.append("</div>")
 
         # graphs - mismatch window (zoomed detail)
@@ -129,9 +163,21 @@ class ReportGenerator:
         if mismatch_window:
             html_strs.append("<h3>Graphs - Mismatch Detail (20% window with most mismatches)</h3>")
             html_strs.append(f'<p class="meta">Index range: {mismatch_window[0]} - {mismatch_window[1]}</p>')
-            mismatch_fig = op.plot_offset(title="Actual - Expected (mismatch window)", id_range=mismatch_window, return_fig=True)
+            
+            mismatch_figs = self._ordering_graph_figs(op, id_range=mismatch_window)
+            
+            html_strs.append('<div class="graph-grid">')
+            for name, layout, fig in mismatch_figs:
+                if layout != "grid":
+                    continue
+                html_strs.append(get_html_img_tag(fig_encode(fig), f"{name} (mismatch window)"))
+            html_strs.append("</div>")
+            
             html_strs.append('<div class="graph-full">')
-            html_strs.append(get_html_img_tag(fig_encode(mismatch_fig), "Offset (mismatch window)"))
+            for name, layout, fig in mismatch_figs:
+                if layout != "full":
+                    continue
+                html_strs.append(get_html_img_tag(fig_encode(fig), f"{name} (mismatch window)"))
             html_strs.append("</div>")
 
         return "\n".join(html_strs), mismatch_window
@@ -140,10 +186,26 @@ class ReportGenerator:
         if not id_range:
             id_range = self.id_range
 
-        return [
-            ("Expected vs Actual", op.plot_out_of_order_pairs(id_range=id_range, return_fig=True)),
-            ("Offset", op.plot_offset(id_range=id_range, return_fig=True)),
-        ]
+        # return [
+        #     ("Expected vs Actual", op.plot_out_of_order_pairs(id_range=id_range, return_fig=True)),
+        #     ("Offset", op.plot_offset(id_range=id_range, return_fig=True)),
+        # ]
+        tags = []
+        for _, method in inspect.getmembers(op, predicate=callable):
+            meta = getattr(method, "_report_meta", None)
+            if meta is None and hasattr(method, "__func__"):
+                meta = getattr(method.__func__, "_report_figure_meta", None)
+            if meta:
+                tags.append((meta, method))
+
+        tags.sort(key=lambda x: x[0].get("order", 1000))
+
+        figs: list[tuple[str, str, plt.Figure]] = []
+        for meta, method in tags:
+            fig = method(return_fig=True, id_range=id_range)
+            figs.append((meta["name"], meta.get("layout", "grid"), fig))
+
+        return figs
 
     # ------------------------------------------------------------------
     # exchange
