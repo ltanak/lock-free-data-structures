@@ -2,7 +2,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from benchmarking.python.plotting.utils import get_graph_dir
+from benchmarking.python.plotting.utils import get_graph_dir, report
 
 class LatencyPlot:
     def __init__(self, csv_path: Path):
@@ -23,7 +23,8 @@ class LatencyPlot:
         hi = q3 + k * iqr
         return data[(data >= lo) & (data <= hi)], (lo, hi)
 
-    def histogram(self, metric="enqueue", title="Latency Histogram", out: Path | None = None, remove_outliers=True, return_fig=False):
+    @report(name="Histogram", layout="grid")
+    def histogram(self, metric="enqueue", title="Latency Histogram", out: Path | None = None, remove_outliers=True, return_fig=False, id_range: tuple[int, int] | None = None):
         data = self.data[metric]
         data = data[data > 0]
 
@@ -74,8 +75,8 @@ class LatencyPlot:
 
         plt.close()
 
-    # CDF
-    def cdf(self, metric="enqueue", title="Latency CDF", out: Path | None = None, remove_outliers=True, return_fig=False):
+    @report(name="CDF", layout="grid")
+    def cdf(self, metric="enqueue", title="Latency CDF", out: Path | None = None, remove_outliers=True, return_fig=False, id_range: tuple[int, int] | None = None):
         data = self.data[metric]
 
         if remove_outliers:
@@ -143,8 +144,8 @@ class LatencyPlot:
         ]
         return summary_rows
 
-    # bar chart of key tail-latency percentiles
-    def percentile_chart(self, metric="enqueue", title="Tail-Latency Percentiles", out: Path | None = None, remove_outliers=True, return_fig=False):
+    @report(name="Histogram", layout="full")
+    def percentile_chart(self, metric="enqueue", title="Tail-Latency Percentiles", out: Path | None = None, remove_outliers=True, return_fig=False, id_range: tuple[int, int] | None = None):
         data = self.data[metric]
         if remove_outliers:
             data, _ = self._remove_outliers_iqr(data)

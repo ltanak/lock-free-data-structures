@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import base64
 import tempfile
+from functools import wraps
 
 """
 Code that contains all the utility functions for getting most recent graphs,
@@ -265,3 +266,23 @@ def create_html_table(headers: list[str], rows: list[list[str]]) -> str:
         parts.append("</tr>")
     parts.append("</tbody></table>")
     return "\n".join(parts)
+
+# ------------------------------------------------------------------
+# decorator for automatic figure enlisting
+# ------------------------------------------------------------------
+
+def report(name: str, layout: str = "grid", rank: int = 0):
+
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+        
+        wrapper._report_meta = {
+            "name": name.capitalize(), 
+            "layout": layout.lower(),
+            "rank": int(rank)
+        }
+        return wrapper
+    
+    return decorator
