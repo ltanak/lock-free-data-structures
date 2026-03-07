@@ -263,7 +263,7 @@ void BenchmarkWrapper<DataStructure, TOrder>::processHardwareCounters() {
     avg_metrics.branch_misses = total_metrics.branch_misses / n;
 
     const std::string test_type = (TEST_TYPE_ == TestType::ORDER) ? "order" : "stress";
-    hardware::write(avg_metrics, RUN_ID_, test_type);
+    hardware::write(avg_metrics, NUM_THREADS_, RUN_ID_, test_type);
 }
 
 template class BenchmarkWrapper<RegularQueue<BenchmarkOrder>, BenchmarkOrder>;

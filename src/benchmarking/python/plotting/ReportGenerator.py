@@ -45,10 +45,14 @@ class ReportGenerator:
         if self.active.get("latencies") and "latencies" in self.files:
             latency_strs = self._latency_section()
             self.sections.append(latency_strs)
+            latency_hardware_strs = self._hardware_section(type="hardware_stress")
+            self.sections.append(latency_hardware_strs)
 
         if self.active.get("ordering") and "ordering" in self.files:
             ordering_strs, mismatch_window = self._ordering_section()
             self.sections.append(ordering_strs)
+            ordering_hardware_strs = self._hardware_section(type="hardware_order")
+            self.sections.append(ordering_hardware_strs)
 
         if self.active.get("exchange") and "exchange" in self.files:
             exchange_strs = self._exchange_section(mismatch_window=mismatch_window)
@@ -259,25 +263,17 @@ class ReportGenerator:
 
     def _hardware_section(
         self,
-        hw_latency_csv: Path | None = None,
-        hw_ordering_csv: Path | None = None,
+        type: str = "hardware_stress" # hardware_order
     ):
-        """
-        Need to implement hardware logging / metrics before able to implement
-        """
-        if hw_latency_csv:
-            hw = HardwarePlot(hw_latency_csv)
-            title = "Latency"
-        else:
-            hw = HardwarePlot(hw_ordering_csv)
-            title = "Ordering"
+        title = "Latency" if type == "hardware_stress" else "Ordering"
+        hw = HardwarePlot(self.files[type])
 
         html_strs = ['<h2>Hardware Counters</h2>']
         html_strs.append(f"<h3>Latency Hardware Metrics - {title}</h3>")
         rows = hw.report_summary()
         html_strs.append(create_html_table(["Metric", "Value"], rows))
 
-        self.sections.append("\n".join(html_strs))
+        return "\n".join(html_strs)
 
     # ------------------------------------------------------------------
     # HTML wrapper

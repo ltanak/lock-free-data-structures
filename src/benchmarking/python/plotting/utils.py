@@ -127,7 +127,7 @@ def get_csv_by_run_id(run_id: str) -> dict[str, Path]:
             file_run_id = extract_run_id(csv_file)
             if file_run_id == run_id:
                 # Store as "hardware" regardless of location
-                result["hardware"] = csv_file
+                result[hw_dir] = csv_file
                 break
         
         if "hardware" in result:

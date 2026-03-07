@@ -55,6 +55,7 @@ def plot_graphs(
                 resolved_run_id = extract_run_id(v)
                 if resolved_run_id:
                     break
+                
         rg = ReportGenerator(
             files=files,
             run_id=resolved_run_id,
@@ -88,7 +89,7 @@ def plot_graphs(
         print("\n=== EXCHANGE SUMMARY ===")
         ep.plot_all(cycle_range=id_range if id_range else None)
 
-if __name__ == "__main__":
+def initialise_args() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Plot benchmarking results from CSV files")
     parser.add_argument("--file", type=str, help="CSV filename to plot")
     parser.add_argument("--run-id", type=str, help="ID to plot (e.g. 1771246990)")
@@ -100,7 +101,10 @@ if __name__ == "__main__":
     parser.add_argument("--exchange", action="store_true", help="Plot exchange graphs")
     parser.add_argument("--all", action="store_true", help="Plot all graph types")
     parser.add_argument("--report", action="store_true", help="Generate full HTML Report for data structure test / a specific Run ID")
-    
+    return parser
+
+if __name__ == "__main__":
+    parser = initialise_args()
     args = parser.parse_args()
     
     # list available run IDs if requested
