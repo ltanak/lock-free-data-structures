@@ -25,7 +25,6 @@ namespace {
 		uint64_t ts = ltime::rdtsc_lfence();
         return BenchmarkOrder{id, type, price, qty, ts, seq};
     }
-
 }
 
 TEST(RegularQueueTest, EnqueueDequeueAndFront) {
@@ -227,4 +226,227 @@ TEST(TestInputsTest, ParseArgsFillsParams) {
 	EXPECT_EQ(params.thread_count, 4u);
 	EXPECT_EQ(params.thread_order_limit, 100u);
 	EXPECT_EQ(params.total_orders, 400u);
+}
+
+TEST(RegularQueueTest, MultipleEnqueueDequeue) {
+	RegularQueue<BenchmarkOrder> q;
+	std::vector<BenchmarkOrder> orders;
+	
+	for (int i = 0; i < 10; ++i) {
+		orders.push_back(makeOrder(i, OrderType::BUY, 100.0 + i, i + 1, i));
+		EXPECT_TRUE(q.enqueueOrder(orders[i]));
+	}
+	
+	EXPECT_EQ(q.size(), 10u);
+	
+	for (int i = 0; i < 10; ++i) {
+		BenchmarkOrder out{};
+		EXPECT_TRUE(q.dequeueOrder(out));
+		EXPECT_EQ(out.order_id, i);
+		EXPECT_EQ(out.sequence_number, i);
+	}
+	
+	EXPECT_TRUE(q.empty());
+}
+
+TEST(RegularQueueTest, AlternateEnqueueDequeue) {
+	RegularQueue<BenchmarkOrder> q;
+	
+	auto order1 = makeOrder(1, OrderType::SELL, 50.0, 10, 0);
+	EXPECT_TRUE(q.enqueueOrder(order1));
+	
+	BenchmarkOrder out1{};
+	EXPECT_TRUE(q.dequeueOrder(out1));
+	EXPECT_EQ(out1.order_id, 1);
+	
+	auto order2 = makeOrder(2, OrderType::BUY, 60.0, 20, 1);
+	EXPECT_TRUE(q.enqueueOrder(order2));
+	
+	BenchmarkOrder out2{};
+	EXPECT_TRUE(q.dequeueOrder(out2));
+	EXPECT_EQ(out2.order_id, 2);
+	
+	EXPECT_TRUE(q.empty());
+}
+
+// ============================================================================
+// MCLockFreeQueue
+// ============================================================================
+
+TEST(MCLockFreeQueueTest, MultipleEnqueueDequeue) {
+	MCLockFreeQueue<BenchmarkOrder> q;
+	
+	for (int i = 0; i < 20; ++i) {
+		auto order = makeOrder(i, OrderType::BUY, 100.0 + i, i + 1, i);
+		EXPECT_TRUE(q.enqueueOrder(order));
+	}
+	
+	EXPECT_EQ(q.getSize(), 20u);
+	
+	for (int i = 0; i < 20; ++i) {
+		BenchmarkOrder out{};
+		EXPECT_TRUE(q.dequeueOrder(out));
+		EXPECT_EQ(out.order_id, i);
+	}
+	
+	EXPECT_TRUE(q.isEmpty());
+}
+
+TEST(MCLockFreeQueueTest, GetFrontConsistency) {
+	MCLockFreeQueue<BenchmarkOrder> q;
+	
+	auto order1 = makeOrder(100, OrderType::SELL, 200.0, 50, 5);
+	EXPECT_TRUE(q.enqueueOrder(order1));
+	
+	BenchmarkOrder front1{}, front2{};
+	EXPECT_TRUE(q.getFront(front1));
+	EXPECT_TRUE(q.getFront(front2));
+	EXPECT_EQ(front1.order_id, front2.order_id);
+	EXPECT_EQ(front1.order_id, 100);
+}
+
+// MCConcurrentQueue
+
+TEST(MCConcurrentQueueTest, LargeSequence) {
+	MCConcurrentQueue<BenchmarkOrder> q;
+	
+	for (int i = 0; i < 100; ++i) {
+		auto order = makeOrder(i, (i % 2 == 0) ? OrderType::BUY : OrderType::SELL, 
+							   100.0 + (i % 20), i + 1, i);
+		EXPECT_TRUE(q.enqueueOrder(order));
+	}
+	
+	EXPECT_EQ(q.getSize(), 100u);
+	
+	for (int i = 0; i < 100; ++i) {
+		BenchmarkOrder out{};
+		EXPECT_TRUE(q.dequeueOrder(out));
+		EXPECT_EQ(out.order_id, i);
+	}
+	
+	EXPECT_TRUE(q.isEmpty());
+	EXPECT_EQ(q.getSize(), 0u);
+}
+
+// MatchingEngine
+
+TEST(MatchingEngineTest, PartialFillScenario) {
+	MatchingEngine<BenchmarkOrder> engine(100.0);
+	
+	// sell 50 units at 100.50
+	auto sell = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(1, OrderType::SELL, 100.50, 50, 1)));
+	engine.processOrder(sell.get());
+	
+	// buy 30 units at 100.60 (crosses)
+	auto buy1 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(2, OrderType::BUY, 100.60, 30, 2)));
+	engine.processOrder(buy1.get());
+	
+	EXPECT_EQ(buy1->quantity, 0u);    // fully matched
+	EXPECT_EQ(sell->quantity, 20u);   // partially filled
+	
+	// buy remaining 20 units
+	auto buy2 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(3, OrderType::BUY, 100.60, 20, 3)));
+	engine.processOrder(buy2.get());
+	
+	EXPECT_EQ(buy2->quantity, 0u);
+	EXPECT_EQ(sell->quantity, 0u);
+}
+
+TEST(MatchingEngineTest, NoCrossAtDifferentPrices) {
+	MatchingEngine<BenchmarkOrder> engine(100.0);
+	
+	// sell at 101.00
+	auto sell = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(1, OrderType::SELL, 101.00, 10, 1)));
+	engine.processOrder(sell.get());
+	
+	// buy at 100.00 (below sell, no cross)
+	auto buy = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(2, OrderType::BUY, 100.00, 5, 2)));
+	engine.processOrder(buy.get());
+	
+	EXPECT_EQ(buy->quantity, 5u);    // not filled
+	EXPECT_EQ(sell->quantity, 10u);  // not filled
+}
+
+TEST(MatchingEngineTest, BuyTakesSellAtMultipleLevels) {
+	MatchingEngine<BenchmarkOrder> engine(100.0);
+	
+	// sells at different price levels
+	auto sell1 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(1, OrderType::SELL, 100.50, 5, 1)));
+	auto sell2 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(2, OrderType::SELL, 101.00, 8, 2)));
+	auto sell3 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(3, OrderType::SELL, 101.50, 10, 3)));
+	
+	engine.processOrder(sell1.get());
+	engine.processOrder(sell2.get());
+	engine.processOrder(sell3.get());
+	
+	// buy at aggressive price that crosses multiple levels
+	auto buy = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(4, OrderType::BUY, 102.00, 20, 4)));
+	engine.processOrder(buy.get());
+	
+	// sell1 (5) + sell2 (8) + partial sell3 (7)
+	EXPECT_EQ(sell1->quantity, 0u);
+	EXPECT_EQ(sell2->quantity, 0u);
+	EXPECT_EQ(sell3->quantity, 3u);
+	EXPECT_EQ(buy->quantity, 0u);
+}
+
+TEST(MatchingEngineTest, SelfTradePreventionSameBuyLevel) {
+	MatchingEngine<BenchmarkOrder> engine(100.0);
+	
+	// add two buy orders at same price level
+	auto buy1 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(1, OrderType::BUY, 100.00, 10, 1)));
+	auto buy2 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(2, OrderType::BUY, 100.00, 5, 2)));
+	
+	engine.processOrder(buy1.get());
+	engine.processOrder(buy2.get());
+	
+	// add opposing sell - should only match with older buy (buy1 by sequence)
+	auto sell = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(3, OrderType::SELL, 100.00, 8, 3)));
+	engine.processOrder(sell.get());
+	
+	EXPECT_EQ(buy1->quantity, 2u);   // matched 8 from its 10
+	EXPECT_EQ(buy2->quantity, 5u);   // not matched yet
+	EXPECT_EQ(sell->quantity, 0u);   // fully matched
+}
+
+// PriceBook and PriceLevel Tests
+
+TEST(PriceLevelTest, OrderingBySequenceNumber) {
+	MatchingEngine<BenchmarkOrder> engine(100.0);
+	
+	// add three orders at same price with different sequence numbers
+	auto order1 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(10, OrderType::BUY, 100.00, 5, 1)));
+	auto order2 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(11, OrderType::BUY, 100.00, 3, 3)));
+	auto order3 = std::make_unique<BookOrder>(engine.convertOrder(makeOrder(12, OrderType::BUY, 100.00, 7, 2)));
+	
+	engine.processOrder(order1.get());
+	engine.processOrder(order2.get());
+	engine.processOrder(order3.get());
+	
+	// query the price level
+	int level = engine.buy_book.priceToIndex(order1->price_ticks);
+	PriceLevel &pl = engine.buy_book.levels[level];
+	
+	// head should be order1 (sequence 1, earliest)
+	EXPECT_EQ(pl.head->order_id, 10);
+	EXPECT_EQ(pl.total_quantity, 15u);  // 5 + 3 + 7
+}
+
+// Conversion and Price Encoding Tests
+
+TEST(MatchingEngineTest, PriceTickConversion) {
+	MatchingEngine<BenchmarkOrder> engine(100.0);
+	
+	double price1 = 100.50;
+	double price2 = 100.75;
+	
+	int64_t ticks1 = engine.priceToTicks(price1);
+	int64_t ticks2 = engine.priceToTicks(price2);
+	
+	// ticks should be different for different prices
+	EXPECT_NE(ticks1, ticks2);
+	
+	// conversion back should be close to original (accounting for tick precision)
+	double restored1 = engine.ticksToPrice(ticks1);
+	EXPECT_NEAR(restored1, price1, 0.001);
 }

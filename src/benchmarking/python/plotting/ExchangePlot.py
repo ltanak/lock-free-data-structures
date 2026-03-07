@@ -7,7 +7,6 @@ from benchmarking.python.plotting.utils import *
 from benchmarking.python.image_editing.image import ImageEditor
 import math
 
-
 class ExchangePlot:
 
     def __init__(self, csv_path: Path):

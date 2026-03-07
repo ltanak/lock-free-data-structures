@@ -68,5 +68,6 @@
         "unordered_set": "cpp",
         "iomanip": "cpp",
         "codecvt": "cpp"
-    }
+    },
+    "liveServer.settings.port": 5501
 }

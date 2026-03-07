@@ -183,7 +183,7 @@ class OrderingPlot:
             plt.show()
         plt.close()
 
-    @report(name="Expected vs Actual", layout="full")
+    # @report(name="Expected vs Actual", layout="full")
     def plot_expected_vs_actual_colored(self, title="Expected vs Actual (colored by displacement)", out: Path | None = None, id_range: tuple[int, int] | None = None, return_fig=False):
         exp = self.data["expected_id"]
         act = self.data["actual_id"]

@@ -35,11 +35,14 @@ struct EventParams {
 };
 
 /**
- * @brief each generator reads from the market state to inform its order generation
- * atomic variables for thread-safe access and modification
- * aligned to cache line size (prevents false sharing)
+ * @class MarketState
+ * @brief simulated market microstructure with event-driven volatility regimes
+ *
+ * maintains synthetic market state (price, volatility, bias) that drives order
+ * generation patterns in benchmarks
+ * supports multiple volatility regimes
+ *
  */
-
 class MarketState {
 public:
     explicit MarketState(std::optional<uint32_t> seed = std::nullopt);
