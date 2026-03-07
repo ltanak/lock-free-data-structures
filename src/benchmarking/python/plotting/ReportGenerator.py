@@ -190,10 +190,6 @@ class ReportGenerator:
         if not id_range:
             id_range = self.id_range
 
-        # return [
-        #     ("Expected vs Actual", op.plot_out_of_order_pairs(id_range=id_range, return_fig=True)),
-        #     ("Offset", op.plot_offset(id_range=id_range, return_fig=True)),
-        # ]
         tags = []
         for _, method in inspect.getmembers(op, predicate=callable):
             meta = getattr(method, "_report_meta", None)
