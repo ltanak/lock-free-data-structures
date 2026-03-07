@@ -269,9 +269,7 @@ TEST(RegularQueueTest, AlternateEnqueueDequeue) {
 	EXPECT_TRUE(q.empty());
 }
 
-// ============================================================================
 // MCLockFreeQueue
-// ============================================================================
 
 TEST(MCLockFreeQueueTest, MultipleEnqueueDequeue) {
 	MCLockFreeQueue<BenchmarkOrder> q;
