@@ -3,6 +3,12 @@
 #include "data_structures/queues/i_queue.hpp"
 #include "data_structures/queues/readerwriterqueue.h"
 
+/**
+ * @class MCLockFreeQueue
+ * @brief single-consumer lock-free queue based on moodycamel's ReaderWriterQueue.
+ *
+ * @tparam TOrder Type of orders stored in the queue
+ */
 template <typename TOrder>
 class MCLockFreeQueue : public IQueue<TOrder, MCLockFreeQueue<TOrder>> {
 

@@ -6,18 +6,52 @@
 #include <vector>
 #include <string>
 #include <mutex>
+
 #include "scenarios/test_inputs.hpp"
+
 #include "utils/timing.hpp"
 #include "utils/structs.hpp"
-#include "exchange/matching_engine.hpp"
-#include "order_simulation/market_state.hpp"
 
-// This will have to either be templ
+#include "exchange/matching_engine.hpp"
+
+#include "order_simulation/market_state.hpp"
 #include "order_simulation/collection_order_generator.hpp"
 
 #include "hardware_logging/hardware_logger.hpp"
 #include "hardware_logging/thread_counter.hpp"
 
+/**
+ * @class BenchmarkWrapper
+ * @brief Benchmarking harness for concurrent data structure evaluation.
+ *
+ * Orchestrates performance testing of concurrent data-structure implementations
+ * across latency, ordering, and exchange matching scenarios. Manages thread
+ * coordination, hardware performance counter collection, and result aggregation.
+ *
+ * **Responsibilities:**
+ * - **Thread Management:** Tracks enqueue/dequeue thread IDs for per-thread metrics
+ * - **Latency Measurement:** Records nanosecond-precision timestamps for queue operations
+ * - **Order Preservation:** Tracks sequence numbers and execution order for correctness
+ * - **Exchange Simulation:** Drives matching engine with generated orders and validates outputs
+ * - **Hardware Profiling:** Collects CPU cycles, cache misses, branch predictions
+ * - **Result Serialisation:** Writes benchmarks results and hardware metrics to CSV
+ *
+ * **Key Features:**
+ * - Template-based generic design supporting any queue implementation and order type
+ * - Hardware counter integration via PAPI for low-level performance analysis
+ * - Configurable test scenarios (stress, ordering, exchange)
+ * - Per-thread metrics aggregation with proper thread safety
+ * - Automatic CSV output generation for post-processing and visualization
+ *
+ * **Output Files:**
+ * - Latency CSV: enqueue/dequeue latencies in nanoseconds
+ * - Ordering CSV: expected vs actual order sequences
+ * - Exchange CSV: matching engine execution traces
+ * - Hardware CSV: aggregated per-thread performance counter data
+ *
+ * @tparam DataStructure The queue implementation being benchmarked
+ * @tparam TOrder The order type being processed (always BenchmarkOrder)
+ */
 template<typename DataStructure, typename TOrder>
 class BenchmarkWrapper {
 public:

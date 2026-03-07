@@ -10,10 +10,14 @@
 #include "order_simulation/benchmark_order.hpp"
 
 /**
- * MatchingEngine struct
- * Entry point for the exchange, stores books and initialises ticks for 'traded-commodity'
+ * @class MatchingEngine
+ * @brief Core financial exchange matching engine implementing price-time priority.
+ *
+ * implemented a limit order book (LOB) matching engine using two separate price books
+ * (buy and sell sides) with dynamic recentering
+ *
+ * @tparam TOrder User-defined order type to be matched
  */
-
 template<typename TOrder>
 struct MatchingEngine {
 

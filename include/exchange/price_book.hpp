@@ -8,14 +8,14 @@
 #include "exchange/price_level.hpp"
 
 /**
- * Going for a recentering OrderBook, so that it dynamically adapts
- * to price changes like in a real exchange
- * 
- * Uses a PriceBook that stores various PriceLevels
- * each pricelevel represents a different tick index
- * bitmap indicates which price levels are active
+ * @class PriceBook
+ * @brief dynamic limit order book side (buy or sell) with bitmap level discovery.
+ *
+ * order book (one side) implemented using a fixed array of price levels with a
+ * bitmap for O(1) lookup of active levels. 
+ * supports dynamic recentering
+ *
  */
-
 struct PriceBook {
     static constexpr int NUM_LEVELS = 8192;
     static constexpr int BITMAP_WORDS = (NUM_LEVELS + 63) / 64;
