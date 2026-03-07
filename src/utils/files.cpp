@@ -189,7 +189,7 @@ namespace hardware {
         return str;
     }
 
-    auto write(const HardwareMetrics& metrics, const string& run_id, const string& test_type) -> bool {
+    auto write(const HardwareMetrics& metrics, int num_threads, const string& run_id, const string& test_type) -> bool {
         namespace fs = std::filesystem;
         
         fs::path dirPath = getPath(test_type);
@@ -197,7 +197,7 @@ namespace hardware {
         fs::path filePath = dirPath / createFileName(run_id);
 
         if (!fs::exists(filePath)) {
-            std::ofstream(filePath) << "cpu_cycles,cpu_insts,cache_refs,cache_misses,branch_insts,branch_misses\n"; // header
+            std::ofstream(filePath) << "cpu_cycles,cpu_insts,cache_refs,cache_misses,branch_insts,branch_misses,num_threads\n"; // header
         }
 
         std::ofstream out(filePath, std::ios::app);
@@ -207,7 +207,8 @@ namespace hardware {
             << metrics.cache_refs << ","
             << metrics.cache_misses << ","
             << metrics.branch_insts << ","
-            << metrics.branch_misses << "\n";
+            << metrics.branch_misses << ","
+            << (test_type == "stress" ? num_threads * 2 : num_threads);
         return true;
     }
 }

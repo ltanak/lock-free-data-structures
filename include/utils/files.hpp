@@ -57,5 +57,5 @@ namespace hardware {
     auto getPath(const string& test_type = "stress") -> filesystem::path;
 
     auto createFileName(const string& run_id) -> string;
-    auto write(const HardwareMetrics& metrics, const string& run_id, const string& test_type = "stress") -> bool;
+    auto write(const HardwareMetrics& metrics, int num_threads, const string& run_id, const string& test_type = "stress") -> bool;
 }
