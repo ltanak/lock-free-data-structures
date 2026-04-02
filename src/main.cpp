@@ -51,15 +51,35 @@ int main(int argc, char* argv[]) {
         static_cast<size_t>(100000),  // minimum safe capacity
         params.total_orders * params.thread_count * 2  // scale with workload
     );
-    
-    // WiltMPMCBlockRing<BenchmarkOrder> ring(ring_capacity);
-    // WiltMPMCNonBlockRing<BenchmarkOrder> ring(ring_capacity);
-    // MCConcurrentQueue<BenchmarkOrder> queue;
-    RigtorpMPMCQueue<BenchmarkOrder> queue(ring_capacity);
 
-    BenchmarkWrapper<RigtorpMPMCQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
+    // REGULAR QUEUE BENCHMARKING
+    // RegularQueue<BenchmarkOrder> queue;
+    // BenchmarkWrapper<RegularQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
+
+
+    // MCMPMC
+    // MCConcurrentQueue<BenchmarkOrder> queue;
     // BenchmarkWrapper<MCConcurrentQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
+
+
+    // MC Readerwriter
+    // MCLockFreeQueue<BenchmarkOrder> queue;
+    // BenchmarkWrapper<MCLockFreeQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
+
+
+    // Wilt Blocking
+    // WiltMPMCBlockRing<BenchmarkOrder> ring(ring_capacity);
+    // BenchmarkWrapper<WiltMPMCBlockRing<BenchmarkOrder>, BenchmarkOrder> wrapper(ring, params);
+
+
+    // Wilt Non-blocking
+    // WiltMPMCNonBlockRing<BenchmarkOrder> ring(ring_capacity);
     // BenchmarkWrapper<WiltMPMCNonBlockRing<BenchmarkOrder>, BenchmarkOrder> wrapper(ring, params);
+
+    
+    // Rigtorp MPMC
+    RigtorpMPMCQueue<BenchmarkOrder> queue(ring_capacity);
+    BenchmarkWrapper<RigtorpMPMCQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
     
     switch (params.test){
         case TestType::STRESS: stressTest(wrapper, params); break;
