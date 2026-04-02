@@ -17,6 +17,8 @@
 #include "utils/timing.hpp"
 #include "utils/files.hpp"
 
+#include "data_structures/queues/rigtorp_mpmc_queue.hpp"
+
 template<typename DataStructure, typename TOrder>
 BenchmarkWrapper<DataStructure, TOrder>::BenchmarkWrapper(DataStructure &structure, TestParams &params)
 : structure_(structure), TOTAL_ORDERS_(params.total_orders), NUM_THREADS_(params.thread_count), THREAD_LIMIT_(params.thread_order_limit), RUN_ID_(params.run_id), TEST_TYPE_(params.test), exchange_(100)
@@ -271,3 +273,4 @@ template class BenchmarkWrapper<MCLockFreeQueue<BenchmarkOrder>, BenchmarkOrder>
 template class BenchmarkWrapper<MCConcurrentQueue<BenchmarkOrder>, BenchmarkOrder>;
 template class BenchmarkWrapper<WiltMPMCBlockRing<BenchmarkOrder>, BenchmarkOrder>;
 template class BenchmarkWrapper<WiltMPMCNonBlockRing<BenchmarkOrder>, BenchmarkOrder>;
+template class BenchmarkWrapper<RigtorpMPMCQueue<BenchmarkOrder>, BenchmarkOrder>;

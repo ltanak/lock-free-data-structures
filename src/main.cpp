@@ -21,6 +21,7 @@
 #include "data_structures/queues/mc_mpmc_queue.hpp"
 #include "data_structures/ring_buffers/wilt_mpmc_blocking_ring.hpp"
 #include "data_structures/ring_buffers/wilt_mpmc_nonblock_ring.hpp"
+#include "data_structures/queues/rigtorp_mpmc_queue.hpp"
 
 // Benchmark
 #include "benchmarking/benchmark.hpp"
@@ -52,10 +53,13 @@ int main(int argc, char* argv[]) {
     );
     
     // WiltMPMCBlockRing<BenchmarkOrder> ring(ring_capacity);
-    WiltMPMCNonBlockRing<BenchmarkOrder> ring(ring_capacity);
+    // WiltMPMCNonBlockRing<BenchmarkOrder> ring(ring_capacity);
     // MCConcurrentQueue<BenchmarkOrder> queue;
+    RigtorpMPMCQueue<BenchmarkOrder> queue(ring_capacity);
+
+    BenchmarkWrapper<RigtorpMPMCQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
     // BenchmarkWrapper<MCConcurrentQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
-    BenchmarkWrapper<WiltMPMCNonBlockRing<BenchmarkOrder>, BenchmarkOrder> wrapper(ring, params);
+    // BenchmarkWrapper<WiltMPMCNonBlockRing<BenchmarkOrder>, BenchmarkOrder> wrapper(ring, params);
     
     switch (params.test){
         case TestType::STRESS: stressTest(wrapper, params); break;
