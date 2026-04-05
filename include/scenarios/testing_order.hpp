@@ -60,7 +60,7 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
     const uint32_t SEED = params.seed;
 
     std::queue<BenchmarkOrder> ordersQueue;
-    MarketState marketState;
+    MarketState marketState(SEED);
 
     CollectionOrderGenerator<BenchmarkOrder> collection = initialiseGeneratorsOrder(marketState, SEED);
     CollectionOrderGenerator<BenchmarkOrder> checkGen = initialiseGeneratorsOrder(marketState, SEED);
@@ -137,7 +137,7 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
 
     wrapper.setOrderingVectors(local_timestamps, local_sequences);
     // as order generators are seeded, this will provide the exact same sequence of transactions to compare to
-    MarketState resetMarketstate;
+    MarketState resetMarketstate(SEED);
     CollectionOrderGenerator<BenchmarkOrder> resetGen = initialiseGeneratorsOrder(resetMarketstate, SEED);
 
     wrapper.processOrders(resetGen, resetMarketstate);

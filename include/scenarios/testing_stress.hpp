@@ -51,7 +51,7 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
     constexpr uint32_t WARMUP_ITERS = 5000;
 
     // market state thread
-    MarketState market_state;
+    MarketState market_state(SEED);
 
     // after cache warming, before warmup
     std::barrier warmup_start_barrier(TOTAL_THREADS);

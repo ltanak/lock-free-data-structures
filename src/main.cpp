@@ -53,33 +53,36 @@ int main(int argc, char* argv[]) {
     );
 
     // REGULAR QUEUE BENCHMARKING
-    // RegularQueue<BenchmarkOrder> queue;
-    // BenchmarkWrapper<RegularQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
-
+    RegularQueue<BenchmarkOrder> queue;
+    BenchmarkWrapper<RegularQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
+    std::cout << "REGULARRRRRRRRRRRR" << std::endl;
 
     // MCMPMC
     // MCConcurrentQueue<BenchmarkOrder> queue;
     // BenchmarkWrapper<MCConcurrentQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
-
+    // std::cout << "mpmceeeeeeeeeeee" << std::endl;
 
     // MC Readerwriter
     // MCLockFreeQueue<BenchmarkOrder> queue;
     // BenchmarkWrapper<MCLockFreeQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
+    // std::cout << "Should be the reader writer???" << std::endl;
+    // std::cout << "readerwriterrrrrrrrrrrr" << std::endl;
 
 
     // Wilt Blocking
     // WiltMPMCBlockRing<BenchmarkOrder> ring(ring_capacity);
     // BenchmarkWrapper<WiltMPMCBlockRing<BenchmarkOrder>, BenchmarkOrder> wrapper(ring, params);
-
-
+    // std::cout << "blokdkkskskskks" << std::endl;
+    
     // Wilt Non-blocking
     // WiltMPMCNonBlockRing<BenchmarkOrder> ring(ring_capacity);
     // BenchmarkWrapper<WiltMPMCNonBlockRing<BenchmarkOrder>, BenchmarkOrder> wrapper(ring, params);
-
+    // std::cout << "non blockkkkkkkkkkkkkkk" << std::endl;
     
     // Rigtorp MPMC
-    RigtorpMPMCQueue<BenchmarkOrder> queue(ring_capacity);
-    BenchmarkWrapper<RigtorpMPMCQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
+    // RigtorpMPMCQueue<BenchmarkOrder> queue(ring_capacity);
+    // BenchmarkWrapper<RigtorpMPMCQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
+    // std::cout << "rigyyyyyyyyyyyyyyyyyy" << std::endl;
     
     switch (params.test){
         case TestType::STRESS: stressTest(wrapper, params); break;
