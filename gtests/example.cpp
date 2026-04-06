@@ -448,3 +448,41 @@ TEST(MatchingEngineTest, PriceTickConversion) {
 	double restored1 = engine.ticksToPrice(ticks1);
 	EXPECT_NEAR(restored1, price1, 0.001);
 }
+
+TEST(MatchingEngineTest, DeterministicOutput) {
+	/**
+	 * Runs the same order sequence through two ME instances
+	 * asserts equal outcomes
+	 */
+    auto run = [](int seed_offset) {
+        MatchingEngine<BenchmarkOrder> engine(100.0);
+
+		// 
+        auto sell_1 = std::make_unique<BookOrder>(
+            engine.convertOrder(makeOrder(1, OrderType::SELL, 101.00, 10, 1)));
+        auto sell_2 = std::make_unique<BookOrder>(
+            engine.convertOrder(makeOrder(2, OrderType::SELL, 102.00, 5,  2)));
+        auto buy_1 = std::make_unique<BookOrder>(
+            engine.convertOrder(makeOrder(3, OrderType::BUY,  101.50, 8,  3)));
+        auto buy_2 = std::make_unique<BookOrder>(
+            engine.convertOrder(makeOrder(4, OrderType::BUY,  102.50, 10, 4)));
+        engine.processOrder(sell_1.get());
+        engine.processOrder(sell_2.get());
+        engine.processOrder(buy_1.get());
+        engine.processOrder(buy_2.get());
+
+		// engine updates fields in-place
+        return std::make_tuple(
+            sell_1->quantity, sell_2->quantity,
+            buy_1->quantity, buy_2->quantity
+        );
+    };
+
+    auto result1 = run(0);
+    auto result2 = run(0);
+
+    EXPECT_EQ(std::get<0>(result1), std::get<0>(result2));  // sell1 remaining
+    EXPECT_EQ(std::get<1>(result1), std::get<1>(result2));  // sell2 remaining
+    EXPECT_EQ(std::get<2>(result1), std::get<2>(result2));  // buy1 remaining
+    EXPECT_EQ(std::get<3>(result1), std::get<3>(result2));  // buy2 remaining
+}
