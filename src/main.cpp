@@ -53,9 +53,9 @@ int main(int argc, char* argv[]) {
     );
 
     // REGULAR QUEUE BENCHMARKING
-    RegularQueue<BenchmarkOrder> queue;
-    BenchmarkWrapper<RegularQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
-    std::cout << "REGULARRRRRRRRRRRR" << std::endl;
+    // RegularQueue<BenchmarkOrder> queue;
+    // BenchmarkWrapper<RegularQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
+    // std::cout << "REGULARRRRRRRRRRRR" << std::endl;
 
     // MCMPMC
     // MCConcurrentQueue<BenchmarkOrder> queue;
@@ -80,9 +80,9 @@ int main(int argc, char* argv[]) {
     // std::cout << "non blockkkkkkkkkkkkkkk" << std::endl;
     
     // Rigtorp MPMC
-    // RigtorpMPMCQueue<BenchmarkOrder> queue(ring_capacity);
-    // BenchmarkWrapper<RigtorpMPMCQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
-    // std::cout << "rigyyyyyyyyyyyyyyyyyy" << std::endl;
+    RigtorpMPMCQueue<BenchmarkOrder> queue(ring_capacity);
+    BenchmarkWrapper<RigtorpMPMCQueue<BenchmarkOrder>, BenchmarkOrder> wrapper(queue, params);
+    std::cout << "rigyyyyyyyyyyyyyyyyyy" << std::endl;
     
     switch (params.test){
         case TestType::STRESS: stressTest(wrapper, params); break;
