@@ -36,13 +36,6 @@ bool MCConcurrentQueue<TOrder>::getFront(TOrder &order){
     // there isn't an implementation for peek, it does it through deque
     NOT_IMPLEMENTED
     return false;
-    // TOrder order;
-    // bool success = mcMPMCQueue_.try_dequeue(order);
-    // if (!success){
-    //     // error message here
-    // }
-    // size_--;
-    // return order;
 }
 
 template<typename TOrder>

@@ -1,6 +1,6 @@
-#include "hardware_logging/hardware_metrics.hpp"
-
 #include <cstdint>
+
+#include "hardware_logging/hardware_metrics.hpp"
 
 double HardwareMetrics::ipc() const {
     return (cycles > 0) ? static_cast<double>(instructions) / cycles : 0.0;

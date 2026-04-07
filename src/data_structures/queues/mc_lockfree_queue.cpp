@@ -17,7 +17,6 @@ bool MCLockFreeQueue<TOrder>::enqueueOrder(TOrder &order){
 template<typename TOrder>
 bool MCLockFreeQueue<TOrder>::dequeueOrder(TOrder &order){
     if (!mcQueue_.try_dequeue(order)){
-        // will do a terminal logging error saying not possible
         return false;
     } else {
         return true;
