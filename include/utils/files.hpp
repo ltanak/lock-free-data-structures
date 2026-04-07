@@ -1,5 +1,4 @@
 #pragma once
-
 #include <filesystem>
 #include <fstream>
 #include <vector>
@@ -8,6 +7,7 @@
 #include "exchange/book_order.hpp"
 #include "exchange/trades_cycle.hpp"
 #include "hardware_logging/hardware_metrics.hpp"
+
 using namespace std;
 
 /**

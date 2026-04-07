@@ -17,28 +17,35 @@
  *
  */
 struct PriceBook {
+    // consts
     static constexpr int NUM_LEVELS = 8192;
     static constexpr int BITMAP_WORDS = (NUM_LEVELS + 63) / 64;
 
+    // base pricing information
     uint32_t base_price_ticks;    // lowest supported price
     uint32_t centre_price_ticks;  // use market state information
 
+    // pricelevel attributes
     PriceLevel levels[NUM_LEVELS]; // the number of pricelevels
     uint64_t bitmap[BITMAP_WORDS]; // each bit corresponds to a PriceLevel to see if it is active or not
-    uint8_t side; // buy or sell
 
+    // buy or sell book
+    uint8_t side;
+
+    // configuration functions
     auto initialise(uint32_t centre) -> void;
     auto recentre(uint32_t centre) -> void;
     auto shift(uint32_t new_ticks) -> void;
 
+    // conversion functions
     auto priceToIndex(uint32_t price) -> int;
 
-    // functions are O(1)
+    // order functions (all O(1))
     auto addOrder(BookOrder*) -> void;
     auto removeOrder(BookOrder*) -> void;
     auto setBit(int index) -> void;
     auto clearBit(int index) -> void;
 
-    // amortised O(1) checking
+    // bestpricelevel function, amortised O(1) checking 
     auto bestPriceLevel() const -> int;
 };

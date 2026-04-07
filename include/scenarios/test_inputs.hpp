@@ -3,17 +3,16 @@
 #include <iostream>
 #include <sstream>
 
-// If we want to add different tests in the future
+// TO EDIT - If implementing different test types in the future
 enum class TestType {
     STRESS,
     ORDER
 };
 
 /**
- * TestParams
+ * @struct TestParams
  * the input parameters from the ./run.sh script
  */
-
 struct TestParams {
     TestType test;
     uint64_t thread_count;

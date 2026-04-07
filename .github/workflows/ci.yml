@@ -1,4 +1,4 @@
-name: Project Unit Tests
+name: Project Unit, Integration & Component Tests
 
 on:
   push:

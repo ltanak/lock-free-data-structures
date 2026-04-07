@@ -5,6 +5,11 @@
 #include <random>
 #include <optional>
 
+/**
+ * @class MomentumGenerator
+ * @tparam TOrder
+ * @brief Buys continually on upticks, sells continuously on downticks
+ */
 template<typename TOrder>
 class MomentumGenerator : public IOrderGenerator<TOrder, MomentumGenerator<TOrder>> {
 public:

@@ -1,10 +1,16 @@
 #pragma once
-#include "i_order_generator.hpp"
-#include "market_state.hpp"
-#include "benchmark_order.hpp"
 #include <random>
 #include <optional>
 
+#include "i_order_generator.hpp"
+#include "market_state.hpp"
+#include "benchmark_order.hpp"
+
+/**
+ * @class MeanRevertGenerator
+ * @tparam TOrder
+ * @brief Sells when significantly above mean, buys when significantly below
+ */
 template<typename TOrder>
 class MeanRevertGenerator : public IOrderGenerator<TOrder, MeanRevertGenerator<TOrder>> {
 public:

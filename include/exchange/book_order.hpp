@@ -12,12 +12,13 @@
  */
 
 struct BookOrder {
-    uint32_t order_id;
-    uint32_t price_ticks;
-    uint32_t quantity;
-    uint8_t side;
+  // order attributes
+  uint32_t order_id;
+  uint32_t price_ticks;
+  uint32_t quantity;
+  uint8_t side;
 
-    // pointers to adjacent orders
-    BookOrder* prev;
-    BookOrder* next;
+  // pointers to adjacent orders
+  BookOrder* prev;
+  BookOrder* next;
 };

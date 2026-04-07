@@ -4,6 +4,9 @@
 #include <thread>
 #include <chrono>
 
+/**
+ * @brief RDTSC_LFENCE functions for ARM & x86
+ */
 namespace ltime {
 #ifdef __ARM_ARCH_ISA_A64
     inline auto rdtsc_lfence() -> uint64_t {

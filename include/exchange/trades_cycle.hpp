@@ -13,7 +13,6 @@ struct TradesCycle {
     int cycle; 
 
     // vectors of prices and their quantaties when matched
-    // per-cycle can have multiple trades matched
     std::vector<double> prices;
     std::vector<uint32_t> quantities;
 };

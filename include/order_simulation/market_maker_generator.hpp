@@ -1,11 +1,16 @@
 #pragma once
+#include <random>
+#include <optional>
 
 #include "i_order_generator.hpp"
 #include "market_state.hpp"
 #include "benchmark_order.hpp"
-#include <random>
-#include <optional>
 
+/**
+ * @class MarketMakerGenerator
+ * @tparam TOrder
+ * @brief Tight-spread order placing for market-making simulation
+ */
 template<typename TOrder>
 class MarketMakerGenerator : public IOrderGenerator<TOrder, MarketMakerGenerator<TOrder>> {
 
@@ -18,6 +23,8 @@ private:
     MarketState *market_state_;
 
     std::mt19937 rng_;
+
+    // pre-set distributions
     std::uniform_real_distribution<double> spread_frac_{0.3, 1.2}; // fraction of market spread
     std::uniform_int_distribution<uint32_t> qty_dist_{5, 50};
     std::uniform_int_distribution<int> side_dist_{0, 1};

@@ -7,7 +7,6 @@
  * @tparam TOrder the type of the order being pushed to the ring buffer
  * Each derived class implements this interface
  */
-
 template<typename TOrder, typename RingImpl>
 class IRing {
 public:

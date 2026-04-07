@@ -1,4 +1,13 @@
 #!/bin/bash
+: '
+Simple script to paste in run IDs and to automatically generate the benchmarking report
+for each one individually.
+- run_ids: list of all run IDs to create reports for
+'
+
+echo "=========================================="
+echo "Creating all Benchmarking Reports"
+echo "=========================================="
 
 run_ids=(
     247032233224988
@@ -45,8 +54,10 @@ run_ids=(
 )
 
 for id in "${run_ids[@]}"; do
-  echo "Running report for run-id: $id"
+  echo "Creating report for run ID: $id"
   pixi run report --run-id="$id"
 done
 
-echo "Finished benchmarking!"
+echo "=========================================="
+echo "Finished Creating Reports!"
+echo "=========================================="

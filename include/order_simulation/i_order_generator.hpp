@@ -1,6 +1,7 @@
 #pragma once
 
 /**
+ * @class IOrderGenerator
  * @brief Interface for generating orders
  * @tparam TOrder The type of order to generate
  * @return TOrder The generated order

@@ -11,7 +11,6 @@
 template <typename TOrder, typename QueueImpl>
 class IQueue {
     public:
-        // we pass by reference so that we can point to the value that has been dequeued
         auto enqueue(TOrder &order) -> bool {
             return static_cast<QueueImpl*>(this)->enqueueOrder(order);
         }

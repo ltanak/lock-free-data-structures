@@ -3,6 +3,11 @@
 #include "data_structures/ring_buffers/i_ring_buffer.hpp"
 #include "data_structures/ring_buffers/ring.h"
 
+/**
+ * @class WiltMPMCBlockRing
+ * @brief multi-producer, multi-consumer blocking ring buffer.
+ * @tparam TOrder Type of orders stored in the queue
+ */
 template <typename TOrder>
 class WiltMPMCBlockRing : public IRing<TOrder, WiltMPMCBlockRing<TOrder>> {
 
@@ -13,6 +18,7 @@ public:
     auto getSize() -> uint64_t;
     auto isEmpty() -> bool;
     auto getFront(TOrder &order) -> bool;
+    
 private:
     wilt::Ring<TOrder> wilt_ring_buffer_;
 };
