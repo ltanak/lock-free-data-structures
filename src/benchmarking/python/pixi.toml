@@ -15,3 +15,4 @@ pillow = "*"
 main = { cmd = ["python", "-m", "scripts.main"] }
 image = { cmd = ["python", "-m", "image_editing.image"] }
 report = { cmd = ["python", "-m", "scripts.main", "--report", "--all"] }
+compare = { cmd = ["python", "-m", "image_editing.compare_runs"] }

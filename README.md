@@ -1,10 +1,74 @@
 # Evaluating the performance of lock-free data structures under realistic exchange workloads
-Louis Tanak, University of Warwick Third Year Computer Science Project
+Louis Tanak, University of Warwick Third Year Computer Science Project 2026.
 
 ## Abstract
-Lock-free data structures allow multiple threads to operate safely on shared data without using locks. These have many real-word use cases in high-performance computing, low-latency systems and financial exchanges. Research has been conducted on their theoretical properties, however there is a gap in understanding how lock-free data structures perform under realistic workloads, such as trading exchange-like patterns. 
+Lock-free data structures are concurrent data structures that allow multiple threads to operate without the use of locks for synchronisation. They utilise atomic hardware instructions such as compare-and-swap (\acrshort{CAS}) or fetch-and-add (\acrshort{FAA}) to guarantee that at least one thread makes progress in a finite number of steps. Due to their ability to reduce contention and improve scalability, lock-free data structures have various applications primarily in high-performance systems such as web servers, physics engines and high-frequency trading systems. 
 
-The work aims to implement various lock-free data structures and evaluate their performance against each other and traditional lock-based solutions. The data structures will be benchmarked against simulated exchange traffic to measure throughput, latency, scalability and completion ordering. Results will provide insights into the benefits, drawbacks and the suitable conditions for each data structure.
+Modern research covers different implementations of various lock-free data structures, to improve their latency and scalability with increasing thread counts. However, there currently lacks standardised frameworks to empirically evaluate lock-free data structures. Further to this, studies primarily focus on throughput and latency under synthetic workloads, whilst little work investigates order-preservation properties and their effects on downstream systems. These are critical properties in applications such as financial exchanges, where fairness and correctness depend on ordering guarantees.
+
+This project evaluates the performance of lock-free data structures under realistic exchange workloads. We present a low-latency benchmarking framework, which provides concurrent measurement of latencies, order-preservation and implements a price-time priority matching engine to assess the downstream effects of ordering anomalies. Using the framework, we present a performance analysis of various lock-free data structure implementations and their characteristics. We conclude that the framework can effectively evaluate performance and ordering properties, providing a reusable suite for evaluating lock-free data structures.
+
+## Supervisor Running Instructions
+This section is a quickstart intended for the project supervisor. It walks through running any one of the six lock-free data-structure implementations out of the box and viewing the generated report.
+
+### 1. Compile the project
+From the repository root, run:
+```bash
+./compile.sh
+```
+
+### 2. Select the data structure to evaluate
+Open `src/main.cpp`. Near the top of `main()` you will find six clearly-labelled blocks under the **DATA STRUCTURE SELECTION** banner:
+
+1. `RegularQueue` - lock-based baseline
+2. `MCConcurrentQueue` - moodycamel ConcurrentQueue (MPMC)
+3. `MCLockFreeQueue` - moodycamel ReaderWriterQueue (SPSC only)
+4. `WiltMPMCBlockRing` - Wilt MPMC blocking ring buffer
+5. `WiltMPMCNonBlockRing` - Wilt MPMC non-blocking ring buffer
+6. `RigtorpMPMCQueue` - Rigtorp MPMC queue *(active by default)*
+
+Uncomment **exactly one** block and comment out the others, then re-run `./compile.sh`.
+
+By default, `RigtorpMPMCQueue` is uncommented.
+
+### 3. Run the benchmark
+The recommended testing scenario runs both the stress and order scenarios under the same run ID:
+```bash
+./run.sh --all 4 1000
+```
+The arguments are:
+- `4` - number of producer/consumer threads (use `1` for SPSC-only structures such as the moodycamel ReaderWriterQueue)
+- `1000` - total orders driven through the system
+
+The script prints a run ID of the form `XXXXXXXXXX` at the start and end of the run. **Copy this run ID**, as it is needed for the report step.
+
+### 4. Generate the HTML report
+Switch into the Python benchmarking directory and generate the report for the run ID from step 3:
+```bash
+cd src/benchmarking/python
+pixi run report --run-id=XXXXXXXXXX
+```
+(Replace `XXXXXXXXXX` with the actual ID printed by `run.sh`.)
+
+The first invocation of `pixi run` will download the Python environment, with subsequent calls being faster once the environment is resolved.
+
+### 5. View the report
+The generated HTML report is written to:
+```
+results/reports/report_<run_id>.html
+```
+Open this file in any browser. It contains latency plots, ordering summaries, exchange-matching results and hardware counter data for the selected data structure.
+
+### Full supervisor walkthrough (copy-paste)
+```bash
+./compile.sh
+# edit src/main.cpp, uncomment the desired data structure, re-run compile.sh
+./run.sh --all 4 1000
+# note the run ID printed by run.sh
+cd src/benchmarking/python
+pixi run report --run-id=<RUN_ID>
+# open results/reports/report_<RUN_ID>.html in a browser
+```
 
 ## Adding your own Lock-free Data Structure
 To begin benchmarking your lock-free data structure, perform the following:
@@ -156,5 +220,11 @@ If you want direct plots instead of the report:
 - Or: `pixi run -- python -m scripts.main --latencies --ordering --exchange`
 
 If you would prefer to look at the code, please see: `pixi.toml` and `main.py` (both are unique names in this codebase!)
+
+### Cross-run latency comparison
+To overlay latency graphs from multiple runs onto a single image (useful for comparing different data structures), see `src/benchmarking/python/image_editing/compare_runs.py` or run:
+- `pixi run compare --run-ids 1234567 7654321 1122334`
+
+Output images are saved into `src/benchmarking/python/image_editing/`.
 
 Note: The plotting code is actively evolving. The report mode is the most stable path for benchmarking.

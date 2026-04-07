@@ -58,7 +58,6 @@ bool BenchmarkWrapper<DataStructure, TOrder>::dequeueLatency(TOrder &o, int thre
 
 template<typename DataStructure, typename TOrder>
 bool BenchmarkWrapper<DataStructure, TOrder>::dequeueOrdering(TOrder &o, int threadId) {
-    // maybe add logic for if transaction wasn't successful
     bool dequeued = structure_.dequeue(o);
     return dequeued;
 }
