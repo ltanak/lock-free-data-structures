@@ -388,6 +388,8 @@ TEST(MatchingEngineTest, BuyTakesSellAtMultipleLevels) {
 	EXPECT_EQ(buy->quantity, 0u);
 }
 
+// Matching Engine tests
+
 TEST(MatchingEngineTest, SelfTradePreventionSameBuyLevel) {
 	MatchingEngine<BenchmarkOrder> engine(100.0);
 	
@@ -457,7 +459,6 @@ TEST(MatchingEngineTest, DeterministicOutput) {
     auto run = [](int seed_offset) {
         MatchingEngine<BenchmarkOrder> engine(100.0);
 
-		// 
         auto sell_1 = std::make_unique<BookOrder>(
             engine.convertOrder(makeOrder(1, OrderType::SELL, 101.00, 10, 1)));
         auto sell_2 = std::make_unique<BookOrder>(
