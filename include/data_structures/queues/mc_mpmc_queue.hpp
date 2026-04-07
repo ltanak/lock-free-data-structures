@@ -5,8 +5,7 @@
 
 /**
  * @class MCConcurrentQueue
- * @brief multi-producer, multi-consumer lock-free queue from moodycamel.
- *
+ * @brief multi-producer, multi-consumer lock-free queue from moodycamel
  * @tparam TOrder Type of orders stored in the queue
  */
 template <typename TOrder>

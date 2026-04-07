@@ -12,11 +12,13 @@
  * MEDIUM = ~0.03 - 0.08% per tick  (active trading)
  * HIGH   = ~0.08 - 0.20% per tick  (event-driven / crisis)
  */
-
 enum class Volatility {
     LOW, MEDIUM, HIGH
 };
 
+/**
+ * Different types of market events implemented
+ */
 enum class MarketEvent {
     BASE,
     UP_TREND,
@@ -26,6 +28,9 @@ enum class MarketEvent {
     SURGE
 };
 
+/**
+ * Parameter struct for setting market events
+ */
 struct EventParams {
     Volatility volatility;
     double bias;
@@ -37,16 +42,15 @@ struct EventParams {
 /**
  * @class MarketState
  * @brief simulated market microstructure with event-driven volatility regimes
- *
  * maintains synthetic market state (price, volatility, bias) that drives order
  * generation patterns in benchmarks
  * supports multiple volatility regimes
- *
  */
 class MarketState {
 public:
     explicit MarketState(std::optional<uint32_t> seed = std::nullopt);
     
+    // getter methods
     double getPrice() const noexcept;
     double getVolatility() const noexcept;
     double getBias() const noexcept;
@@ -63,6 +67,7 @@ public:
     const EventParams& getEventParams(MarketEvent evt) const noexcept;
 
 private:
+    // base matrics
     std::atomic<double> base_price_{100.0};
     std::atomic<double> volatility_{0.005}; // ~0.5% per tick default
     std::atomic<double> bias_{0.50}; // 0.5 = balanced; >0.5 favors buys, <0.5 favors sells
@@ -71,6 +76,7 @@ private:
     std::atomic<Volatility> curr_volatility_{Volatility::LOW};
     std::atomic<MarketEvent> event_{MarketEvent::BASE};
 
+    // constexpr lookup table for different events
     static constexpr std::array<std::pair<MarketEvent, EventParams>, 6> event_params{
         // ------------------------------------------- volatility -------- bias - drift - spread - duration
         std::pair{MarketEvent::BASE,       EventParams{Volatility::LOW,    0.50,  0.000,  0.05,    0}},
@@ -79,7 +85,6 @@ private:
         std::pair{MarketEvent::SURGE,      EventParams{Volatility::MEDIUM, 0.72,  0.060,  0.08,  300}},
         std::pair{MarketEvent::PULL_BACK,  EventParams{Volatility::MEDIUM, 0.28, -0.060,  0.08,  300}},
         std::pair{MarketEvent::CRASH,      EventParams{Volatility::HIGH,   0.15, -0.120,  0.20,  200}},
-        // IMPORTANT - Need to reason behind values - show research for this
     };
     
     // state for event generation
@@ -88,10 +93,6 @@ private:
     uint64_t last_event_cycle_{0};
     std::atomic<uint64_t> event_duration_{0};
     std::atomic<uint64_t> event_end_{0};
-    // starts running
-    // once we are past the current count we load an event
-    // we mark the event duration
-    // once we go past the event duration we reset back to base
     
     // volatility distributions (values in basis points, divided by 10000 to get fraction)
     std::uniform_int_distribution<int> low_vol_dist_{30, 80};    // 0.30 - 0.80% per tick

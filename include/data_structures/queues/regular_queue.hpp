@@ -7,6 +7,11 @@
 #include <optional>
 #include "data_structures/queues/i_queue.hpp"
 
+/**
+ * @class RegularQueue
+ * @brief OS-locking implementation of the regular std::queue
+ * @tparam TOrder Type of orders stored in the queue
+ */
 template <typename TOrder>
 class RegularQueue : public IQueue<TOrder, RegularQueue<TOrder>> {
 

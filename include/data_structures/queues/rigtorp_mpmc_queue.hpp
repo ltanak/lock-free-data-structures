@@ -5,8 +5,7 @@
 
 /**
  * @class Rigtorp MPMC queue
- * @brief multi-producer, multi-consumer lock-free queue from rigtorp.
- *
+ * @brief multi-producer, multi-consumer lock-free queue from rigtorp
  * @tparam TOrder Type of orders stored in the queue
  */
 template <typename TOrder>

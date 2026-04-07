@@ -20,7 +20,6 @@ enum class OrderType {
  * The struct that is enqueued and dequeued from the data structures
  * @note need to evaluate the effect of alignas on the struct
  */
-
 struct alignas(64) BenchmarkOrder {
     uint64_t order_id; // 64 bits = 8 bytes (offset starts at 0)
     OrderType type; // int = 4 bytes (starts at 8)

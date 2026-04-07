@@ -68,6 +68,7 @@ public:
     auto dequeueLatency(TOrder &o, int threadId) -> bool;
     auto dequeueOrdering(TOrder &o, int threadId) -> bool;
 
+    // updating internal vectors with results from per-thread buffers
     auto setLatencyVectors(const std::vector<uint64_t> &enqueue, const std::vector<uint64_t> &dequeue) -> void;
     auto setOrderingVectors(const std::vector<uint64_t> &timestamps, const std::vector<uint64_t> &sequence) -> void;
 

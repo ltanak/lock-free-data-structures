@@ -1,5 +1,4 @@
 #pragma once
-
 #include <iostream>
 #include <vector>
 #include <algorithm>
@@ -9,6 +8,8 @@
 #include <thread>
 #include <memory>
 #include <barrier>
+
+// Order generation includes
 #include "order_simulation/benchmark_order.hpp"
 #include "order_simulation/random_order_generator.hpp"
 #include "order_simulation/market_maker_generator.hpp"
@@ -30,7 +31,6 @@
  * Adds sequenced orders to a data structure from a single producer
  * Multiple consumers will then deque orders from the data structure
  */
-
 auto initialiseGeneratorsOrder(MarketState &market, const uint32_t SEED) -> CollectionOrderGenerator<BenchmarkOrder> {
     auto random1 = std::make_shared<RandomOrderGenerator<BenchmarkOrder>>(market, 20, SEED);
     auto random2 = std::make_shared<RandomOrderGenerator<BenchmarkOrder>>(market, 80, SEED + 1);
@@ -67,6 +67,7 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
 
     std::barrier benchmark_barrier(CONSUMERS);
 
+    // per-thread buffers
     std::vector<llogs::OrderingStore> thread_ordering(CONSUMERS);
     for (auto &t_o: thread_ordering){
         t_o.sequence_buffers = std::make_unique<uint64_t[]>(THREAD_LIMIT);
@@ -143,5 +144,4 @@ void orderTest(Wrapper &wrapper, TestParams &params) {
     wrapper.processOrders(resetGen, resetMarketstate);
     wrapper.processHardwareCounters();
     std::cout << "Ordering test completed with " << CONSUMERS << " consumers.\n";
-
 }

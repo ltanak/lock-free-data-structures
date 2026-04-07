@@ -8,6 +8,10 @@
 
 #include "hardware_logging/hardware_metrics.hpp"
 
+/**
+ * @class HardwareLogger
+ * @brief Collects all hardware metrics logged
+ */
 class HardwareLogger {
 
 public:
@@ -15,8 +19,12 @@ public:
 
     // register thread's values
     auto registerThreadMetrics(int tid, const HardwareMetrics &metrics) -> void;
+
+    // get hardware metrics collected - either in one struct or vector of multiple structs
     auto getMetrics() -> HardwareMetrics;
     auto getListMetrics() -> std::vector<HardwareMetrics>;
+
+    // helper methods
     auto clear() -> void;
 
 private:

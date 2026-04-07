@@ -25,6 +25,7 @@ struct MatchingEngine {
     PriceBook buy_book;
     PriceBook sell_book;
 
+    // ticks / pricing
     double tick_size = 0.01; // for prices such as 123.45
     uint32_t price_scale = 100;
 
@@ -34,10 +35,11 @@ struct MatchingEngine {
     // constructor for matchingengine
     explicit MatchingEngine(double);
 
+    // order processing functions
     auto processOrder(BookOrder*) -> TradesCycle;
     auto convertOrder(const TOrder&) -> BookOrder;
 
-    // conversion functions
+    // price conversion functions
     auto priceToTicks(double) -> uint32_t;
     auto ticksToPrice(uint32_t) -> double;
 

@@ -32,10 +32,8 @@
  * Multiple threads will be generating orders and pushing them to the data structure
  * Each producer thread will have its own order generation model
  * Multiple consumer threads will be dequeuing from the data structure at the same time
- * 
  * @note For SPSC data structures, inputs will be 1 producer, 1 consumer thread
  */
-
 template <typename Wrapper>
 void stressTest(Wrapper &wrapper, TestParams &params) {
 
@@ -182,6 +180,7 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
 
     wrapper.aggregateHardwareMetrics(TOTAL_THREADS);
 
+    // combines results for wrapper to store
     std::vector<uint64_t> local_enqueues;
     std::vector<uint64_t> local_dequeues;
     local_enqueues.reserve(PRODUCERS * THREAD_LIMIT);
@@ -196,9 +195,9 @@ void stressTest(Wrapper &wrapper, TestParams &params) {
         auto &t_l = thread_latencies[PRODUCERS + i];
         std::copy(t_l.dequeue_buffers.get(), t_l.dequeue_buffers.get() + THREAD_LIMIT, std::back_inserter(local_dequeues));
     }
-
     wrapper.setLatencyVectors(local_enqueues, local_dequeues);
     
+    // post-processing pipeline
     wrapper.processLatencies();
     wrapper.processHardwareCounters();
 }

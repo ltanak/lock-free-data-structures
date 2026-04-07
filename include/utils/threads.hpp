@@ -6,6 +6,9 @@
 #include <pthread.h>
 #include <sched.h>
 
+/**
+ * louis-thread functions, primarily for thread collection and CPU-pinning
+ */
 namespace lThread {
     using namespace std;
 

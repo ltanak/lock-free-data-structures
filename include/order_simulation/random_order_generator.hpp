@@ -1,5 +1,4 @@
 #pragma once
-
 #include <random>
 #include <optional>
 #include <sstream>
@@ -8,16 +7,17 @@
 #include "market_state.hpp"
 
 /**
- * RandomOrderGenerator class
- * Uses seed to pseudorandomly generate orders
+ * @class RandomOrderGenerator
+ * @tparam TOrder
+ * @brief generates a random order based on the market state
  */
-
 template <typename TOrder>
 class RandomOrderGenerator : public IOrderGenerator<TOrder, RandomOrderGenerator<TOrder>> {
     
 public:
     RandomOrderGenerator(MarketState &market, uint32_t maxQuantity, std::optional<uint32_t> seed = std::nullopt);
     TOrder generateOrder();
+
 private:
     uint32_t maxQuantity_;
     uint64_t orderId_ = 0;

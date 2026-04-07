@@ -49,7 +49,7 @@ results/stress_testing/**/*.csv
 results/stress_testing/**/*.png
 results/order_testing/**/*.csv
 results/order_testing/**/*.png
-results/reports/**/*.html
+
 src/benchmarking/python/.pixi
 src/benchmarking/reports/
 demos/

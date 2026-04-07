@@ -1,7 +1,4 @@
 #pragma once
-
-#include "hardware_logging/hardware_metrics.hpp"
-
 #include <cstdint>
 #include <atomic>
 #include <memory>
@@ -9,17 +6,25 @@
 #include <array>
 #include <mutex>
 
+#include "hardware_logging/hardware_metrics.hpp"
+
+/**
+ * @class ThreadHardwareCounter
+ * @brief Per-thread hardware counter class, storing local HardwareMetrics struct
+ */
 class ThreadHardwareCounter {
 
 public: 
     ThreadHardwareCounter();
     ~ThreadHardwareCounter();
 
-    bool setup(); // the setup for perf required
+    // initialisation / helper methods
+    bool setup();
     void start();
     void stop();
     void clear();
 
+    // returns the collected metrics
     HardwareMetrics snapshot();
 
 private:

@@ -5,8 +5,7 @@
 
 /**
  * @class MCLockFreeQueue
- * @brief single-consumer lock-free queue based on moodycamel's ReaderWriterQueue.
- *
+ * @brief single-consumer lock-free queue based on moodycamel's ReaderWriterQueue
  * @tparam TOrder Type of orders stored in the queue
  */
 template <typename TOrder>
