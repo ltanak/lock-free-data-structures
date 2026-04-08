@@ -35,7 +35,5 @@ external/**     linguist-vendored=true
 # don't count documentation
 *.md     linguist-documentation=true
 *.rst    linguist-documentation=true
-reports/**  linguist-documentation=true
+results/reports/** linguist-documentation=true
 markdowns/** linguist-documentation=true
-
-results/reports/** linguist-documentation
