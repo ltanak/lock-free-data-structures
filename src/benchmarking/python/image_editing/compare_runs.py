@@ -86,7 +86,6 @@ class RunComparator:
         plt.close(fig)
         return out
 
-    # ------------------------------------------------------------ Histogram
     def plot_histogram(self, bins: int = 120) -> Path:
         fig, ax = plt.subplots(figsize=(9, 5))
 
@@ -125,7 +124,6 @@ class RunComparator:
         plt.close(fig)
         return out
 
-    # ----------------------------------------------------------- Percentiles
     def plot_percentiles(self) -> Path:
         percentiles = [50, 75, 90, 95, 99, 99.5, 99.9]
         labels_x = [f"P{p}" for p in percentiles]
@@ -151,7 +149,6 @@ class RunComparator:
         plt.close(fig)
         return out
 
-    # ------------------------------------------------------------ Plot-all
     def plot_all(self) -> list[Path]:
         outputs = [
             self.plot_cdf(),
