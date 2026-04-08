@@ -38,4 +38,4 @@ external/**     linguist-vendored=true
 reports/**  linguist-documentation=true
 markdowns/** linguist-documentation=true
 
-reports/**/*.html linguist-documentation
+results/reports/** linguist-documentation
