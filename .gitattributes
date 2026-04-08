@@ -37,3 +37,5 @@ external/**     linguist-vendored=true
 *.rst    linguist-documentation=true
 reports/**  linguist-documentation=true
 markdowns/** linguist-documentation=true
+
+reports/**/*.html linguist-documentation
